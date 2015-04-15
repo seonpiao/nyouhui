@@ -1,0 +1,36 @@
+{
+  "name": "carrier",
+  "version": "0.0.1",
+  "dependencies": {
+    "async": "0.7.0",
+    "co": "3.1.0",
+    "jade": "1.3.1",
+    "koa": "^0.18.1",
+    "koa-body": "^1.2.0",
+    "koa-routing": "^1.3.0",
+    "koa-views": "2.0.3",
+    "log4js": "0.6.13",
+    "request": "2.54.0",
+    "thunkify": "2.1.2",
+    "underscore": "1.7.0",
+    "node-datapool": "*"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.3",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-stylus": "~0.4.1",
+    "grunt-contrib-uglify": "~0.9.0",
+    "grunt-contrib-copy": "~0.8.0",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-requirejs": "*",
+    "grunt-contrib-watch": "~0.3.1",
+    "private-grunt-jade-runtime": "*",
+    "grunt-carrier-helper": "*",
+    "grunt-filerev": "",
+    "grunt-string-replace": "",
+    "load-grunt-tasks": "~0.3.0"
+  },
+  "description": "wanleyun.com",
+  "main": "index.js",
+  "author": "piaoshihuang@wanleyun.com"
+}

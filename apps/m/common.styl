@@ -1,0 +1,2393 @@
+/********* variables *********/
+//colors
+$grayLight = #ccc
+$grayLighter = #f1f1f1
+$themeColor = darken(rgb(30,164,207),5%)
+$secondColor = #ff5a00
+$thirdColor = darken(rgb(30,164,207),5%)
+$highlightColor = lighten($thirdColor,70%)
+
+$themeBackground = rgb(0,12,36)
+$bodyBackground = #eee
+
+$dividingColor = #f9f9f9
+$dividingLineColor = #aaa
+
+$textColor = #fff
+$infoTextColor = #bbb
+$summaryColor = #8f8f8f
+$rateColor = #F1AE00
+$norateColor = gray
+
+$linkColor = $textColor
+$linkColorHover = $thirdColor
+
+$placeholderColor = #ddd
+
+$baseSpacing = 20px
+$baseWidth = 980px
+
+// fonts
+$fontFamily = Microsoft Yahei,Hiragino Sans GB,WenQuanYi Micro Hei,sans-serif
+$numFontFamily = Arial, sans-serif
+$baseFontSize = 12px
+
+// parag
+$baseLineHeight = 16px
+$higherLineHeight = 24px
+
+// Forms
+$inputBackground = white
+$inputBorder = #ccc
+$inputBorderRadius = 3px
+$inputDisabledBackground = #ccc
+
+// Dropdowns
+$dropdownBackground = $btnPrimaryBackground
+
+// Z-index
+$zindexDropdown = 20
+$zindexFloat = 30
+
+// Form states and alerts
+$warningText = #c09853
+$warningBackground = #fcf8e3
+$warningBorder = darken($warningBackground, 5%)
+
+$errorText = #b94a48
+$errorBackground = #f2dede
+$errorBorder = darken($errorBackground, 5%)
+
+$successText = #468847
+$successBackground = #dff0d8
+$successBorder = darken($successBackground, 5%)
+
+$infoText = #3a87ad
+$infoBackground = #d9edf7
+$infoBorder = darken($infoBackground, 5%)
+
+$bgUrl='http://static.mm.wanleyun.com/orig/images/'
+
+$itemLevel0=#a2a2a2
+$itemLevel1=#fff
+$itemLevel2=#00fe9b
+$itemLevel3=#21c1e5
+$itemLevel4=#d87dfd
+$itemLevel5=#ff7301
+
+/********* mixins *********/
+
+text-overflow()
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+border-radius($n)
+  -webkit-border-radius: $n
+  -moz-border-radius: $n
+  border-radius: $n
+
+transition($val)
+  -webkit-transition: $val
+  -moz-transition: $val
+  -o-transition: $val
+
+text-shadow($shadow)
+  -webkit-text-shadow: $shadow
+  -moz-text-shadow: $shadow
+  text-shadow: $shadow
+
+box-shadow($shadow)
+  -webkit-box-shadow: $shadow
+  -moz-box-shadow: $shadow
+  box-shadow: $shadow
+
+animation(value)
+  -moz-animation: value
+  -o-animation: value
+  -webkit-animation: value
+  animation: value
+
+animation-delay(value)
+  -moz-animation-delay: value
+  -o-animation-delay: value
+  -webkit-animation-delay: value
+  animation-delay: value
+
+transform(value)
+  -moz-transform: value
+  -o-transform: value
+  -webkit-transform: value
+  transform: value
+
+transform-style(value)
+  -moz-transform-style: value
+  -o-transform-style: value
+  -webkit-transform-style: value
+  transform-style: value
+
+clear-fix()
+  content:' '
+  height:0
+  overflow:hidden
+  display:block
+  clear:both
+
+@keyframes move
+  0%
+    transform(scale(1.2))
+    opacity: 1
+  100%
+    transform(scale(0.7))
+    opacity: 0.1
+
+/********* reset *********/
+
+body
+  font-family:$fontFamily
+  //letter-spacing:1px
+  -webkit-font-smoothing:antialiased
+  //background:#979797
+body,dl,dd,dt,ul,ol,h1,h2,h3,h4,h5,h6,input,p
+  margin:0
+  padding:0
+ul
+  list-style:none
+li
+  list-style:none
+input[type="submit"]
+  border:0
+  outline:0
+i,em
+  font-style:nomal
+button
+  border:none
+
+/********* base *********/
+
+*
+  font-family:"微软雅黑"
+html
+  color: #595959
+  background: #f5f5f5
+  font-size: 12px
+  font-family: "微软雅黑",'microsoft yahei',Arial,sans-serif
+img
+  border:none
+a
+  color:$linkColor
+  text-decoration:none
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+  &:focus
+    outline: 0 none
+    color:$linkColorHover
+  &:hover
+    outline: 0
+    color:$linkColorHover
+.clearfix:after,.cl:after
+  content:'.'
+  height:0
+  overflow:hidden
+  display:block
+  clear:both
+
+a.grayA
+  color:#808080
+  font-family: "微软雅黑"
+a.grayA:hover
+  color:#808080
+a.grayA:active
+  color:#808080
+a.grayA:visited
+  color:#808080
+.tal
+  text-align: left
+.tar
+  text-align: right
+.tc
+  text-align:center
+.tl
+  text-align:left
+.gr
+  text-align:right
+.redText
+  color: #f00
+.grayText
+  color:#595959
+.grayText2
+  color:#cdc7c3
+.blueText
+  color: #2ec1e5
+.pinkText
+  color: #ffa0c4
+.greenText
+  color: #00fe9b
+.purpleText
+  color: #00fe9b
+.yellowText
+  color: #fdf5a2
+.whiteText
+  color: #fff
+.orangeText
+  color: #f7aa25
+.goldText
+  color: #f9f03a
+.roseText
+  color: #b45dd8
+.uactive
+  color:#e73378
+.uname
+  color:#7bede8
+.mcname
+  color:#f9f03a
+.taskname
+  color:#f9f03a
+.rename
+  color:#ff7301
+.noticeRed,.redText2
+  color:#ff4023
+
+.textoverflow
+  white-space: nowrap
+  word-wrap: normal
+  overflow: hidden
+  text-overflow: ellipsis
+  vertical-align: -2px
+.wordbreak
+  word-break:break-all
+  word-wrap:break-word
+.wordkeep
+  word-break:keep-all
+  white-space:nowrap
+.hide
+  display:none
+.fl
+  float: left
+.fr
+  float: right
+.pr
+  position:relative
+.pa
+  position:absolute
+
+.tc
+  text-align:center
+.tr
+  text-align:right
+.tl
+  text-align:left
+.hide
+  display:none
+.show
+  display:block
+.ml_5
+  margin-left:5px
+.ml20
+  margin-left:20px
+
+/*color*/
+.red
+  color:#ff4023
+.yellow
+  color:#f9f03a
+.blue
+  color:#2ec1e5
+.blue1
+  color:#2ec1e5
+  text-decoration:underline/*带下划线的深蓝色字体*/
+.blue2
+  color:#7bede8/*浅蓝色样式字体*/
+.blue_3
+  color:#1368ff
+.green
+  color:#00fe9b
+.gray
+  color:#a7a292
+.name_color
+  color:#ffa0c4/*女神名字颜色*/
+.purple
+  color:#d87dfd/*紫色*/
+.white
+  color:#fff
+.tips_red
+  color:#ffa0c4
+/*品质颜色值color*/
+.q_orange
+  color:#f46e01
+.q_purple
+  color:#cf77f2
+.q_blue
+  color:#2db9db
+.q_green
+  color:#06e88d
+.q_white
+  color:#fff
+
+.quality1
+  color:#a7a292 
+.quality2
+  color:#fff  
+.quality3
+  color:#00fe9b
+.quality4
+  color:#2ec1e5
+.quality5
+  color:#d87dfd/*紫色*/
+.quality6
+  color:#f46e01
+
+
+.yellow_1
+  color:#f7aa25
+.yellow_2
+  color:#f9fbb6
+.yellow_3
+  color:#ff7301
+.yellow_4
+  color:#fdf5a2/*浅黄色颜色*/
+.yellow_5
+  color:#ffbb17
+.f14,h2
+  font-size:14px
+.bold
+  font-weight:bold
+.pr
+  position:relative
+.pa
+  position:absolute
+.vm
+  vertical-align:middle/*图片文字水平垂直居中*/
+/*通用的外边距样式*/
+.ml_20
+  margin-left:20px
+.ml_10
+  margin-left:10px
+.ml_40
+  margin-left:40px
+.mt_5
+  margin-top:5px
+.mb_20
+  margin-bottom:20px
+.mb_60
+  margin-bottom:60px
+.mt_10
+  margin-top:10px
+.mt_20
+  margin-top:20px
+.mt_25
+  margin-top:25px
+.mt_15
+  margin-top:15px
+.mt_40
+  margin-top:40px
+.mt_68
+  margin-top:68px
+.mt_30
+  margin-top:30px
+.mr_10
+  margin-right:10px
+.mr_15
+  margin-right:15px
+.pl50
+  padding-left:50px
+.mt_70
+  margin-top:70px
+.mt_50
+  margin-top:50px
+.mt_60
+  margin-top:60px
+/*按钮所需宽度*/
+.w150
+  width:150px
+.w300
+  width:300px
+.w100
+  width:100px
+.w90
+  width:90px
+.w160
+  width:160px
+.h20
+  height:20px
+  line-height:20px
+.w120
+  width:120px
+.w80
+  width:80px
+.w50
+  width:50px
+.w60
+  width:60px
+.w40
+  width:40px
+.w110
+  width:110px
+.w40
+  width:40px
+
+.ml_6
+  margin-left:6px
+.ml_7
+  margin-left:7px
+.mr_2
+  margin-right:2px
+.ml_5
+  margin-left:5px
+.ml_5
+  margin-left:5px
+.ml_40
+  margin-left:40px
+.ml_50
+  margin-left:50px
+.ml_25
+  margin-left:25px
+.ml_10
+  margin-left:10px
+.ml_35
+  margin-left:35px
+.ml_15
+  margin-left:15px
+.mt_32
+  margin-top:32px
+.ml_30
+  margin-left:30px
+.ml60
+  margin-left:60px
+.ml_60
+  margin-left:60px
+.ml80
+  margin-left:80px
+.ml_70
+  margin-left:70px
+.mb_5
+  margin-bottom:5px
+.mb_20
+  margin-bottom:20px
+/*btn*/
+.btn_3:hover,a.btn_3:hover
+  background-color:#43d1f4
+.btn_3:active,a.btn_3:active
+  background-color:#037aa2
+.btn_1y:hover,.btn_4y:hover,.btn_5y:hover,.btn_6y:hover,a.btn_1y:hover,a.btn_4y:hover,a.btn_5y:hover,a.btn_6y:hover
+  background-color:#f7d725   /*黄色为主hover的按钮样色*/
+.btn_1y:active,.btn_4y:active,.btn_5y:active,.btn_6y:active,a.btn_1y:active,a.btn_4y:active,a.btn_5y:active,a.btn_6y:active
+  background-color:#ca8017/*黄色为主的按下按钮样色*/
+.btn_2b:hover,.btn_3b:hover,.btn_5b:hover,a.btn_2b:hover,a.btn_3b:hover,a.btn_5b:hover
+  background-color:#43d1f4/*蓝色为主的hover按钮样色*/
+  color:#fff
+.btn_2b:active,.btn_3b:active,.btn_5b:active,a.btn_2b:active,a.btn_3b:active,a.btn_5b:active
+  background-color:#037aa2/*蓝色为主按下颜色按钮*/
+  color:#fff
+.btn_2b,a.btn_2b
+  height:25px
+  line-height:25px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#2ec1e5
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度25px蓝色为主默认颜色按钮*/
+.btn_1y,a.btn_1y
+  height:25px
+  line-height:25px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#f7aa25
+  color:#fff
+  display:block/*高度25px黄色为主默认颜色按钮*/
+  margin:auto
+  text-align:center
+.btn_3b,a.btn_3b
+  height:20px
+  line-height:20px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#2ec1e5
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度20px蓝色为主默认颜色按钮*/
+.btn_4y,a.btn_4y
+  height:20px
+  line-height:20px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#f7aa25
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度20px黄色为主默认颜色按钮*/
+.btn_5y,a.btn_5y
+  height:30px
+  line-height:30px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#f7aa25
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度30px黄色为主默认颜色按钮*/
+.btn_5b,a.btn_5b
+  height:30px
+  line-height:30px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#2ec1e5
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度30px黄色为主默认颜色按钮*/
+.btn_6y,a.btn_6y
+  height:18px
+  line-height:17px
+  text-align:center
+  border-radius:2px
+  cursor:pointer
+  background-color:#f7aa25
+  color:#fff
+  margin:auto
+  text-align:center
+  display:block/*高度18px黄色为主默认颜色按钮*/
+.btn_grayh25,a.btn_grayh25
+  height:25px
+  line-height:25px
+  text-align:center
+  border-radius:2px
+  background-color:#5e5e5e
+  color:#b4b2b2
+  display:block
+  cursor:text
+  margin:auto
+  text-align:center
+.btn_grayh20,a.btn_grayh20
+  height:20px
+  line-height:20px
+  text-align:center
+  border-radius:2px
+  background-color:#5e5e5e
+  color:#b4b2b2
+  display:block
+  margin:auto
+  text-align:center
+  cursor:text/*高度20px灰色为主默认颜色按钮*/
+.btn_grayh30,a.btn_grayh30
+  height:30px
+  line-height:30px
+  text-align:center
+  border-radius:2px
+  background-color:#5e5e5e
+  color:#b4b2b2
+  display:block
+  margin:auto
+  text-align:center
+  cursor:text/*高度20px灰色为主默认颜色按钮*/
+.btn_style,a.btn_style
+  margin:5px auto
+  text-align:center
+/*turn page 及左右按钮*/
+.turnpage_box
+  width:66px
+  margin:0 35px
+.turnpage_box li
+  width:20px
+  height:15px
+  line-height:15px
+  background-color:#273851
+  border:1px solid #182431
+  color:#fff
+  float:left
+  border-radius:2px
+  cursor:pointer
+
+.turnpage_box li:hover
+  background-color:#4a70a8
+.turnpage_box li:active
+  background-color:#1b2739
+.l_turnpage_btn
+  width:11px
+  height:18px
+  background:url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat 0 0
+  cursor:pointer
+.l_turnpage_btn:hover
+  background:url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -13px 0
+.r_turnpage_btn
+  width:11px
+  height:18px
+  background:url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -39px 0
+  cursor:pointer
+.r_turnpage_btn:hover
+  background:url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -24px 0
+.turn_page_box
+  width:528px
+.turn_page_con
+  width:160px
+  margin:3px auto 0
+  text-align:center
+.close_btn
+  width:15px
+  height:15px
+  background:url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px 0
+  right:6px
+  opacity:1
+  top:4px
+  z-index:555
+  position:absolute
+  cursor:pointer
+.close_btn:hover,.close_btn:focus
+  background:url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px -15px
+  opacity:1
+/*幸福度表情*/
+.expression_1,.expression_2,.expression_3,.expression_4,.expression_5
+  width:20px
+  height:21px
+  background:url($bgUrl + 'player3/expression_icon_20.png') no-repeat
+  vertical-align:middle
+  display:inline-block
+.expression_1
+  background-position:0 0
+.expression_2
+  background-position:0 -24px
+.expression_3
+  background-position:0 -48px
+.expression_4
+  background-position:0 -72px
+.expression_5
+  background-position:0 -96px
+/*金币的样式*/
+.gray_gold
+  background: url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -199px -141px
+  height: 20px
+  padding-left: 22px
+  display:inline-block
+.yellow_gold
+  background: url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -199px -120px
+  height: 20px
+  padding-left: 22px
+  display:inline-block
+/*灰色文字上面的栅格线*/
+.cost_price
+  text-decoration: line-through
+
+/*五角黄色星星*/
+.five_star
+  height:23px
+  line-height:23px
+  background: url($bgUrl + "prop_icon/start_img.png") no-repeat 0 0
+  display:inline-block
+  vertical-align:middle
+  padding-left:23px
+/*蓝钻*/
+.blue_drill
+  display:inline-block
+  height:18px
+  line-height:18px
+  background:url($bgUrl + 'player3/blue_drill.png') no-repeat 0 0
+  padding-left:23px
+  vertical-align:middle
+/*自定义*/
+.mt_03
+  margin-top:-5px
+.mt_02
+  margin-top:-2px
+.ml_90
+  margin-left:89px
+.w70
+  width:70px
+  float:left
+.mt_2
+  margin-top:2px
+.mt_45
+  margin-top:45px
+.mt_3
+  margin-top:3px
+
+i.iconHappy
+  display: inline-block
+  height: 20px
+  width: 20px
+i.iconHappy1
+  background:url($bgUrl+'happy/1.png') no-repeat
+i.iconHappy2
+  background:url($bgUrl+'happy/2.png') no-repeat
+i.iconHappy3
+  background:url($bgUrl+'happy/3.png') no-repeat
+i.iconHappy4
+  background:url($bgUrl+'happy/4.png') no-repeat
+i.iconHappy5
+  background:url($bgUrl+'happy/5.png') no-repeat
+.iconHappyB
+  display: inline-block
+  height: 32px
+  width: 32px
+.iconHappyBLight
+  //background:url($bgUrl+'myladyBg.png') no-repeat -350px -80px
+  display:inline-block
+  width:32px
+  height:32px
+  padding:20px
+.iconHappyBLightHover
+  background:url($bgUrl+'myladyBg.png') no-repeat -350px -80px
+.iconHappyB1
+  background:url($bgUrl+'myladyBg.png') no-repeat -345px -256px
+.iconHappyB2
+  background:url($bgUrl+'myladyBg.png') no-repeat -385px -256px
+.iconHappyB3
+  background:url($bgUrl+'myladyBg.png') no-repeat -385px -293px
+.iconHappyB4
+  background:url($bgUrl+'myladyBg.png') no-repeat -345px -293px
+.iconHappyB5
+  background:url($bgUrl+'myladyBg.png') no-repeat -345px -293px
+
+.itemlevel1
+  color:#a2a2a2
+.itemlevel2
+  color:#fff
+.itemlevel3
+  color:#00fe9b
+.itemlevel4
+  color:#21c1e5
+.itemlevel5
+  color:#d87dfd
+.itemlevel6
+  color:#ff7301
+
+.usrIcons
+  img
+    max-height:16px
+    vertical-align:middle
+    margin-right:2px
+.usrnick
+  line-height:16px
+  vertical-align:middle
+  width: 66px;
+  overflow: hidden;
+  word-wrap: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+.ui-popup-focus .gbuytips_box
+  width:252px
+.gbuytips_box .buytips_words i
+  font-style: normal;
+  
+/********* scrollbar *********/
+
+.scrollbars
+  padding:0 25px 0 0
+  margin:0 0 10px
+  position:relative
+.scrollbars .viewport
+  height:128px
+  overflow:hidden
+  position:relative
+.scrollbars .overview
+  list-style:none
+  position:absolute
+  left:0
+  top:0
+  padding:0
+  margin:0
+.scrollbars .scrollbar
+  position:absolute
+  top:0
+  right:10px
+  width:8px 
+.scrollbars .track
+  background:url($bgUrl + 'scrollbg0.png') repeat-y -52px 0px
+  height:102px
+  width:6px
+  position:relative
+  margin:4px 1px
+  border-radius:2px
+.scrollbars .thumb
+  background:url($bgUrl + 'scrollbg0.png') repeat-y -39px 0px
+  height:20px
+  width:6px
+  cursor:pointer
+  overflow:hidden
+  position:absolute
+  top:0px
+  left:0px
+  border-radius:2px
+.scrollbars .thumb .thumb_end
+  overflow:hidden
+  height:5px
+  width:6px
+.scrollbars .scroll_up
+  background:url($bgUrl + 'scrollbg0.png') no-repeat -2px -1px
+  width:8px
+  height:9px
+  cursor:pointer 
+.scrollbars .scroll_down
+  background:url($bgUrl + 'scrollbg0.png') no-repeat -2px -12px
+  width:8px
+  height:9px
+  cursor:pointer
+.scrollbars .disable
+  display:none
+.noSelect
+  user-select:none
+  -o-user-select:none
+  -moz-user-select:none
+  -khtml-user-select:none
+  -webkit-user-select:none
+  
+/********* ui-dialog *********/
+
+.ui-dialog
+  *zoom:1
+  _float: left
+  position: relative
+  background-color: #FFF
+  border: 1px solid #999
+  border-radius: 6px
+  outline: 0
+  background-clip: padding-box
+  font-family: Helvetica, arial, sans-serif
+  font-size: 14px
+  letter-spacing:0px
+  line-height: 1.428571429
+  color: #333
+  opacity: 0
+  -webkit-transform: scale(0)
+  transform: scale(0)
+  -webkit-transition: -webkit-transform .15s ease-in-out, opacity .15s ease-in-out
+  transition: transform .15s ease-in-out, opacity .15s ease-in-out
+.ui-popup-show .ui-dialog
+  opacity: 1
+  -webkit-transform: scale(1)
+  transform: scale(1)
+.ui-popup-focus .ui-dialog
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1)
+.ui-popup-modal .ui-dialog
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1), 0 0 256px rgba(255, 255, 255, .3)
+.ui-dialog-grid
+  width: auto
+  margin: 0
+  border: 0 none
+  border-collapse:collapse
+  border-spacing: 0
+  background: transparent
+.ui-dialog-header,.ui-dialog-body,.ui-dialog-footer
+  padding: 0
+  border: 0 none
+  text-align: left
+  background: transparent
+.ui-dialog-header
+  white-space: nowrap
+  border-bottom: 1px solid #E5E5E5
+.ui-dialog-close
+  position: relative
+  _position: absolute
+  float: right
+  top: 13px
+  right: 13px
+  _height: 26px
+  padding: 0 4px
+  font-size: 21px
+  font-weight: bold
+  line-height: 1
+  color: #000
+  text-shadow: 0 1px 0 #FFF
+  //opacity: 0.2
+  //filter: alpha(opacity=20)
+  cursor: pointer
+  background: transparent
+  _background: #FFF
+  border: 0
+  -webkit-appearance: none
+.ui-dialog-close:hover,.ui-dialog-close:focus
+  color: #000000
+  text-decoration: none
+  cursor: pointer
+  outline: 0
+  //opacity: 0.5
+  //filter: alpha(opacity=50)
+.ui-dialog-title
+  margin: 0
+  line-height: 1.428571429
+  min-height: 16.428571429px
+  padding: 15px
+  overflow:hidden 
+  white-space: nowrap
+  text-overflow: ellipsis
+  font-weight: bold
+  cursor: default
+.ui-dialog-body
+  padding: 20px
+  text-align: center
+.ui-dialog-content
+  display: inline-block
+  position: relative
+  vertical-align: middle
+  *zoom: 1
+  *display: inline
+  text-align: left
+.ui-dialog-footer
+  padding: 0 20px 20px 20px
+.ui-dialog-statusbar
+  float: left
+  margin-right: 20px
+  padding: 6px 0
+  line-height: 1.428571429
+  font-size: 14px
+  color: #888
+  white-space: nowrap
+.ui-dialog-statusbar label:hover
+  color: #333
+.ui-dialog-statusbar input,
+.ui-dialog-statusbar .label
+  vertical-align: middle
+.ui-dialog-button
+  float: right
+  white-space: nowrap
+.ui-dialog-footer button+button
+  margin-bottom: 0
+  margin-left: 5px
+.ui-dialog-footer button
+  width:auto
+  overflow:visible
+  display: inline-block
+  padding: 6px 12px
+  _margin-left: 5px
+  margin-bottom: 0
+  font-size: 14px
+  font-weight: normal
+  line-height: 1.428571429
+  text-align: center
+  white-space: nowrap
+  vertical-align: middle
+  cursor: pointer
+  background-image: none
+  border: 1px solid transparent
+  border-radius: 4px
+  -webkit-user-select: none
+   -moz-user-select: none
+    -ms-user-select: none
+     -o-user-select: none
+      user-select: none
+
+.ui-dialog-footer button:focus
+  outline: thin dotted #333
+  outline: 5px auto -webkit-focus-ring-color
+  outline-offset: -2px
+
+.ui-dialog-footer button:hover,.ui-dialog-footer button:focus
+  color: #333333
+  text-decoration: none
+
+.ui-dialog-footer button:active
+  background-image: none
+  outline: 0
+  -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125)
+      box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125)
+.ui-dialog-footer button[disabled]
+  pointer-events: none
+  cursor: not-allowed
+  //opacity: 0.65
+  //filter: alpha(opacity=65)
+  -webkit-box-shadow: none
+      box-shadow: none
+
+.ui-dialog-footer button
+  color: #333333
+  background-color: #ffffff
+  border-color: #cccccc
+
+.ui-dialog-footer button:hover,.ui-dialog-footer button:focus,.ui-dialog-footer button:active
+  color: #333333
+  background-color: #ebebeb
+  border-color: #adadad
+
+.ui-dialog-footer button:active
+  background-image: none
+.ui-dialog-footer button[disabled],.ui-dialog-footer button[disabled]:hover,.ui-dialog-footer button[disabled]:focus,.ui-dialog-footer button[disabled]:active
+  background-color: #ffffff
+  border-color: #cccccc
+.ui-dialog-footer button.ui-dialog-autofocus
+  color: #ffffff
+  background-color: #428bca
+  border-color: #357ebd
+
+.ui-dialog-footer button.ui-dialog-autofocus:hover,.ui-dialog-footer button.ui-dialog-autofocus:focus,.ui-dialog-footer button.ui-dialog-autofocus:active
+  color: #ffffff
+  background-color: #3276b1
+  border-color: #285e8e
+.ui-dialog-footer button.ui-dialog-autofocus:active
+  background-image: none
+.ui-popup-top-left .ui-dialog,.ui-popup-top .ui-dialog,.ui-popup-top-right .ui-dialog
+  top: -8px
+.ui-popup-bottom-left .ui-dialog,.ui-popup-bottom .ui-dialog,.ui-popup-bottom-right .ui-dialog
+  top: 8px
+.ui-popup-left-top .ui-dialog,.ui-popup-left .ui-dialog,.ui-popup-left-bottom .ui-dialog
+  left: -8px
+.ui-popup-right-top .ui-dialog,.ui-popup-right .ui-dialog,.ui-popup-right-bottom .ui-dialog
+  left: 8px
+.ui-dialog-arrow-a,.ui-dialog-arrow-b
+  position: absolute
+  display: none
+  width: 0
+  height: 0
+  overflow:hidden
+  _color:#FF3FFF
+  _filter:chroma(color=#FF3FFF)
+  border:8px dashed transparent
+.ui-popup-follow .ui-dialog-arrow-a,.ui-popup-follow .ui-dialog-arrow-b
+  display: block
+.ui-popup-top-left .ui-dialog-arrow-a,.ui-popup-top .ui-dialog-arrow-a,.ui-popup-top-right .ui-dialog-arrow-a
+  bottom: -16px
+  border-top:8px solid #7C7C7C
+.ui-popup-top-left .ui-dialog-arrow-b,.ui-popup-top .ui-dialog-arrow-b,.ui-popup-top-right .ui-dialog-arrow-b
+  bottom: -15px
+  border-top:8px solid #fff
+.ui-popup-top-left .ui-dialog-arrow-a,.ui-popup-top-left .ui-dialog-arrow-b
+  left: 15px
+.ui-popup-top .ui-dialog-arrow-a,.ui-popup-top .ui-dialog-arrow-b
+  left: 50%
+  margin-left: -8px
+.ui-popup-top-right .ui-dialog-arrow-a,.ui-popup-top-right .ui-dialog-arrow-b
+  right: 15px
+.ui-popup-bottom-left .ui-dialog-arrow-a,.ui-popup-bottom .ui-dialog-arrow-a,.ui-popup-bottom-right .ui-dialog-arrow-a
+  top: -16px
+  border-bottom:8px solid #7C7C7C
+.ui-popup-bottom-left .ui-dialog-arrow-b,.ui-popup-bottom .ui-dialog-arrow-b,.ui-popup-bottom-right .ui-dialog-arrow-b
+  top: -15px
+  border-bottom:8px solid #fff
+.ui-popup-bottom-left .ui-dialog-arrow-a,.ui-popup-bottom-left .ui-dialog-arrow-b
+  left: 15px
+.ui-popup-bottom .ui-dialog-arrow-a,.ui-popup-bottom .ui-dialog-arrow-b
+  margin-left: -8px
+  left: 50%
+.ui-popup-bottom-right .ui-dialog-arrow-a,.ui-popup-bottom-right .ui-dialog-arrow-b
+  right: 15px
+.ui-popup-left-top .ui-dialog-arrow-a,.ui-popup-left .ui-dialog-arrow-a,.ui-popup-left-bottom .ui-dialog-arrow-a
+  right: -16px
+  border-left:8px solid #7C7C7C
+.ui-popup-left-top .ui-dialog-arrow-b,.ui-popup-left .ui-dialog-arrow-b,.ui-popup-left-bottom .ui-dialog-arrow-b
+  right: -15px
+  border-left:8px solid #fff
+.ui-popup-left-top .ui-dialog-arrow-a,.ui-popup-left-top .ui-dialog-arrow-b
+  top: 15px
+.ui-popup-left .ui-dialog-arrow-a,.ui-popup-left .ui-dialog-arrow-b
+  margin-top: -8px
+  top: 50%
+.ui-popup-left-bottom .ui-dialog-arrow-a,.ui-popup-left-bottom .ui-dialog-arrow-b
+  bottom: 15px
+.ui-popup-right-top .ui-dialog-arrow-a,.ui-popup-right .ui-dialog-arrow-a,.ui-popup-right-bottom .ui-dialog-arrow-a
+  left: -16px
+  border-right:8px solid #7C7C7C
+.ui-popup-right-top .ui-dialog-arrow-b,.ui-popup-right .ui-dialog-arrow-b,.ui-popup-right-bottom .ui-dialog-arrow-b
+  left: -15px
+  border-right:8px solid #fff
+.ui-popup-right-top .ui-dialog-arrow-a,.ui-popup-right-top .ui-dialog-arrow-b
+  top: 15px
+.ui-popup-right .ui-dialog-arrow-a,.ui-popup-right .ui-dialog-arrow-b
+  margin-top: -8px
+  top: 50%
+.ui-popup-right-bottom .ui-dialog-arrow-a,.ui-popup-right-bottom .ui-dialog-arrow-b
+  bottom: 15px
+
+.ui-dialog-loading
+  vertical-align: middle
+  position: relative
+  display: block
+  *zoom: 1
+  *display: inline
+  overflow: hidden
+  width: 32px
+  height: 32px
+  top: 50%
+  margin: -16px auto 0 auto
+  font-size: 0
+  text-indent: -999em
+  color: #666
+.ui-dialog-loading
+  width: 100%\9
+  text-indent: 0\9
+  line-height: 32px\9
+  text-align: center\9
+  font-size: 12px\9
+.ui-dialog-loading::after
+  position: absolute
+  content: ''
+  width: 3px
+  height: 3px
+  margin: 14.5px 0 0 14.5px
+  border-radius: 100%
+  box-shadow: 0 -10px 0 1px #ccc, 10px 0px #ccc, 0 10px #ccc, -10px 0 #ccc, -7px -7px 0 0.5px #ccc, 7px -7px 0 1.5px #ccc, 7px 7px #ccc, -7px 7px #ccc
+  -webkit-transform: rotate(360deg)
+  -webkit-animation: ui-dialog-loading 1.5s infinite linear
+  transform: rotate(360deg)
+  animation: ui-dialog-loading 1.5s infinite linear
+  display: none\9
+  
+.popup-email
+  background: #fff
+.ui-popup-bottom-left .popup-msg-blue
+  .ui-dialog-arrow-a
+    border-top:0
+    border-bottom:8px solid #153f63
+    display:block
+    top:-8px
+  .ui-dialog-arrow-b
+    border-top:0
+    border-bottom:8px solid #000
+    display:block
+    top:-8px
+.popup-msg-blue
+  border:#153f63 solid 1px
+  left:-10px
+  background:url($bgUrl + 'bg_blue.png') repeat
+  border-radius:2px
+  box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  -webkit-box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  -moz-box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  .ui-dialog-arrow-a
+    border-top:8px solid #153f63
+    display:block
+  .ui-dialog-arrow-b
+    border-top:8px solid #000
+    display:block
+  .ui-dialog-body
+    padding: 2px 10px
+    font-size : 12px
+    //-webkit-transform : scale(0.84,0.84) 
+    //*font-size:10px
+    font-family: arial, sans serif
+  .ui-dialog-grid
+    background: #000
+    color: #f00
+.pop-msg-blue2
+  border:#0c131a solid 1px
+  background:#0c1924
+  border-radius:0px
+  font-size:12px
+  padding:4px 8px
+  box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  -webkit-box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  -moz-box-shadow:1px 0px 5px #172a39 inset,0 1px 5px #172a39 inset,0 -1px 5px #172a39 inset,-1px 0 5px #172a39 inset
+  .ui-dialog-arrow-a
+    display:inline-block
+  .ui-dialog-arrow-b
+    display:inline-block
+.ui-popup-left .pop-msg-blue2 .ui-dialog-arrow-a
+    border:none
+    background:url($bgUrl + 'myladyBg.png') no-repeat -18px -411px
+    height:14px
+    width:14px
+    right:-14px
+.ui-popup-left .pop-msg-blue2 .ui-dialog-arrow-b 
+    display:none
+.ui-popup-right .pop-msg-blue2 .ui-dialog-arrow-a
+    border:none
+    background:url($bgUrl + 'myladyBg.png') no-repeat -1px -411px
+    height:14px
+    width:14px
+    left:-14px
+.ui-popup-right .pop-msg-blue2 .ui-dialog-arrow-b 
+    display:none
+
+.ui-popup-bottom .popup-msg-blue-text
+  border:1px solid #3eacf8
+  background: #095268
+  color:#fff
+  top:4px
+  .ui-dialog-arrow-a
+    display:none
+  .ui-dialog-arrow-b
+    display:none
+  .ui-dialog-body
+    padding: 0px 6px
+    font-size : 12px
+    -webkit-transform : scale(0.84,0.84)
+    *font-size:10px
+  .ui-dialog-grid
+    background: #000
+
+.ui-popup-top .popup-msg-green-text
+  background: transparent
+  border: none
+  color: #07f495
+  top:4px
+  .ui-dialog-arrow-a
+    display:none
+  .ui-dialog-arrow-b
+    display:none
+  .ui-dialog-body
+    padding: 0px 2px
+    font-size : 14px
+    //-webkit-transform : scale(0.84,0.84) 
+    //*font-size:10px;*
+    -webkit-text-shadow:#5e2d02 2px 0 0,#5e2d02 0 1px 0,#5e2d02 -1px 0 0,#5e2d02 0 -1px 0
+    -moz-text-shadow:#5e2d02 1px 0 0,#5e2d02 0 1px 0,#5e2d02 -1px 0 0,#5e2d02 0 -1px 0
+    text-shadow:#5e2d02 1px 0 0,#5e2d02 0 1px 0,#5e2d02 -1px 0 0,#5e2d02 0 -1px 0
+    *filter: Glow(Color=#5e2d02, Strength=1)
+
+ /*以内容浅蓝色为主的内阴影样式，高宽度自定义*/
+.dialogLightbgGame
+  border:1px solid #1774a4
+  background-color:#273851
+  border-radius:3px
+  -webkit-box-shadow:1px 0px 2px #2f4662 inset,0 1px 2px #2f4662 inset,0 -1px 2px #2f4662 inset,-1px 0 2px #2f4662 inset
+  -moz-box-shadow:1px 0px 2px #2f4662 inset,0 1px 2px #2f4662 inset,0 -1px 2px #2f4662 inset,-1px 0 2px #2f4662 inset
+  box-shadow:1px 0px 2px #2f4662 inset,0 1px 2px #2f4662 inset,0 -1px 2px #2f4662 inset,-1px 0 2px #2f4662 inset
+  font-family: "微软雅黑","microsoft yahei",Arial
+  color:#fff
+  font-size:12px
+/*使用dialog插件弹层白色透明为主的背景样式*/
+.ui-dialog.dialogGames
+  padding:10px
+  background:url($bgUrl + 'bg_white.png') repeat 0 0/*以白色透明为主的背景图样式*/
+.dialogGames .ui-dialog-grid,.dialogBluebgGames .ui-dialog-grid,.dialogLightbgGame .ui-dialog-grid,.dialognonebgGame .ui-dialog-grid
+  width: 100%
+.dialogGames .ui-dialog-body,.dialogBluebgGames .ui-dialog-body,.dialogLightbgGame .ui-dialog-body,.dialognonebgGame .ui-dialog-body
+  padding:0
+.dialogGames .ui-dialog-title,.dialogBluebgGames .ui-dialog-title,.dialogLightbgGame .ui-dialog-title,.dialognonebgGame .ui-dialog-title
+  padding:0
+  position:relative
+  overflow:visible
+.dialogGames .ui-dialog-header,.dialogBluebgGames .ui-dialog-header,.dialogLightbgGame .ui-dialog-header,.dialognonebgGame .ui-dialog-header
+  border:none
+/*白色透明框上面的关闭按钮样式*/
+.dialogGames .ui-dialog-close,.dialogBluebgGames .ui-dialog-close,.dialogLightbgGame .ui-dialog-close,.dialognonebgGame .ui-dialog-close
+  width:15px
+  height:15px
+  background:url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px 0
+  opacity:1
+  z-index:1040
+.dialogGames .ui-dialog-close:hover,.dialogGames .ui-dialog-close:focus,.dialogLightbgGame .ui-dialog-close:hover,.dialogBluebgGames .ui-dialog-close:hover,.dialognonebgGame .ui-dialog-close:hover,.dialogBluebgGames .ui-dialog-close:focus,.dialognonebgGame .ui-dialog-close:focus
+  background:url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px -15px
+  opacity:1
+
+/*使用dialog插件弹层样式blue背景框样式*/
+.ui-dialog.dialogBluebgGames,.goods_showbox,.connect-error-wordbg  
+  border:1px solid #0c1218
+  border-radius:4px
+  background-color:#0c1924  
+  padding:10px 5px
+  box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -webkit-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -moz-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  color:#fff
+  font-size:12px
+  font-family: "微软雅黑","microsoft yahei",Arial
+  color:#fff
+  font-size:12px
+
+/*深蓝色的底框背景色*/
+.dialogBluebgGames,.click_single_giftbox
+  width:auto
+  height:auto
+  position:relative
+  font-family: "微软雅黑","microsoft yahei",Arial
+  color:#fff
+  font-size:12px
+  border:1px solid #0c1218
+  border-radius:2px
+  background-color:#0c1924
+  box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -webkit-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -moz-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+
+
+/*有左边grils图片的基本样式，可作为替换项*/
+.dialogGames_img
+  width:223px
+  height:357px
+  position:absolute
+  left:-45px
+  top:-19px
+.dialogGames_title span
+  width:211px
+  height:35px
+  background:url($bgUrl + 'prop_icon/prop_iconbg.png') no-repeat 0 -260px
+  position:absolute
+  left:170px
+  top:-41px
+
+
+/*弹层title图片上面的光图片样式*/
+.lights_show
+  width:210px
+  height:102px
+  background:url($bgUrl + 'prop_icon/tips_lights.png') no-repeat 0 0
+  position:absolute
+
+/*波斯商人和特殊商人的共用的样式*/
+.discountimg_con,.discountimg_introduce
+  height:80px
+.discountimg_con
+  width:80px
+  height:80px
+  margin-right:5px
+.discountimg_introduce
+  width:135px
+  vertical-align:middle
+.discounticonbox img
+  width:78px
+   height:78px
+  margin:1px
+  vertical-align:top
+  cursor:pointer
+
+.discountimg_introduce img
+  vertical-align:middle
+.mt_03
+  margin-top:-5px
+.mt_02
+  margin-top:-2px
+.ml_90
+  margin-left:89px
+.discount_number_con
+  position:absolute
+  left:0
+  bottom:4px
+  width:78px
+.discount_number_list
+  width:78px
+   height:18px
+  line-height:18px
+  margin:0 auto
+  text-align:center
+  letter-spacing:-4.2px
+
+
+/*购买提示*/
+.ui-dialog.bottleGames
+  border:1px solid #0c1218
+  border-radius:2px
+  background-color:#0c1924
+  padding:10px 20px
+  box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -webkit-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -moz-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+.buy_tips_box
+  width:262px
+  height:209px
+.tips_grils img
+  position:absolute
+  left:-79px
+  bottom:-39px
+.buytips_title span
+  width:172px
+  height:47px
+  background:url($bgUrl + 'prop_icon/bottolbg.png') no-repeat 0 -736px
+  position:absolute
+  left:50px
+  top:-2px
+.buytips_rightcon
+  width:210px
+  height:100px
+  color:#fff
+  font-family: "微软雅黑","microsoft yahei"
+  font-size:12px
+  padding:50px 0 0 40px
+.buytips_rightcon img
+  vertical-align:middle
+  margin:0 2px
+
+/*购买成功四个大字*/
+.success_box
+  width:159px
+  height:154px
+  position:absolute
+  left:50%
+  top:200px
+  z-index:2000
+  margin-left:-100px
+.buy_lingtsshow
+  width:159px
+  height:154px
+  background:url($bgUrl + 'player3/successlights_bg.png') no-repeat 0 0
+  position:absolute
+  left:20px
+  top:20px
+.buy_success_word span
+  width:120px
+  height:28px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat -131px -227px
+  display:block
+  margin:65px auto 0
+.use_success_word span
+  width:102px
+  height:26px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat -131px -161px
+  display:block
+  margin:65px auto 0
+.give_success_word span
+  width:102px
+  height:26px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat -131px -195px
+  display:block
+  margin:65px auto 0
+.connect-error-box
+  width:auto
+  height:auto
+  padding:10px
+  background:url($bgUrl + 'bg_white.png') repeat 0 0
+  position:absolute
+  left:50%
+  top:200px
+  z-index:2000
+  margin-left:-100px
+  border-radius:2px
+.connect-error-wordbg
+  width:auto
+  height:auto
+  padding:10px
+  text-align:center
+  border-radius:2px
+.connect-error-wordbg p
+  letter-spacing:2px
+
+/*一键第一*/
+.deep_bluebg_box
+  position:absolute
+  left:50%
+  top:200px
+  z-index:2000
+  margin-left:-100px
+/*一键第一*/
+.onekeyfirstmain
+  height:204px
+  padding:0 10px 10px 60px
+  margin-top:30px
+.onekeygirls
+  width:125px
+  height:257px
+  position:absolute
+  left:-70px
+  top:-14px
+.onekeygirls_title
+  width:172px
+  height:46px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat 0 -264px
+  position:absolute
+  left:61px
+  top:-2px
+.onekey_lightsshow
+  width:143px
+  height:102px
+  background:url($bgUrl + 'player3/onekey_lights_bg.png') no-repeat 0 0
+  position:absolute
+  left:22px
+  top:-35px
+.onekeygirls_title span
+  width:87px
+  height:20px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat 0 -212px
+  display:block
+  margin:40px 0 0 20px
+
+/*暴击提示*/
+.crittips_title
+  width:172px
+  height:47px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat 0 0
+  position:relative
+  left:44px
+  top:-30px
+.crittips_title span
+  width:88px
+  height:22px
+  background:url($bgUrl + 'player3/tips_wordbg.png') no-repeat 0 -239px
+  position:absolute
+  left:62px
+  top:40px
+.crittips_title .lights_show
+  top:-35px
+  left:-20px
+.crittips_con
+  padding:0px 0 0 45px
+  width:215px
+  margin-top:-35px
+.give_goods,.goods_jizi
+  p
+    vertical-align:middle
+    font-size:14px
+/*鼠标hover到道具图上面内容*/
+.prop_hoverbox
+  width:135px
+  padding:5px 10px
+  border:1px solid #0c1218
+  border-radius:2px
+  background-color:#0c1924
+  box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -webkit-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -moz-box-shadow:1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  color:#fff
+  font-size:12px
+.prop_hoverbox
+  width:150px
+  position:absolute
+  left:120px
+  bottom:15px
+  z-index:5
+.prop_hoverbox .arrow_icon
+  top:57px
+.arrow_icon
+  width:19px
+  height:18px
+  background:url($bgUrl + 'player3/foodarrow_icon.png') no-repeat 0 0
+  position:absolute
+  left:-16px
+  bottom:18px
+  z-index:6
+
+/********* games-dialog *********/
+
+.ui-popup-focus
+  .ui-dialog
+    &.dialogGames
+      padding 10px
+      background url($bgUrl + 'bg_white.png') repeat 0 0
+    &.bottleGames
+      border 1px solid #0c1218
+      border-radius 2px
+      background-color #0c1924
+      padding 10px 20px
+      box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+      -webkit-box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+      -moz-box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+    &.tipGames
+      border-radius(0px)
+      background-color:transparent
+      border:0 none
+      .ui-dialog-body
+        background: #00485c
+        border: 1px solid #3eacf8
+        display:inline-block
+        padding:2px 6px
+        line-height:16px
+        height:16px
+        color:#fff
+        font-size:12px
+        border-radius(3px)
+      .ui-dialog-arrow-a
+        border-bottom: 8px solid #3eacf8
+      .ui-dialog-arrow-b
+        border-bottom: 8px solid #00485c
+      
+.dialogGames_img
+  width 223px
+  height 357px
+  position absolute
+  left -45px
+  top -19px
+.dialogGames_title
+  span
+    width 211px
+    height 35px
+    background url($bgUrl + 'prop_icon/prop_iconbg.png') no-repeat 0 -260px
+    position absolute
+    left 170px
+    top -41px
+
+.gray_gold
+  background url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -199px -141px
+  height 20px
+  padding-left 22px
+  display inline-block
+
+.yellow_gold
+  background url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -199px -120px
+  height 20px
+  padding-left 22px
+  display inline-block
+
+.cost_price
+  text-decoration line-through
+
+.five_star
+  height 23px
+  line-height 23px
+  background url($bgUrl + "prop_icon/start_img.png") no-repeat 0 0
+  display inline-block
+  vertical-align middle
+  padding-left 23px
+
+.blue_drill
+  display inline-block
+  height 18px
+  line-height 18px
+  background url($bgUrl + 'player3/blue_drill.png') no-repeat 0 0
+  padding-left 23px
+  vertical-align middle
+
+.mt_03
+  margin-top -5px
+  margin-top -5px
+
+.mt_02
+  margin-top -2px
+  margin-top -2px
+
+.ml_90
+  margin-left 89px
+  margin-left 89px
+
+.w70
+  width 70px
+  float left
+
+.mt_2
+  margin-top 2px
+
+.mt_45
+  margin-top 45px
+
+.mt_3
+  margin-top 3px
+
+.lights_show
+  width 210px
+  height 102px
+  background url($bgUrl + 'prop_icon/tips_lights.png') no-repeat 0 0
+  position absolute
+
+.expression_1,.expression_2,.expression_3,.expression_4,.expression_5
+  width 20px
+  height 21px
+  background url($bgUrl + 'player3/expression_icon_20.png') no-repeat
+  vertical-align middle
+  display inline-block
+
+.expression_1
+  background-position 0 0
+
+.expression_2
+  background-position 0 -24px
+
+.expression_3
+  background-position 0 -48px
+
+.expression_4
+  background-position 0 -72px
+
+.expression_5
+  background-position 0 -96px
+
+.turnpage_box
+  width 66px
+  margin 0 35px
+  li
+    width 20px
+    height 15px
+    line-height 15px
+    background-color #273851
+    border 1px solid #182431
+    color #fff
+    float left
+    border-radius 2px
+    cursor pointer
+    &:hover
+      background-color #4a70a8
+    &:active
+      background-color #1b2739
+
+.l_turnpage_btn
+  width 11px
+  height 18px
+  background url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat 0 0
+  cursor pointer
+  &:hover
+    background url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -13px 0
+
+.r_turnpage_btn
+  width 11px
+  height 18px
+  background url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -39px 0
+  cursor pointer
+  &:hover
+    background url($bgUrl + "player3/lr_turnpage_btn.png") no-repeat -24px 0
+
+.turn_page_box
+  width 528px
+
+.turn_page_con
+  width 160px
+  margin 3px auto 0
+  text-align center
+
+.close_btn
+  width 15px
+  height 15px
+  background url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px 0
+  right 6px
+  opacity 1
+  top 4px
+  z-index 555
+  position absolute
+  cursor pointer
+
+.close_btn:hover,.close_btn:focus
+  background url($bgUrl + 'prop_icon/bottolbg.png') no-repeat -585px -15px
+  opacity 1
+
+.discountimg_con,.discountimg_introduce
+  height 80px
+
+.discountimg_con
+  width 80px
+  height 80px
+  margin-right 5px
+
+.discountimg_introduce
+  width 135px
+  vertical-align middle
+  img
+    vertical-align middle
+
+.discounticonbox
+  img
+    width 78px
+    height 78px
+    margin 1px
+    vertical-align top
+    cursor pointer
+  p
+    &:hover
+      width 80px
+      height 80px
+      background url($bgUrl + "prop_icon/iconbg_80_hover.png") no-repeat 0 0
+      cursor pointer
+
+.discount_number_con
+  position absolute
+  left 0
+  bottom 4px
+  width 78px
+
+.discount_number_list
+  width 78px
+  height 18px
+  line-height 18px
+  margin 0 auto
+  text-align center
+  letter-spacing -4.2px
+
+.discount_word
+  width 18px
+  height 18px
+  background url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -201px -307px
+  display inline-block
+
+.discount_number_pointer
+  width 6px
+  height 7px
+  background url($bgUrl + "prop_icon/number_explain.png") no-repeat 0 -176px
+  display inline-block
+
+.discount_number_1,.discount_number_2,.discount_number_3,.discount_number_4,.discount_number_5,.discount_number_6,.discount_number_7,.discount_number_8,.discount_number_9,.discount_number_01,.discount_number_02,.discount_number_03,.discount_number_04,.discount_number_05,.discount_number_06,.discount_number_07,.discount_number_08,.discount_number_09
+  width 10px
+  height 16px
+  display inline-block
+  line-height 16px
+  background url($bgUrl + "prop_icon/number_explain.png") no-repeat
+
+.discount_number_1,.discount_number_01
+  background-position 0 -18px
+
+.discount_number_2,.discount_number_02
+  background-position 0 -35px
+
+.discount_number_3,.discount_number_03
+  background-position 0 -52px
+
+.discount_number_4,.discount_number_04
+  background-position 0 -68px
+
+.discount_number_5,.discount_number_05
+  background-position 0 -83px
+
+.discount_number_6,.discount_number_06
+  background-position 0 -100px
+
+.discount_number_7,.discount_number_07
+  background-position 0 -118px
+
+.discount_number_8,.discount_number_08
+  background-position 0 -134px
+
+.discount_number_9,.discount_number_09
+  background-position 0 -152px
+
+.discount_number_0,.discount_number_00
+  background-position 0 0
+
+.grade_number_01,.grade_number_02,.grade_number_03,.grade_number_04,.grade_number_05,.grade_number_06,.grade_number_07,.grade_number_08,.grade_number_09
+  height 13px
+  display inline-block
+  line-height 13px
+  background url($bgUrl + "prop_icon/number_explain_10.png") no-repeat
+
+.grade_number_01
+  width 6px
+  background-position 0 -14px
+
+.grade_number_02
+  width 9px
+  background-position 0 -27px
+
+.grade_number_03
+  width 10px
+  background-position 0 -40px
+
+.grade_number_04
+  width 9px
+  background-position 0 -52px
+
+.grade_number_05
+  width 8px
+  background-position 0 -65px
+
+.grade_number_06
+  width 8px
+  background-position 0 -77px
+
+.grade_number_07
+  width 9px
+  background-position 0 -91px
+
+.grade_number_08
+  width 9px
+  background-position 0 -103px
+
+.grade_number_09
+  width 9px
+  background-position 0 -117px
+
+.grade_number_00
+  width 9px
+  background-position 0 0
+
+.buy_tips_box
+  width 262px
+  height 209px
+
+.tips_grils
+  img
+    position absolute
+    left -79px
+    bottom -39px
+
+.buytips_title
+  span
+    width 172px
+    height 47px
+    background url($bgUrl + 'prop_icon/bottolbg.png') no-repeat 0 -736px
+    position absolute
+    left 50px
+    top -2px
+
+.buytips_rightcon
+  width 210px
+  height 100px
+  color #fff
+  font-family "微软雅黑","microsoft yahei"
+  font-size 12px
+  padding 50px 0 0 40px
+  img
+    vertical-align middle
+    margin 0 2px
+
+.vip_btn_lights
+  height 8px
+  background url($bgUrl + 'player3/vipbtn.png') no-repeat 0 9px
+  color #fff
+  padding-left 20px
+  display block
+  vertical-align middle
+
+.vip_btn_gray
+  height 8px
+  background url($bgUrl + 'player3/vipbtn_gray.png') no-repeat 0 5px
+  padding-left 20px
+  color #ccc
+  vertical-align middle
+
+.angle_btn_lights
+  height 15px
+  background url($bgUrl + 'player3/yellow_1.png') no-repeat 0 4px
+  padding-left 16px
+  display block
+  vertical-align middle
+
+.angle_btn_gray
+  height 15px
+  background url($bgUrl + 'player3/gray_2.png') no-repeat 0 4px
+  padding-left 16px
+  display block
+  vertical-align middle
+.hover_boxbg,.prop_hoverbox
+  padding 5px 10px
+  border 1px solid #0c1218
+  border-radius 2px
+  background-color #0c1924
+  box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -webkit-box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  -moz-box-shadow 1px 0px 2px #172a39 inset,0 1px 2px #172a39 inset,0 -1px 2px #172a39 inset,-1px 0 2px #172a39 inset
+  color #fff
+  font-size 12px
+
+.prop_hoverbox
+  width 150px
+  position absolute
+  left 120px
+  bottom 15px
+  z-index 5
+  .arrow_icon
+    top 57px
+
+.arrow_icon
+  width 19px
+  height 18px
+  background url($bgUrl + 'player3/foodarrow_icon.png') no-repeat 0 0
+  position absolute
+  left -16px
+  bottom 18px
+  z-index 6
+
+.arrow_icon_right
+  width 19px
+  height 18px
+  background url($bgUrl + 'player3/foodarrow_icon.png') no-repeat -21px 0
+  position absolute
+  right -16px
+  bottom 6px
+  z-index 6
+
+.attention_tips_tit
+  width 218px
+  height 50px
+  background url($bgUrl + 'player3/tips_wordbg.png') 0 -409px
+  left 18px
+  position absolute
+  top -40px
+  margin 0 auto
+  span
+    width 54px
+    height 20px
+    background url($bgUrl + 'player3/tips_wordbg.png') 0 -378px
+    display block
+    margin 7px auto 0
+
+.attention_tips_con
+  width 250px
+
+.attention_tips_main
+  width 232px
+  padding 0 5px 15px 11px
+  height 165px
+
+.prop_list
+  li
+    background url($bgUrl + "bottle/iconlink_40.png") no-repeat 0 0
+    cursor pointer
+    float left
+    margin-right 6px
+    width 40px
+
+.attention_word
+  text-indent 2em
+  letter-spacing 1px
+  line-height 20px
+
+/********* numbers *********/
+
+.levelCount
+  color:#fefefe
+  position:absolute
+  font-size:10px
+  left:26px
+  height:15px
+  bottom:0px
+  font-size : 12px
+  -webkit-transform : scale(0.84,0.84) 
+  *font-size:10px
+  -webkit-text-shadow:#552917 2px 0 0,#552917 0 1px 0,#552917 -1px 0 0,#552917 0 -1px 0
+  -moz-text-shadow:#552917 1px 0 0,#552917 0 1px 0,#552917 -1px 0 0,#552917 0 -1px 0
+  text-shadow:#552917 1px 0 0,#552917 0 1px 0,#552917 -1px 0 0,#552917 0 -1px 0
+  *filter: Glow(Color=#552917, Strength=1)
+  i
+    display:inline-block
+    width:8px
+    height:14px
+    background:url($bgUrl + 'dateNum.png') no-repeat
+  i.num1
+    background-position:-2px -67px
+  i.num2
+    background-position:-11px -67px
+  i.num3
+    background-position:-21px -67px
+  i.num4
+    background-position:-31px -67px
+  i.num5
+    background-position:-40px -67px
+  i.num6
+    background-position:-49px -67px
+  i.num7
+    background-position:-58px -67px
+  i.num8
+    background-position:-68px -67px
+  i.num9
+    background-position:-77px -67px
+  i.num0
+    width:9px
+    background-position:-86px -67px
+.currentCount
+  font-weight:bold
+  display:inline-block
+  padding:4px 0
+  height:18px
+  i
+    display:inline-block
+    height:18px
+    width:9px
+    background:url($bgUrl + 'dateNum.png') no-repeat
+  i.num1
+    width:7px
+    background-position:-1px -45px
+  i.num2
+    background-position:-14px -45px
+  i.num3
+    background-position:-29px -45px
+  i.num4
+    background-position:-41px -45px
+  i.num5
+    background-position:-56px -45px
+  i.num6
+    background-position:-69px -45px
+  i.num7
+    background-position:-83px -45px
+  i.num8
+    background-position:-95px -45px
+  i.num9
+    background-position:-109px -45px
+  i.num0
+    background-position:-123px -45px
+.dateNum
+  a i
+    display:inline-block
+    background:url($bgUrl + 'dateNum.png') no-repeat
+    display:inline-block
+    width:10px
+    height:16px
+  .di
+    background-position:-1px -4px
+    width:12px
+  .tian
+    background-position:-21px -4px
+    width:12px
+  .num0
+    background-position:-177px -4px
+  .num1
+    background-position:-50px -4px
+    width:7px
+  .num2
+    background-position:-63px -4px
+  .num3
+    background-position:-77px -4px
+  .num4
+    background-position:-90px -4px
+  .num5
+    background-position:-105px -4px
+  .num6
+    background-position:-119px -4px
+  .num7
+    background-position:-134px -4px
+  .num8
+    background-position:-147px -4px
+  .num9
+    background-position:-162px -4px
+  a.hover,a:hover
+    display:inline-block
+    .di
+      background-position:-1px -26px
+    .tian
+      background-position:-21px -26px
+    .num0
+      background-position:-177px -25px
+    .num1
+      background-position:-50px -25px
+    .num2
+      background-position:-63px -25px
+    .num3
+      background-position:-77px -25px
+    .num4
+      background-position:-90px -25px
+    .num5
+      background-position:-105px -25px
+    .num6
+      background-position:-119px -25px
+    .num7
+      background-position:-134px -25px
+    .num8
+      background-position:-147px -25px
+    .num9
+      background-position:-162px -25px
+
+
+.discount_number_pointer
+  width:6px
+  height:7px
+  background:url($bgUrl + "prop_icon/number_explain.png") no-repeat 0 -176px
+  display:inline-block
+.discount_number_1,.discount_number_2,.discount_number_3,.discount_number_4,.discount_number_5,.discount_number_6,.discount_number_7,.discount_number_8,.discount_number_9,.discount_number_01,.discount_number_02,.discount_number_03,.discount_number_04,.discount_number_05,.discount_number_06,.discount_number_07,.discount_number_08,.discount_number_09
+  width:10px
+  height:16px
+  display:inline-block
+  line-height:16px
+  background: url($bgUrl + "prop_icon/number_explain.png") no-repeat
+.discount_number_1,.discount_number_01
+  background-position:0 -18px
+.discount_number_2,.discount_number_02
+  background-position:0 -35px
+.discount_number_3,.discount_number_03
+  background-position:0 -52px
+.discount_number_4,.discount_number_04
+  background-position:0 -68px
+.discount_number_5,.discount_number_05
+  background-position:0 -83px
+.discount_number_6,.discount_number_06
+  background-position:0 -100px
+.discount_number_7,.discount_number_07
+  background-position:0 -118px
+.discount_number_8,.discount_number_08
+  background-position:0 -134px
+.discount_number_9,.discount_number_09
+  background-position:0 -152px
+.discount_number_0,.discount_number_00
+  background-position:0 0
+
+.p_vipgradei
+  i
+    height:13px
+    display:inline-block
+    line-height:13px
+    background:url($bgUrl + "prop_icon/number_explain_10.png") no-repeat
+  i.num_1
+    width:6px
+    background-position:0 -14px
+  i.num_2
+    width:9px
+    background-position:0 -27px
+  i.num_3
+    width:10px
+    background-position:0 -40px
+  i.num_4
+    width:9px
+    background-position:0 -52px
+  i.num_5
+    width:8px
+    background-position:0 -65px
+  i.num_6
+    width:8px
+    background-position:0 -77px
+  i.num_7
+    width:9px
+    background-position:0 -91px
+  i.num_8
+    width:9px
+    background-position:0 -103px
+  i.num_9
+    width:9px
+    background-position:0 -117px
+  i.num_0
+    width:9px
+    background-position:0 0
+
+/*折扣数字*/
+.discount_word
+  width:18px
+  height:18px
+  background: url($bgUrl + "prop_icon/prop_iconbg.png") no-repeat scroll -201px -307px
+  display:inline-block
+/*折扣数字height:16px*/
+.discount_number_pointer
+  width:6px
+  height:7px
+  background:url($bgUrl + "prop_icon/number_explain.png") no-repeat 0 -176px
+  display:inline-block
+.discount_number_1,.discount_number_2,.discount_number_3,.discount_number_4,.discount_number_5,.discount_number_6,.discount_number_7,.discount_number_8,.discount_number_9,.discount_number_01,.discount_number_02,.discount_number_03,.discount_number_04,.discount_number_05,.discount_number_06,.discount_number_07,.discount_number_08,.discount_number_09
+  width:10px
+  height:16px
+   display:inline-block
+   line-height:16px
+  background: url($bgUrl + "prop_icon/number_explain.png") no-repeat
+.discount_number_1,.discount_number_01
+  background-position:0 -18px
+.discount_number_2,.discount_number_02
+  background-position:0 -35px
+.discount_number_3,.discount_number_03
+  background-position:0 -52px
+.discount_number_4,.discount_number_04
+  background-position:0 -68px
+.discount_number_5,.discount_number_05
+  background-position:0 -83px
+.discount_number_6,.discount_number_06
+  background-position:0 -100px
+.discount_number_7,.discount_number_07
+  background-position:0 -118px
+.discount_number_8,.discount_number_08
+  background-position:0 -134px
+.discount_number_9,.discount_number_09
+  background-position:0 -152px
+.discount_number_0,.discount_number_00
+  background-position:0 0
+
+.discounticonbox p:hover
+  width:80px
+  height:80px
+  background:url($bgUrl + "prop_icon/iconbg_80_hover.png") no-repeat 0 0
+  cursor:pointer
+
+/*等级数字height:10px*/
+.grade_number_01,.grade_number_02,.grade_number_03,.grade_number_04,.grade_number_05,.grade_number_06,.grade_number_07,.grade_number_08,.grade_number_09
+  height:13px
+  display:inline-block
+  line-height:13px
+  background:url($bgUrl + "prop_icon/number_explain_10.png") no-repeat
+.grade_number_01
+  width:6px
+  background-position:0 -14px
+.grade_number_02
+  width:9px
+  background-position:0 -27px
+.grade_number_03
+  width:10px
+  background-position:0 -40px
+.grade_number_04
+  width:9px
+  background-position:0 -52px
+.grade_number_05
+  width:8px
+  background-position:0 -65px
+.grade_number_06
+  width:8px
+  background-position:0 -77px
+.grade_number_07
+  width:9px
+  background-position:0 -91px
+.grade_number_08
+  width:9px
+  background-position:0 -103px
+.grade_number_09
+  width:9px
+  background-position:0 -117px
+.grade_number_00
+  width:9px
+  background-position:0 0
+
+/********* layout *********/
+
+html
+  height:100%
+  //overflow: hidden
+body
+  color:$textColor
+  height:100%
+  overflow:visible
+  //background:url($bgUrl+'player/page_bg.jpg') no-repeat top center
+  &::after
+    clear-fix()  
+.body-box-bg
+  position:relative
+  margin:0 auto
+.body-bg-img
+  width:100%
+  height:100%
+  min-width:1280px
+  min-height:768px
+  background-color:#000
+  position:absolute
+  left:0
+  top:0
+  z-index:-10
+  padding-bottom:10px;
+  zoom:1
+.body-bg-l
+  width:595px
+  height:768px
+  background:url($bgUrl + 'player3/bodybg_l.jpg') no-repeat left center
+.body-bg-c
+  width:387px
+  height:528px
+  background:url($bgUrl + 'player3/bodybg_c.jpg') no-repeat center center
+  position:absolute
+  left:50%
+  margin-left:-190px
+  bottom:0
+.body-bg-r
+  width:366px
+  height:768px
+  background:url($bgUrl+'player3/bodybg_r.jpg') no-repeat center center
+  position:absolute
+  right:0
+  bottom:0
+li
+  list-style:none
+  padding:0px
+  margin:0px
+.container
+  width:1190px
+  margin:auto
+
+.shownone
+  display:none
+.w1190
+  width:1190px
+.w1120
+  width:1120px
+
+.main
+  height:auto
+  margin:auto;
+  position:relative
+  z-index:0
+footer
+  background:white
+.indexMain
+  font-size:12px
+  margin:0 auto
+  position:relative
+  z-index:0
+.leftsec,.goddess_left
+  width: 332px
+  float: left
+  padding-top: 5px
+  position:relative
+.goddess_left .chat_viewer
+  margin-top:15px
+.rightsec,.goddess_right
+  width: 277px
+  //height: 700px
+  overflow:hidden
+  float:left
+.midsec,.goddess_main
+  width:480px
+  float: left
+  margin:0 12px
+  padding-top:5px
+.footer_nav
+  width: 100%
+  text-align: center
+  font-size: 12px
+  color: #666
+  padding-bottom:10px
+.footer_nav .cp_list
+  margin:22px auto 0
+  text-align: center
+  color: #fff
+.cp_list a
+  font-size: 12px
+  width:55px
+  margin: auto 10px
+.footer_nav a
+  color: #e5e5e5

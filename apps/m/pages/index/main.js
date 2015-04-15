@@ -1,0 +1,1 @@
+require([ "apps/m/pages/index/modules" ], function() {});
