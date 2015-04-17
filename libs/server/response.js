@@ -21,7 +21,7 @@ module.exports = function*(view) {
   this.locals = this.locals || defaultLocals;
 
 
-  if (!this.result) {
+  if (!this.result && !this.body) {
     this.status = 404;
     try {
       //如果有自定义的404页面，就渲染404页面
@@ -33,22 +33,23 @@ module.exports = function*(view) {
   }
 
   if (this.json) {
-    this.body = this.result
+    this.body = this.result || {};
+  } else if (this.text) {
+    this.body = this.result || '';
   } else {
     this.locals = this.result
   }
 
-  if (!this.json) {
+  if (this.json) {
+    this.status = 200;
+    _.extend(this.body, defaultLocals);
+  } else if (this.text) {
+    this.status = 200;
+  } else if (this.body && typeof this.body.pipe === 'function') {
+    this.status = 200;
+  } else {
     _.extend(this.locals, defaultLocals);
     this.status = 200;
     yield this.render(this.page + '/' + this.view);
-  } else if (this.body === null) {
-    this.status = !isNaN(this.status) ? this.status : 500;
-    this.body = errorMsgs[this.status];
-  } else if (typeof this.body.pipe === 'function') {
-    this.status = 200;
-  } else {
-    this.status = 200;
-    _.extend(this.body, defaultLocals);
   }
 }

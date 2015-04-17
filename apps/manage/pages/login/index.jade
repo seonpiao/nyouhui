@@ -1,0 +1,63 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  // iCheck
+  link(href='/plugins/iCheck/square/blue.css', rel='stylesheet', type='text/css')
+  //- link(type="text/css",rel="stylesheet",href="/dist/css/manage/login.1234567890abcdef.css")
+
+block append headjs
+  //- script(type="text/javascript",src="/dist/js/manage/common.min.1234567890abcdef.js")
+
+block append body
+  body.login-page
+    .login-box
+      .login-logo
+        a(href='/')
+          b Admin
+          | LTE
+      // /.login-logo
+      .login-box-body
+        p.login-box-msg Sign in to start your session
+        form(action='/', method='post')
+          .form-group.has-feedback
+            input.form-control(type='text', placeholder='Email', name="email")
+            span.glyphicon.glyphicon-envelope.form-control-feedback
+          .form-group.has-feedback
+            input.form-control(type='password', placeholder='Password', name="password")
+            span.glyphicon.glyphicon-lock.form-control-feedback
+          .row
+            .col-xs-8
+              .checkbox.icheck
+                label
+                  input(type='checkbox')
+                  |  Remember Me
+            // /.col
+            .col-xs-4
+              button.btn.btn-primary.btn-block.btn-flat(type='submit') Sign In
+            // /.col
+        a(href='#') I forgot my password
+        br
+        a.text-center(href='register.html') Register a new membership
+      // /.login-box-body
+    // /.login-box
+    // jQuery 2.1.3
+    script(src='/plugins/jQuery/jQuery-2.1.3.min.js')
+    // Bootstrap 3.3.2 JS
+    script(src='/bootstrap/js/bootstrap.min.js', type='text/javascript')
+    // iCheck
+    script(src='/plugins/iCheck/icheck.min.js', type='text/javascript')
+    script.
+      $(function () {
+      $('input').iCheck({
+      checkboxClass: 'icheckbox_square-blue',
+      radioClass: 'iradio_square-blue',
+      increaseArea: '20%' // optional
+      });
+      });
+
+block append footjs
+  //- script(type="text/javascript",src="/js/manage/login.min.1234567890abcdef.js")

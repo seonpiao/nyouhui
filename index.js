@@ -8,10 +8,15 @@ var views = require('koa-views');
 var body = require('koa-body');
 var resetctx = require('./libs/server/resetctx');
 var response = require('./libs/server/response');
+var staticServe = require('koa-static');
 
 var APP_PATH = path.join(__dirname, 'apps');
 
-function init(app, pagePath) {
+function init(app, options) {
+  var appPath = options.appPath;
+  var appConfig = options.appConfig;
+  var pagePath = path.join(appPath, 'pages');
+  var wwwPath = path.join(appPath, 'www');
   app.use(views(pagePath, {
     default: 'jade',
     cache: process.env.NODE_ENV === 'production' ? true : false
@@ -20,11 +25,23 @@ function init(app, pagePath) {
   //parse body
   app.use(body());
 
+  if (appConfig.middlewares) {
+    appConfig.middlewares.forEach(function(middleware) {
+      app.use(middleware);
+    });
+  }
+
   //default routing
   defaultRoute(app);
 
   //routing
   app.use(routing(app));
+
+  //static
+  app.use(staticServe(wwwPath, {
+    maxage: 3600 * 24 * 30 * 1000,
+    defer: true
+  }));
 }
 
 
@@ -103,12 +120,18 @@ var sanitize = function(s) {
 }
 
 apps.forEach(function(appName, i) {
+  var app = koa();
   var appPath = path.join(APP_PATH, appName)
   var appConfig = require(path.join(appPath, 'config.js'));
+  if (_.isFunction(appConfig)) {
+    appConfig = appConfig(app);
+  }
   var pagePath = path.join(appPath, 'pages');
   var pageNames = fs.readdirSync(pagePath);
-  var app = koa();
-  init(app, pagePath);
+  init(app, {
+    appPath: appPath,
+    appConfig: appConfig
+  });
   pageNames.forEach(function(pageName) {
     var routePath = path.join(pagePath, pageName, 'route.js');
     if (fs.existsSync(routePath)) {

@@ -84,9 +84,15 @@ module.exports = function(grunt) {
           modules: [ {
             name: "apps/m/common"
           }, {
+            name: "apps/manage/common"
+          }, {
             name: "apps/www/common"
           }, {
             name: "apps/m/pages/index/main"
+          }, {
+            name: "apps/manage/pages/index/main"
+          }, {
+            name: "apps/manage/pages/login/main"
           }, {
             name: "apps/www/pages/index/main"
           } ]
