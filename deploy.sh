@@ -7,6 +7,7 @@ static_host="static.nyouhui.com"
 server_host="117.121.10.98"
 server_path="/data/www/nyouhui.com/static/dist"
 server_code="/root/code/nyouhui"
+pm2_pname="index"
 upload_dirs=(js css template)
 
 users=(seon)
@@ -140,7 +141,7 @@ if [ "$choice" = "y" ]; then
   for((i=0;i<num;i++));do
     echo deploy to ${hosts[i]}
     if [ "$env" = "production" ]; then
-      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd ${server_code} && git pull && /usr/local/node/bin/pm2 reload carrier'"
+      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd ${server_code} && git pull && /usr/local/node/bin/pm2 reload ${pm2_pname}'"
     else
       ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && /usr/local/bin/pm2 reload $2"
     fi
