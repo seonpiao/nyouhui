@@ -1,15 +1,14 @@
 #!/bin/bash
 
-test=(121.201.7.134)
-production=(123.56.152.17)
-wlycn=(182.92.215.90)
-staticdir="../web/code/static/"
-staticurl="http://online.static.mm.wanleyun.com/"
+test=(117.121.10.98)
+production=(117.121.10.98)
+staticurl="http://online.static.nyouhui.com/"
 server_host="182.92.215.90"
-server_path="/data/wwwroot/wanleyun/static/dist"
+server_path="/data/www/nyouhui.com/static"
+server_code="/root/code/nyouhui"
 upload_dirs=(js css template)
 
-users=(master wujunlian seon feng staging yange)
+users=(seon)
 
 env=$1
 user=$2
@@ -140,7 +139,7 @@ if [ "$choice" = "y" ]; then
   for((i=0;i<num;i++));do
     echo deploy to ${hosts[i]}
     if [ "$env" = "production" ]; then
-      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd /root/code/carrier && git pull && /usr/local/node/bin/pm2 reload carrier'"
+      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd ${server_code} && git pull && /usr/local/node/bin/pm2 reload carrier'"
     else
       ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && /usr/local/bin/pm2 reload $2"
     fi
