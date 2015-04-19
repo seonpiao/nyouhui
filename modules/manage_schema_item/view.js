@@ -10,14 +10,16 @@ define(["libs/client/views/base"], function(Base) {
       this.renderTo('.schema-list');
       this.on('afterrender', this.check.bind(this));
     },
-    add: function() {
+    add: function(e) {
+      e.preventDefault();
       var self = this;
       this.buildHtml(function(html) {
         self.$('.schema-list').append(html);
         self.check();
       });
     },
-    del: function() {
+    del: function(e) {
+      e.preventDefault();
       var $items = this.$('.schema-list .form-group');
       $items.last().remove();
       this.check();
