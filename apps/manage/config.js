@@ -7,6 +7,12 @@ module.exports = function(app) {
 
   return {
     port: '9002',
-    middlewares: [session(), auth]
+    middlewares: [session({
+      cookie: {
+        domain: global.DOMAIN,
+        path: '/',
+        maxage: 1000 * 60 * 60 * 24 * 30
+      }
+    }), auth]
   }
 };
