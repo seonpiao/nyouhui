@@ -128,7 +128,7 @@ if [ "$choice" = "y" ]; then
     httpcode=""
     while [ "$httpcode" != "200" ]
     do
-      httpcode=`curl -I -o /dev/null -s -w %{http_code} ${staticfileurl}`
+      httpcode=`curl -I -o /dev/null -s -w %{http_code} -H Host:${static_host} ${staticfileurl}`
       echo "$httpcode - ${staticfileurl}"
       wait
       if [ "$httpcode" != "200" ]; then
