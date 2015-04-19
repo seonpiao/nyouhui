@@ -3,6 +3,7 @@
 test=(117.121.10.98)
 production=(117.121.10.98)
 staticurl="http://online.static.nyouhui.com/"
+static_host="static.nyouhui.com"
 server_host="117.121.10.98"
 server_path="/data/www/nyouhui.com/static/dist"
 server_code="/root/code/nyouhui"
@@ -126,7 +127,7 @@ if [ "$choice" = "y" ]; then
     httpcode=""
     while [ "$httpcode" != "200" ]
     do
-      httpcode=`curl -I -o /dev/null -s -w %{http_code} -H 'Host:static.mm.wanleyun.com' ${staticfileurl}`
+      httpcode=`curl -I -o /dev/null -s -w %{http_code} -H 'Host:${static_host}' ${staticfileurl}`
       echo "$httpcode - ${staticfileurl}"
       wait
       if [ "$httpcode" != "200" ]; then
