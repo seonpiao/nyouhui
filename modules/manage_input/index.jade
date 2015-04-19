@@ -1,0 +1,5 @@
+mixin manage_input(options)
+  .form-group
+    if options.label
+      label= options.label
+    input.form-control(type="text", placeholder=options.placeholder || 'Enter..', name=options.name)

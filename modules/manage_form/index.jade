@@ -1,0 +1,10 @@
+mixin manage_form(options)
+  - var formid = 'box_' + Date.now()
+  form(role="form")
+    div(class="box box-" + (options.type || 'primary'), id=formid)
+      .box-header
+        h3.box-title= options.title
+      .box-body
+      .box-footer
+        button(type="submit",class="btn btn-" + (options.type || 'primary'))= options.submitText || '确定'
+    script!= 'var $form = $("#' + formid + '");$form.find(".box-body").append($form.prev());'

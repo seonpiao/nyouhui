@@ -82,17 +82,25 @@ module.exports = function(grunt) {
             jaderuntime: "libs/client/runtime"
           },
           modules: [ {
+            name: "apps/api/common"
+          }, {
             name: "apps/m/common"
           }, {
             name: "apps/manage/common"
           }, {
             name: "apps/www/common"
           }, {
+            name: "apps/api/pages/index/main"
+          }, {
             name: "apps/m/pages/index/main"
+          }, {
+            name: "apps/manage/pages/api/main"
           }, {
             name: "apps/manage/pages/index/main"
           }, {
             name: "apps/manage/pages/login/main"
+          }, {
+            name: "apps/manage/pages/test/main"
           }, {
             name: "apps/www/pages/index/main"
           } ]

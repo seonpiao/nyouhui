@@ -1,44 +1,6 @@
 define(function() {
-  Backbone.sync = function(method, model, options) {
-    var params = {
-      type: 'GET',
-      dataType: 'jsonp',
-      jsonp: 'jsonpCallback'
-    };
-
-    options || (options = {});
-
-    var action = model.action;
-    var baseUrl = model.baseUrl || 'http://api.mm.' + window.domain + '/';
-
-    if (options.action) {
-      action = options.action;
-    }
-
-    if (model.path) {
-      params.url = model.path;
-    } else {
-      params.url = baseUrl + model.module + '/' + action
-    }
-
-    _.extend(params, options)
-
-    if (!options.data && model && (method === 'create' || method === 'update' || method === 'delete')) {
-      params.data = model.toJSON();
-      params.type = 'POST';
-    }
-
-    if (!('cache' in params)) {
-      params.cache = false;
-    }
-
-    model.filter = params.data;
-    var xhr = Backbone.ajax(params);
-    model.trigger('request', model, xhr, params);
-    return xhr;
-  };
   var View = Backbone.View.extend({
-    __base: 'http://static.mm.' + window.domain + '/dist/template/',
+    __base: 'http://static.' + window.domain + '/dist/template/',
     _templates: {},
     // __base: '/jsdev/dist/template/modules/',
     loadTemplate: function(template, callback) {

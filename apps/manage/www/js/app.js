@@ -121,7 +121,7 @@ $.AdminLTE.options = {
  * functions and plugins as specified by the
  * options above.
  */
-$(function () {
+$(function() {
   //Easy access to options
   var o = $.AdminLTE.options;
 
@@ -162,7 +162,7 @@ $(function () {
 
   //Activate direct chat widget
   if (o.directChat.enable) {
-    $(o.directChat.contactToggleSelector).click(function () {
+    $(o.directChat.contactToggleSelector).click(function() {
       var box = $(this).parents('.direct-chat').first();
       box.toggleClass('direct-chat-contacts-open');
     });
@@ -172,9 +172,9 @@ $(function () {
    * INITIALIZE BUTTON TOGGLE
    * ------------------------
    */
-  $('.btn-group[data-toggle="btn-toggle"]').each(function () {
+  $('.btn-group[data-toggle="btn-toggle"]').each(function() {
     var group = $(this);
-    $(this).find(".btn").click(function (e) {
+    $(this).find(".btn").click(function(e) {
       group.find(".btn.active").removeClass("active");
       $(this).addClass("active");
       e.preventDefault();
@@ -199,16 +199,16 @@ $(function () {
  *        $.AdminLTE.layout.fixSidebar()
  */
 $.AdminLTE.layout = {
-  activate: function () {
+  activate: function() {
     var _this = this;
     _this.fix();
     _this.fixSidebar();
-    $(window, ".wrapper").resize(function () {
+    $(window, ".wrapper").resize(function() {
       _this.fix();
       _this.fixSidebar();
     });
   },
-  fix: function () {
+  fix: function() {
     //Get window height and the wrapper height
     var neg = $('.main-header').outerHeight() + $('.main-footer').outerHeight();
     var window_height = $(window).height();
@@ -225,11 +225,13 @@ $.AdminLTE.layout = {
       }
     }
   },
-  fixSidebar: function () {
+  fixSidebar: function() {
     //Make sure the body tag has the .fixed class
     if (!$("body").hasClass("fixed")) {
       if (typeof $.fn.slimScroll != 'undefined') {
-        $(".sidebar").slimScroll({destroy: true}).height("auto");
+        $(".sidebar").slimScroll({
+          destroy: true
+        }).height("auto");
       }
       return;
     } else if (typeof $.fn.slimScroll == 'undefined' && console) {
@@ -239,7 +241,9 @@ $.AdminLTE.layout = {
     if ($.AdminLTE.options.sidebarSlimScroll) {
       if (typeof $.fn.slimScroll != 'undefined') {
         //Distroy if it exists
-        $(".sidebar").slimScroll({destroy: true}).height("auto");
+        $(".sidebar").slimScroll({
+          destroy: true
+        }).height("auto");
         //Add slimscroll
         $(".sidebar").slimscroll({
           height: ($(window).height() - $(".main-header").height()) + "px",
@@ -258,12 +262,12 @@ $.AdminLTE.layout = {
  * @type Function
  * @usage: $.AdminLTE.pushMenu("[data-toggle='offcanvas']")
  */
-$.AdminLTE.pushMenu = function (toggleBtn) {
+$.AdminLTE.pushMenu = function(toggleBtn) {
   //Get the screen sizes
   var screenSizes = this.options.screenSizes;
 
   //Enable sidebar toggle
-  $(toggleBtn).click(function (e) {
+  $(toggleBtn).click(function(e) {
     e.preventDefault();
 
     //Enable sidebar push menu
@@ -281,7 +285,7 @@ $.AdminLTE.pushMenu = function (toggleBtn) {
     }
   });
 
-  $(".content-wrapper").click(function () {
+  $(".content-wrapper").click(function() {
     //Enable hide menu when clicking on the content-wrapper on small screens
     if ($(window).width() <= (screenSizes.sm - 1) && $("body").hasClass("sidebar-open")) {
       $("body").removeClass('sidebar-open');
@@ -298,10 +302,10 @@ $.AdminLTE.pushMenu = function (toggleBtn) {
  * @type Function
  * @Usage: $.AdminLTE.tree('.sidebar')
  */
-$.AdminLTE.tree = function (menu) {
+$.AdminLTE.tree = function(menu) {
   var _this = this;
 
-  $("li a", $(menu)).click(function (e) {
+  $("li a", $(menu)).click(function(e) {
     //Get the clicked link and the next element
     var $this = $(this);
     var checkElement = $this.next();
@@ -309,7 +313,7 @@ $.AdminLTE.tree = function (menu) {
     //Check if the next element is a menu and is visible
     if ((checkElement.is('.treeview-menu')) && (checkElement.is(':visible'))) {
       //Close the menu
-      checkElement.slideUp('normal', function () {
+      checkElement.slideUp('normal', function() {
         checkElement.removeClass('menu-open');
         //Fix the layout in case the sidebar stretches over the height of the window
         //_this.layout.fix();
@@ -328,7 +332,7 @@ $.AdminLTE.tree = function (menu) {
       var parent_li = $this.parent("li");
 
       //Open the target menu and add the menu-open class
-      checkElement.slideDown('normal', function () {
+      checkElement.slideDown('normal', function() {
         //Add the class active to the parent li
         checkElement.addClass('menu-open');
         parent.find('li.active').removeClass('active');
@@ -354,22 +358,22 @@ $.AdminLTE.tree = function (menu) {
  *        Set all of your option in the main $.AdminLTE.options object
  */
 $.AdminLTE.boxWidget = {
-  activate: function () {
+  activate: function() {
     var o = $.AdminLTE.options;
     var _this = this;
     //Listen for collapse event triggers
-    $(o.boxWidgetOptions.boxWidgetSelectors.collapse).click(function (e) {
+    $(o.boxWidgetOptions.boxWidgetSelectors.collapse).click(function(e) {
       e.preventDefault();
       _this.collapse($(this));
     });
 
     //Listen for remove event triggers
-    $(o.boxWidgetOptions.boxWidgetSelectors.remove).click(function (e) {
+    $(o.boxWidgetOptions.boxWidgetSelectors.remove).click(function(e) {
       e.preventDefault();
       _this.remove($(this));
     });
   },
-  collapse: function (element) {
+  collapse: function(element) {
     //Find the box parent
     var box = element.parents(".box").first();
     //Find the body and the footer
@@ -377,18 +381,18 @@ $.AdminLTE.boxWidget = {
     if (!box.hasClass("collapsed-box")) {
       //Convert minus into plus
       element.children(".fa-minus").removeClass("fa-minus").addClass("fa-plus");
-      bf.slideUp(300, function () {
+      bf.slideUp(300, function() {
         box.addClass("collapsed-box");
       });
     } else {
       //Convert plus into minus
       element.children(".fa-plus").removeClass("fa-plus").addClass("fa-minus");
-      bf.slideDown(300, function () {
+      bf.slideDown(300, function() {
         box.removeClass("collapsed-box");
       });
     }
   },
-  remove: function (element) {
+  remove: function(element) {
     //Find the box parent
     var box = element.parents(".box").first();
     box.slideUp();
@@ -411,9 +415,9 @@ $.AdminLTE.boxWidget = {
  * @type plugin
  * @usage $("#box-widget").boxRefresh( options );
  */
-(function ($) {
+(function($) {
 
-  $.fn.boxRefresh = function (options) {
+  $.fn.boxRefresh = function(options) {
 
     // Render options
     var settings = $.extend({
@@ -422,17 +426,15 @@ $.AdminLTE.boxWidget = {
       //File source to be loaded (e.g: ajax/src.php)
       source: "",
       //Callbacks
-      onLoadStart: function (box) {
-      }, //Right after the button has been clicked
-      onLoadDone: function (box) {
-      } //When the source has been loaded
+      onLoadStart: function(box) {}, //Right after the button has been clicked
+      onLoadDone: function(box) {} //When the source has been loaded
 
     }, options);
 
     //The overlay
     var overlay = $('<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>');
 
-    return this.each(function () {
+    return this.each(function() {
       //if a source is specified
       if (settings.source === "") {
         if (console) {
@@ -446,13 +448,13 @@ $.AdminLTE.boxWidget = {
       var rBtn = box.find(settings.trigger).first();
 
       //On trigger click
-      rBtn.click(function (e) {
+      rBtn.click(function(e) {
         e.preventDefault();
         //Add loading overlay
         start(box);
 
         //Perform ajax call
-        box.find(".box-body").load(settings.source, function () {
+        box.find(".box-body").load(settings.source, function() {
           done(box);
         });
       });
@@ -484,35 +486,33 @@ $.AdminLTE.boxWidget = {
  * @type plugin
  * @usage $("#todo-widget").todolist( options );
  */
-(function ($) {
+(function($) {
 
-  $.fn.todolist = function (options) {
+  $.fn.todolist = function(options) {
     // Render options
     var settings = $.extend({
       //When the user checks the input
-      onCheck: function (ele) {
-      },
+      onCheck: function(ele) {},
       //When the user unchecks the input
-      onUncheck: function (ele) {
-      }
+      onUncheck: function(ele) {}
     }, options);
 
-    return this.each(function () {
+    return this.each(function() {
 
       if (typeof $.fn.iCheck != 'undefined') {
-        $('input', this).on('ifChecked', function (event) {
+        $('input', this).on('ifChecked', function(event) {
           var ele = $(this).parents("li").first();
           ele.toggleClass("done");
           settings.onCheck.call(ele);
         });
 
-        $('input', this).on('ifUnchecked', function (event) {
+        $('input', this).on('ifUnchecked', function(event) {
           var ele = $(this).parents("li").first();
           ele.toggleClass("done");
           settings.onUncheck.call(ele);
         });
       } else {
-        $('input', this).on('change', function (event) {
+        $('input', this).on('change', function(event) {
           var ele = $(this).parents("li").first();
           ele.toggleClass("done");
           settings.onCheck.call(ele);

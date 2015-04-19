@@ -1,0 +1,12 @@
+mixin manage_content_header(options)
+  // Content Header (Page header)
+  section.content-header
+    h1= options.title
+      small= options.short
+    ol.breadcrumb
+      li
+        a(href='#')
+          i.fa.fa-dashboard
+          |  Home
+      for item, index in options.pathes
+        li(class=((index === options.pathes.length - 1) ? 'active' : ''))= item.name

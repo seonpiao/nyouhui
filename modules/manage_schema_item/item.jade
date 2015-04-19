@@ -1,0 +1,17 @@
+.form-group
+  .row.field-item
+    .col-xs-2
+      input.form-control(type="text",placeholder="字段名",name="field_name")
+    .col-xs-2
+      input.form-control(type="text",placeholder="别名",name="field_alias")
+    .col-xs-2
+      select.form-control(type="text",name="field_type")
+        option 类型
+        option String
+    .col-xs-2
+      select.form-control(type="text",name="field_index")
+        option 索引
+        option(value="yes") 是
+        option(value="no") 否
+    .col-xs-2
+      input.form-control(type="text",placeholder="默认值",name="field_default")

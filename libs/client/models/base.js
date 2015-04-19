@@ -8,9 +8,31 @@ define(function() {
       }
       this.init.apply(this, arguments);
     },
+    fetch: function() {
+      this.method = 'read';
+      return Backbone.Model.prototype.fetch.apply(this, arguments);
+    },
+    save: function(key, val, options) {
+      this.method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
+      return Backbone.Model.prototype.save.apply(this, arguments);
+    },
+    destroy: function() {
+      this.method = 'delete';
+      return Backbone.Model.prototype.destroy.apply(this, arguments);
+    },
+    url: function() {
+      if (this.method === 'create') {
+        return '/api/nyouhui/' + this.collection;
+      } else {
+        return '/api/nyouhui/' + this.collection + '/' + this.id;
+      }
+    },
     parse: function(resp) {
-      var data = resp;
-      return data;
+      if (resp.code === 200) {
+        return resp.data;
+      }
+      this.error = resp;
+      return {};
     },
     cache: function(options, callback) {
       if (typeof options === 'function') {

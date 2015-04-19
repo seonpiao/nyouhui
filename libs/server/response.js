@@ -1,5 +1,6 @@
 var errorMsgs = {
   404: 'Not found.',
+  403: 'Not Allowed',
   500: 'Internal error.'
 }
 
@@ -13,7 +14,7 @@ module.exports = function*(view) {
   var defaultLocals = {
     __env: {
       NODE_ENV: process.env.NODE_ENV,
-      WLY_DOMAIN: global.WLY_DOMAIN
+      DOMAIN: global.DOMAIN
     },
     __global: this.global || {}
   };
@@ -22,12 +23,16 @@ module.exports = function*(view) {
 
 
   if (!this.result && !this.body) {
-    this.status = 404;
-    try {
-      //如果有自定义的404页面，就渲染404页面
-      yield this.render(this.page + '/' + this.view);
-    } catch (e) {
-      this.body = 'Not found';
+    if (this.status) {
+      this.body = errorMsgs[this.status] || 'Unknown Error.';
+    } else {
+      this.status = 404;
+      try {
+        //如果有自定义的404页面，就渲染404页面
+        yield this.render(this.page + '/' + this.view);
+      } catch (e) {
+        this.body = 'Not found';
+      }
     }
     return;
   }

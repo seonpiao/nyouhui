@@ -1,5 +1,5 @@
 var session = require('koa-generic-session');
-
+var auth = require('./auth');
 
 module.exports = function(app) {
 
@@ -7,6 +7,6 @@ module.exports = function(app) {
 
   return {
     port: '9002',
-    middlewares: [session()]
+    middlewares: [session(), auth]
   }
 };

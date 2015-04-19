@@ -621,5 +621,5 @@
 })();
 
 require.config({
-    baseUrl: 'http://static.mm.wanleyun.com/dist/'
+    baseUrl: 'http://static.nyouhui.com/dist/'
 });

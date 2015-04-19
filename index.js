@@ -54,7 +54,7 @@ if (port) {
   port = port.split(',');
 }
 var domain = argv[4];
-global.WLY_DOMAIN = domain || 'wanleyun.com';
+global.DOMAIN = domain || 'nyouhui.com';
 
 var defaultRoute = function(app) {
   app.use(function*(next) {
@@ -82,7 +82,7 @@ var defaultRoute = function(app) {
       this.page = '404';
     } else {
       this.result.query = this.request.query;
-      this.page = this.page || this.path.substring(1);
+      this.page = this.page || this.path.substring(1).replace(/\/.*/, '');
     }
     this.global.page = this.page;
     this.view = this.view || 'index';
@@ -91,13 +91,9 @@ var defaultRoute = function(app) {
 };
 
 var bases = {
-  'nvshen.zongyi.letv.com': {
-    i: '2', //把i拼到后面
-    mm: '3' //保持域名不变
-  },
   'defaults': {
-    i: '1', //替换同级子域
-    mm: '1' //替换同级子域
+    www: '1', //替换同级子域
+    m: '1' //替换同级子域
   }
 };
 
