@@ -3,7 +3,7 @@
 test=(117.121.10.98)
 production=(117.121.10.98)
 staticurl="http://online.static.nyouhui.com/"
-server_host="182.92.215.90"
+server_host="117.121.10.98"
 server_path="/data/www/nyouhui.com/static/dist"
 server_code="/root/code/nyouhui"
 upload_dirs=(js css template)
