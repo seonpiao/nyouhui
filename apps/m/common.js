@@ -63,10 +63,10 @@ if (!Object.keys) {
   };
 }
 
-require([ "oz", "jquery", "jquery-cookie", "underscore", "backbone", "jaderuntime" ], function(io) {
+require(["oz", "jquery", "jquery-cookie", "underscore", "backbone", "jaderuntime"], function(io) {
   var trigger = jQuery.fn.trigger;
   jQuery.fn.trigger = function(type, data) {
-    var globalEvents = [ "login", "logout", "DOMNodeRemoved", "DOMNodeInserted" ];
+    var globalEvents = ["login", "logout", "DOMNodeRemoved", "DOMNodeInserted"];
     if (this[0] === document) {
       if (_.indexOf(globalEvents, type) !== -1) {
         trigger.apply(this, arguments);
@@ -74,6 +74,7 @@ require([ "oz", "jquery", "jquery-cookie", "underscore", "backbone", "jaderuntim
     } else {
       trigger.apply(this, arguments);
     }
+    return this;
   };
   jQuery.extend(jQuery.ajaxSettings, {
     cache: false

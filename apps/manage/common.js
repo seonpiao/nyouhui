@@ -74,5 +74,6 @@ require(["oz", "underscore", "backbone", "jaderuntime"], function(io) {
     } else {
       trigger.apply(this, arguments);
     }
+    return this;
   };
 });

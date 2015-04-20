@@ -13,4 +13,9 @@ module.exports = function(app, pageName) {
       this.redirect('/login');
     }
   });
+
+  app.route('/logout').get(function*(next) {
+    this.session = null;
+    this.redirect('/login');
+  });
 }
