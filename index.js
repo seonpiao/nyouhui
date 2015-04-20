@@ -25,14 +25,14 @@ function init(app, options) {
   //parse body
   app.use(body());
 
+  //default routing
+  defaultRoute(app);
+
   if (appConfig.middlewares) {
     appConfig.middlewares.forEach(function(middleware) {
       app.use(middleware);
     });
   }
-
-  //default routing
-  defaultRoute(app);
 
   //routing
   app.use(routing(app));
