@@ -1,8 +1,8 @@
 module.exports = function(app, pageName) {
   app.route('/').get(function*(next) {
-    if (this.session.email) {
+    if (this.session.username) {
       this.result = {
-        email: this.session.email
+        username: this.session.username
       };
       this.page = 'index';
     } else {
