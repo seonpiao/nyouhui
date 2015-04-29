@@ -1,13 +1,53 @@
+mixin drawSubMenu(menus)
+  ul.treeview-menu
+    each item in menus
+      li(class=(item.active ? 'active' : ''))
+        a(href=(item.leaf ? item.url : 'javascript:;'))
+          i.fa.fa-circle-o
+          span= item.name
+          if !item.leaf
+            i.fa.fa-angle-left.pull-right
+        if !item.leaf
+          +drawSubMenu(item.childs)
+
+
+mixin drawMenu(menus)
+  each item in menus
+    li(class="treeview" + (item.active ? ' active' : ''))
+      a(href=item.url)
+        i.fa.fa-dashboard
+        span= item.name
+        if !item.leaf
+          i.fa.fa-angle-left.pull-right
+      if !item.leaf
+        +drawSubMenu(item.childs)
+
 // sidebar menu: : style can be found in sidebar.less
 ul.sidebar-menu
   //- li.header MAIN NAVIGATION
   - var menus = data.nyouhui.manage_menu;
+  - var menuTree = {name:'root',childs:{}};
+  - var currNode = menuTree;
   each item in menus
-    li(class="treeview" + (path.indexOf(item.url) !== -1 ? ' active' : ''))
-      a(href=item.url)
-        i.fa.fa-dashboard
-        span= item.name
-        i.fa.fa-angle-left.pull-right
+    - item.leaf = true;
+    - var menuPath = item.path.replace(/^\/*/,'').replace(/\/*$/,'');
+    - var menuPathArr = menuPath.split('/');
+    each menuName in menuPathArr
+      if menuName
+        if !currNode.childs[menuName]
+          - currNode.childs[menuName] = {name:menuName,childs:{}};
+        - currNode.childs[menuName].parent = currNode;
+        - currNode = currNode.childs[menuName];
+    - currNode.childs[item.name] = item;
+    - item.parent = currNode;
+    - currNode = menuTree;
+    if path.indexOf(item.url) !== -1
+      - var activeNode = item
+      while activeNode.name !== 'root'
+        - activeNode.active = true;
+        - activeNode = activeNode.parent;
+  - console.log(menuTree)
+  +drawMenu(menuTree.childs)
   //- li.active.treeview
   //-   a(href='#')
   //-     i.fa.fa-dashboard
