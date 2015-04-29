@@ -4,11 +4,16 @@ var settings = require('../../settings');
 var thunkify = require('thunkify');
 var assert = require('assert');
 
+var dbs = {};
+
 var Mongo = function() {
 
 };
 
 Mongo.get = function*(dbname) {
+  if (dbs[dbname]) {
+    return dbs[dbname];
+  }
   var constr = format('mongodb://%s/%s', settings.mongodb.host.join(','), dbname);
   var db =
     yield thunkify(MongoClient.connect.bind(MongoClient))(constr, {
@@ -18,6 +23,7 @@ Mongo.get = function*(dbname) {
       }
     });
   assert(db);
+  dbs[dbname] = db;
   return db;
 }
 
