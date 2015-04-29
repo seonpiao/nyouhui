@@ -3,7 +3,10 @@ mixin drawSubMenu(menus)
     each item in menus
       li(class=(item.active ? 'active' : ''))
         a(href=(item.leaf ? item.url : 'javascript:;'))
-          i.fa.fa-circle-o
+          if !item.leaf
+            i.fa.fa-circle-o
+          else
+            i.fa.fa-hand-o-up
           span= item.name
           if !item.leaf
             i.fa.fa-angle-left.pull-right
@@ -15,7 +18,10 @@ mixin drawMenu(menus)
   each item in menus
     li(class="treeview" + (item.active ? ' active' : ''))
       a(href=item.url)
-        i.fa.fa-dashboard
+        if !item.leaf
+          i.fa.fa-circle-o
+        else
+          i.fa.fa-hand-o-up
         span= item.name
         if !item.leaf
           i.fa.fa-angle-left.pull-right
