@@ -1,6 +1,8 @@
 define(function() {
   var Model = Backbone.Model.extend({
     idAttribute: '_id',
+    db: 'nyouhui',
+    prefix: '/api',
     initialize: function(options) {
       options = options || {};
       if (options.module) {
@@ -13,6 +15,7 @@ define(function() {
       return Backbone.Model.prototype.fetch.apply(this, arguments);
     },
     save: function(key, val, options) {
+      options = options || {};
       this.method = this.isNew() ? 'create' : (options.patch ? 'patch' : 'update');
       return Backbone.Model.prototype.save.apply(this, arguments);
     },
@@ -22,9 +25,9 @@ define(function() {
     },
     url: function() {
       if (this.method === 'create') {
-        return '/api/nyouhui/' + this.collection;
+        return this.prefix + '/' + this.db + '/' + this.collection;
       } else {
-        return '/api/nyouhui/' + this.collection + '/' + this.id;
+        return this.prefix + '/' + this.db + '/' + this.collection + '/' + this.id;
       }
     },
     parse: function(resp) {

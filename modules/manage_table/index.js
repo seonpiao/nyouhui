@@ -1,4 +1,4 @@
-define(["modules/manage_schema_def/view", "modules/manage_schema_def/model"], function(View, Model) {
+define(["modules/manage_table/view", "modules/manage_table/model"], function(View, Model) {
   return {
     init: function(el) {
       var view = new View({

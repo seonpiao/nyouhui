@@ -1,0 +1,26 @@
+mixin manage_table(list,options)
+  - options = options || {};
+  if !__global.__manage_table_id
+    - __global.__manage_table_id = 1;
+  - var tableid = 'table_' + __global.__manage_table_id++
+  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=data.db,data-collection=data.collection)
+    thead
+      tr
+        each field in options.fields
+          if field.display === 'yes'
+            th= field.alias
+        th
+    tbody
+      each item in list
+        tr
+          each field in options.fields
+            if field.display === 'yes'
+              td= item[field.name]
+          td
+            a(href=path.replace(/\/$/,'') + '/update/' + item._id) 编辑
+            | 
+            a.del-row(data-id=(item._id + ''), href="javascript:;") 删除
+    //- tfoot
+    //-   tr
+    //-     each field in options.fields
+    //-       th= field.alias

@@ -1,0 +1,63 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  //- link(type="text/css",rel="stylesheet",href="/dist/css/manage/test.3712c195a4afd8c1.css")
+
+block append headjs
+  //- script(type="text/javascript",src="/dist/js/manage/common.min.555a375e978c31de.js")
+
+block append body
+  script.
+    $('body').addClass('skin-blue');
+  .wrapper
+    include ../../../../modules/manage_header/index
+    include ../../../../modules/manage_sidebar/index
+    include ../../../../modules/manage_content_header/index
+    include ../../../../modules/manage_box/index
+    include ../../../../modules/manage_input/index
+    .content-wrapper
+      +manage_content_header({
+        title:'Schema Defination',
+        //- short:'Control panel',
+        pathes:[{
+          name:'Schema Defination'
+        }]
+      })
+      // Main content
+      section.content
+        form(role="form",data-module="manage_form",data-db=data.db,data-collection=data.collection)
+          div
+            if data.data && data.data._id
+              +manage_input({
+                name:'_id',
+                type:'hidden',
+                value:(data.data ? data.data._id + '' : '')
+              })
+            each field in data.schema.fields
+              if field.type === 'input'
+                +manage_input({
+                  label:field.alias,
+                  name:field.name,
+                  value:data.data ? data.data[field.name] : field.defaults
+                })
+              else if field.type === 'password'
+                +manage_input({
+                  label:field.alias,
+                  name:field.name,
+                  value:data.data ? data.data[field.name] : '',
+                  type:'password'
+                })
+          +manage_box({
+            title:'表定义'
+          })
+          .form-group
+            button.btn.btn-primary.btn-schema-add(type="submit") 确定
+            | 
+            button.btn.btn-default.btn-cancel(type="submit") 取消
+
+block append footjs
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.05bf71aa4d266066.js")

@@ -1,5 +1,5 @@
-.manage_schema_item(data-module="manage_schema_item")
-  .schema-list
+.manage_schema_item(data-module="manage_schema_item", data-form-control="schemalist")
+  .schema-list(data-fields=(data.data ? JSON.stringify(data.data.fields) : ''))
   .form-group
     button.btn.btn-default.add-item 增加
     | 

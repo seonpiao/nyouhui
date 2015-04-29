@@ -1,13 +1,26 @@
-module.exports = function(app, pageName) {
+var Mongo = require('../../../../libs/server/mongodb');
+var thunkify = require('thunkify');
+
+module.exports = function(app, pageName, config) {
   app.route('/login').get(function*(next) {
     this.result = {};
     this.page = 'login';
   }).post(function*(next) {
-    var email = this.request.body.email;
+    var username = this.request.body.username;
     var password = this.request.body.password;
     this.status = 301;
-    if ((email === 'admin@nyouhui.com' || email === 'root') && password === '123') {
-      this.session.email = email;
+    var db =
+      yield Mongo.get(config.admins.db);
+    var collection = db.collection(config.admins.collection);
+    var cursor =
+      yield thunkify(collection.find.bind(collection))({
+        username: username,
+        password: password
+      });
+    result =
+      yield thunkify(cursor.toArray.bind(cursor))();
+    if (result && result.length === 1) {
+      this.session.username = username;
       this.redirect(this.session.redirectUrl || '/');
     } else {
       this.redirect('/login');

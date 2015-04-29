@@ -17,6 +17,9 @@ function init(app, options) {
   var appConfig = options.appConfig;
   var pagePath = path.join(appPath, 'pages');
   var wwwPath = path.join(appPath, 'www');
+
+  app.config = appConfig;
+
   app.use(views(pagePath, {
     default: 'jade',
     cache: process.env.NODE_ENV === 'production' ? true : false
@@ -82,6 +85,7 @@ var defaultRoute = function(app) {
       this.page = '404';
     } else {
       this.result.query = this.request.query;
+      this.result.path = this.path;
       this.page = this.page || this.path.substring(1).replace(/\/.*/, '');
     }
     this.global.page = this.page;
@@ -132,7 +136,7 @@ apps.forEach(function(appName, i) {
     var routePath = path.join(pagePath, pageName, 'route.js');
     if (fs.existsSync(routePath)) {
       var route = require(routePath);
-      route(app, pageName);
+      route(app, pageName, appConfig);
     } else {
       app.route('/' + pageName).all(function*(next) {
         this.result = {};

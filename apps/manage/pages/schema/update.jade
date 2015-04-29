@@ -1,0 +1,68 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  //- link(type="text/css",rel="stylesheet",href="/dist/css/manage/test.3712c195a4afd8c1.css")
+
+block append headjs
+  //- script(type="text/javascript",src="/dist/js/manage/common.min.555a375e978c31de.js")
+
+block append body
+  script.
+    $('body').addClass('skin-blue');
+  .wrapper
+    include ../../../../modules/manage_header/index
+    include ../../../../modules/manage_sidebar/index
+    include ../../../../modules/manage_content_header/index
+    include ../../../../modules/manage_box/index
+    .content-wrapper
+      +manage_content_header({
+        title:'Schema Defination',
+        pathes:[{
+          name:'Schema Defination'
+        }]
+      })
+      include ../../../../modules/manage_input/index
+      // Main content
+      section.content
+        form(role="form",data-module="manage_form",data-collection="schema")
+          div
+            if data.data && data.data._id
+              +manage_input({
+                name:'_id',
+                type:'hidden',
+                value:(data.data ? data.data._id + '' : '')
+              })
+            +manage_input({
+              label:'数据库名',
+              name:'db',
+              value:(data.data ? data.data.db : '')
+            })
+            +manage_input({
+              label:'表名',
+              name:'collection',
+              value:(data.data ? data.data.collection : '')
+            })
+            +manage_input({
+              label:'表别名',
+              name:'alias',
+              value:(data.data ? data.data.alias : '')
+            })
+          +manage_box({
+            title:'表定义'
+          })
+          div
+            include ../../../../modules/manage_schema_item/index
+          +manage_box({
+            title:'字段定义'
+          })
+          .form-group
+            button.btn.btn-primary.btn-schema-add(type="submit") 确定
+            | 
+            button.btn.btn-default.btn-cancel(type="submit") 取消
+
+block append footjs
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/schema.min.05bf71aa4d266066.js")

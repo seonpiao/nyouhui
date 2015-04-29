@@ -1,0 +1,46 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  link(href='/plugins/datatables/dataTables.bootstrap.css', rel='stylesheet', type='text/css')
+
+block append headjs
+
+block append body
+  script.
+    $('body').addClass('skin-blue');
+  .wrapper
+    include ../../../../modules/manage_header/index
+    include ../../../../modules/manage_sidebar/index
+    include ../../../../modules/manage_content_header/index
+    include ../../../../modules/manage_box/index
+    .content-wrapper
+      +manage_content_header({
+        title:'CRUD',
+        pathes:[{
+          name:'CRUD'
+        }]
+      })
+      // Main content
+      section.content
+        include ../../../../modules/manage_table/index
+        div
+          +manage_table(data.list,{
+            fields:data.schema.fields
+          })
+          .form-group
+            a.btn.btn-primary(href="/crud/" + data.db + "/" + data.collection + "/create") 新建
+        +manage_box({
+          title:'字段定义'
+        })
+
+block append pluginjs
+  // DATA TABES SCRIPT
+  script(src='/plugins/datatables/jquery.dataTables.js')
+  script(src='/plugins/datatables/dataTables.bootstrap.js')
+
+block append footjs
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.05bf71aa4d266066.js")

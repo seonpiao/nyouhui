@@ -1,6 +1,6 @@
 mixin manage_form(options)
   - var formid = 'box_' + Date.now()
-  form(role="form")
+  form(role="form",data-module="manage_form")
     div(class="box box-" + (options.type || 'primary'), id=formid)
       .box-header
         h3.box-title= options.title

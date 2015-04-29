@@ -2,7 +2,7 @@ mixin manage_box(options)
   if !__global.__manage_box_id
     - __global.__manage_box_id = 1;
   - var boxid = 'box_' + __global.__manage_box_id++
-  div(class="box box-" + (options.type || 'primary'), id=boxid)
+  div(class="box box-" + (options.type || 'primary'), id=boxid, data-module=options.module)
     .box-header
       h3.box-title= options.title
     .box-body

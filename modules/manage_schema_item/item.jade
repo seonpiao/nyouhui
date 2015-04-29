@@ -1,17 +1,29 @@
 .form-group
   .row.field-item
+    - var yesorno = {no:'否',yes:'是'}
     .col-xs-2
-      input.form-control(type="text",placeholder="字段名",name="field_name")
+      label 字段名
+      input.form-control(type="text",name="field_name",value=(field ? field.name : ''))
     .col-xs-2
-      input.form-control(type="text",placeholder="别名",name="field_alias")
+      label 别名
+      input.form-control(type="text",name="field_alias",value=(field ? field.alias : ''))
     .col-xs-2
+      label 类型
+      - var types = ['input','password']
       select.form-control(type="text",name="field_type")
-        option 类型
-        option String
-    .col-xs-2
+        each type in types
+          option(value=type,selected=(field && field.type === type))= type
+    .col-xs-1
+      label 索引
       select.form-control(type="text",name="field_index")
-        option 索引
-        option(value="yes") 是
-        option(value="no") 否
-    .col-xs-2
-      input.form-control(type="text",placeholder="默认值",name="field_default")
+        - var indexTypes = {no:'否',yes:'是',unique:'唯一索引'}
+        each title,value in indexTypes
+          option(value=value,selected=(field && field.index === value))= title
+    .col-xs-1
+      label 显示
+      select.form-control(type="text",name="field_display")
+        each title,value in yesorno
+          option(value=value,selected=(field && field.display === value))= title
+    .col-xs-1
+      label 默认值
+      input.form-control(type="text",name="field_defaults",value=(field ? field.defaults : ''))
