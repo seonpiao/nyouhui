@@ -1,5 +1,8 @@
 mixin manage_table(list,options)
   - options = options || {};
+  - options.overrides = options.overrides || {};
+  - options.overrides.td = options.overrides.td || {};
+  - options.overrides.link = options.overrides.link || {};
   if !__global.__manage_table_id
     - __global.__manage_table_id = 1;
   - var tableid = 'table_' + __global.__manage_table_id++
@@ -15,9 +18,9 @@ mixin manage_table(list,options)
         tr
           each field in options.fields
             if field.display === 'yes'
-              td= item[field.name]
+              td!= (options.overrides && options.overrides[field.name] ? options.overrides[field.name](item[field.name]) : item[field.name])
           td
-            a(href=path.replace(/\/$/,'') + '/update/' + item._id) 编辑
+            a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + item._id)) 编辑
             | 
             a.del-row(data-id=(item._id + ''), href="javascript:;") 删除
     //- tfoot

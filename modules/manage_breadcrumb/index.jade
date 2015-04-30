@@ -1,0 +1,13 @@
+- var menus = data.nyouhui.manage_menu;
+- var title,pathes;
+each item in menus
+  if path.indexOf(item.url) !== -1
+    - title = item.name
+    - pathes = item.path.replace(/^\/*/,'').replace(/\/*$/,'').split('/').map(function(item){return {name:item}});
+- pathes.push({name:title});
+
++manage_content_header({
+  title:title,
+  short:'',
+  pathes:pathes
+})

@@ -1,5 +1,5 @@
-mixin manage_input(options)
-  .form-group(data-module="manage_input",data-form-control="input")
+mixin manage_ctrl_input(options)
+  .form-group(data-module="manage_ctrl_input",data-form-control="input")
     if options.label
       label= options.label
     input.form-control(type=(options.type || "text"), placeholder=options.placeholder || '', name=options.name, value=(options.value || ''))

@@ -1,10 +1,12 @@
 mixin manage_box(options)
+  - options = options || {};
   if !__global.__manage_box_id
     - __global.__manage_box_id = 1;
   - var boxid = 'box_' + __global.__manage_box_id++
   div(class="box box-" + (options.type || 'primary'), id=boxid, data-module=options.module)
-    .box-header
-      h3.box-title= options.title
+    if options.title
+      .box-header
+        h3.box-title= options.title
     .box-body
     //- .box-footer
   script!= 'var $box = $("#' + boxid + '");$box.find(".box-body").append($box.prev());'

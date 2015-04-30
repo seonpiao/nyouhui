@@ -8,54 +8,38 @@ block append stylesheet
 
 block append headjs
 
-block append body
-  script.
-    $('body').addClass('skin-blue');
-  .wrapper
-    include ../../../../modules/manage_header/index
-    include ../../../../modules/manage_sidebar/index
-    include ../../../../modules/manage_content_header/index
-    include ../../../../modules/manage_box/index
-    include ../../../../modules/manage_input/index
-    .content-wrapper
-      +manage_content_header({
-        title:'Schema Defination',
-        //- short:'Control panel',
-        pathes:[{
-          name:'Schema Defination'
-        }]
-      })
-      // Main content
-      section.content
-        form(role="form",data-module="manage_form",data-db=data.db,data-collection=data.collection)
-          div
-            if data.data && data.data._id
-              +manage_input({
-                name:'_id',
-                type:'hidden',
-                value:(data.data ? data.data._id + '' : '')
-              })
-            each field in data.schema.fields
-              if field.type === 'input'
-                +manage_input({
-                  label:field.alias,
-                  name:field.name,
-                  value:data.data ? data.data[field.name] : field.defaults
-                })
-              else if field.type === 'password'
-                +manage_input({
-                  label:field.alias,
-                  name:field.name,
-                  value:data.data ? data.data[field.name] : '',
-                  type:'password'
-                })
-          +manage_box({
-            title:'表定义'
+block append content
+  // Main content
+  section.content
+    form(role="form",data-module="manage_form",data-db=data.db,data-collection=data.collection)
+      div
+        if data.data && data.data._id
+          +manage_ctrl_input({
+            name:'_id',
+            type:'hidden',
+            value:(data.data ? data.data._id + '' : '')
           })
-          .form-group
-            button.btn.btn-primary.btn-schema-add(type="submit") 确定
-            | 
-            button.btn.btn-default.btn-cancel(type="submit") 取消
+        each field in data.schema.fields
+          if field.type === 'input'
+            +manage_ctrl_input({
+              label:field.alias,
+              name:field.name,
+              value:data.data ? data.data[field.name] : field.defaults
+            })
+          else if field.type === 'password'
+            +manage_ctrl_input({
+              label:field.alias,
+              name:field.name,
+              value:data.data ? data.data[field.name] : '',
+              type:'password'
+            })
+      +manage_box({
+        title:'表定义'
+      })
+      .form-group
+        button.btn.btn-primary.btn-schema-add(type="submit") 确定
+        | 
+        a.btn.btn-default.btn-cancel 取消
 
 block append footjs
   script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.caa23e3ecd512ac1.js")

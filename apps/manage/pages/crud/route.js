@@ -4,6 +4,8 @@ var logger = require('log4js').getLogger('manage:api');
 var auth = require('../../auth');
 var settings = require('../../../../settings');
 var _ = require('underscore');
+var fs = require('fs');
+var path = require('path');
 
 module.exports = function(app) {
   app.route('/crud/:db/:collection').get(function*(next) {
@@ -35,6 +37,9 @@ module.exports = function(app) {
           db: db,
           collection: collection
         }
+      }
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'index.jade'))) {
+        this.view = path.join('views', db, collection, 'index');
       }
     } catch (e) {
       this.result = {
@@ -68,6 +73,12 @@ module.exports = function(app) {
           collection: collection
         }
       }
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
+        this.view = path.join('views', db, collection, 'update');
+      } else {
+        this.view = 'update';
+      }
+      console.log(this.result)
     } catch (e) {
       this.result = {
         code: 500,
@@ -109,6 +120,11 @@ module.exports = function(app) {
           collection: collection
         }
       }
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
+        this.view = path.join('views', db, collection, 'update');
+      } else {
+        this.view = 'update';
+      }
     } catch (e) {
       this.result = {
         code: 500,
@@ -116,6 +132,5 @@ module.exports = function(app) {
       }
       logger.error(e.stack);
     }
-    this.view = 'update';
   });
 }

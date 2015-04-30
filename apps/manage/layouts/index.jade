@@ -41,7 +41,18 @@ html
     script!= 'window.domain = "' + __env.DOMAIN + '"'
     block headjs
   body
-    block body
+    script.
+      $('body').addClass('skin-blue');
+    .wrapper
+      include ../../../modules/manage_header/index
+      include ../../../modules/manage_sidebar/index
+      include ../../../modules/manage_content_header/index
+      include ../../../modules/manage_ctrl_input/index
+      include ../../../modules/manage_box/index
+      include ../../../modules/manage_table/index
+      .content-wrapper
+        include ../../../modules/manage_breadcrumb/index
+        block content
     block footer
     // jQuery UI 1.11.2
     script(src='/plugins/jQueryUI/jquery-ui-1.10.3.min.js', type='text/javascript')

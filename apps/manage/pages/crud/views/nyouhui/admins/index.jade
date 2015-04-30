@@ -1,4 +1,4 @@
-extends ../../layouts/index
+extends ../../../../../layouts/index
 
 block append title
 
@@ -12,7 +12,6 @@ block append headjs
 block append content
   // Main content
   section.content
-    include ../../../../modules/manage_table/index
     div
       +manage_table(data.list,{
         fields:data.schema.fields
