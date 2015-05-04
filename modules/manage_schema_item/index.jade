@@ -1,6 +1,6 @@
 .manage_schema_item(data-module="manage_schema_item", data-form-control="schemalist")
   - var data = result.data[result.db][result.collection];
-  .schema-list(data-fields=(data ? JSON.stringify(data.fields) : ''))
+  .schema-list(data-fields=(data ? JSON.stringify(data.fields) : ''),data-types=(result.types ? JSON.stringify(result.types):''))
   .form-group
     button.btn.btn-default.add-item 增加
     | 
