@@ -9,9 +9,18 @@ module.exports = function(app) {
 
   return {
     port: '9002',
+    restful: {
+      host: 'localhost',
+      port: 3000,
+      defaultDb: 'nyouhui'
+    },
     schema: {
       db: 'nyouhui',
       collection: 'schema'
+    },
+    cron: {
+      db: 'nyouhui',
+      collection: 'cron'
     },
     admins: {
       db: 'nyouhui',

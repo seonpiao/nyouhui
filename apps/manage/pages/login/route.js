@@ -1,7 +1,7 @@
 var Mongo = require('../../../../libs/server/mongodb');
 var thunkify = require('thunkify');
 
-module.exports = function(app, pageName, config) {
+module.exports = function(app) {
   app.route('/login').get(function*(next) {
     this.result = {};
     this.page = 'login';
@@ -10,8 +10,8 @@ module.exports = function(app, pageName, config) {
     var password = this.request.body.password;
     this.status = 301;
     var db =
-      yield Mongo.get(config.admins.db);
-    var collection = db.collection(config.admins.collection);
+      yield Mongo.get(app.config.admins.db);
+    var collection = db.collection(app.config.admins.collection);
     var cursor =
       yield thunkify(collection.find.bind(collection))({
         username: username,

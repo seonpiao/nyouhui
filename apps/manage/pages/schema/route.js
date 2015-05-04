@@ -4,22 +4,26 @@ var logger = require('log4js').getLogger('manage:api');
 var auth = require('../../auth');
 var settings = require('../../../../settings');
 var _ = require('underscore');
+var Mongo = require('../../../../libs/server/mongodb');
 
 module.exports = function(app) {
   app.route('/schema').get(function*(next) {
-    var db = 'nyouhui';
-    var collection = 'schema';
+    var db = app.config.schema.db;
+    var collection = app.config.schema.collection;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + db + '/' + collection,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection
+        }, {
           qs: this.request.query
         });
-      var data = JSON.parse(result[1]);
       this.result = {
         code: 200,
-        data: {
-          list: data || [],
+        result: {
+          data: data || [],
           db: db,
           collection: collection
         }
@@ -34,12 +38,12 @@ module.exports = function(app) {
   });
 
   app.route('/schema/create').get(function*(next) {
-    var db = 'nyouhui';
-    var collection = 'schema';
+    var db = app.config.schema.db;
+    var collection = app.config.schema.collection;
     try {
       this.result = {
         code: 200,
-        data: {
+        result: {
           action: 'create',
           db: db,
           collection: collection
@@ -56,19 +60,23 @@ module.exports = function(app) {
   });
 
   app.route('/schema/update/:id').get(function*(next) {
-    var db = 'nyouhui';
-    var collection = 'schema';
+    var db = app.config.schema.db;
+    var collection = app.config.schema.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + db + '/' + collection + '/' + id,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           qs: this.request.query
         });
-      var data = JSON.parse(result[1]);
       this.result = {
         code: 200,
-        data: {
+        result: {
           action: 'update',
           data: data,
           db: db,

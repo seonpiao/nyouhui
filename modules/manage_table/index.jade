@@ -6,7 +6,7 @@ mixin manage_table(list,options)
   if !__global.__manage_table_id
     - __global.__manage_table_id = 1;
   - var tableid = 'table_' + __global.__manage_table_id++
-  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=data.db,data-collection=data.collection)
+  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=result.db,data-collection=result.collection)
     thead
       tr
         each field in options.fields
@@ -20,7 +20,7 @@ mixin manage_table(list,options)
             if field.display === 'yes'
               td!= (options.overrides && options.overrides[field.name] ? options.overrides[field.name](item[field.name]) : item[field.name])
           td
-            a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + item._id)) 编辑
+            a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + (item.id || item._id))) 编辑
             | 
             a.del-row(data-id=(item._id + ''), href="javascript:;") 删除
     //- tfoot

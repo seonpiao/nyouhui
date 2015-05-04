@@ -11,28 +11,29 @@ block append headjs
 block append content
   // Main content
   section.content
-    form(role="form",data-module="manage_form",data-collection="schema")
+    form(role="form",data-module="manage_form",data-db=result.db, data-collection=result.collection)
       div
-        if data.data && data.data._id
+        - var data = result.data[result.db][result.collection];
+        if data && data._id
           +manage_ctrl_input({
             name:'_id',
             type:'hidden',
-            value:(data.data ? data.data._id + '' : '')
+            value:(data ? data._id + '' : '')
           })
         +manage_ctrl_input({
           label:'数据库名',
           name:'db',
-          value:(data.data ? data.data.db : '')
+          value:(data ? data.db : '')
         })
         +manage_ctrl_input({
           label:'表名',
           name:'collection',
-          value:(data.data ? data.data.collection : '')
+          value:(data ? data.collection : '')
         })
         +manage_ctrl_input({
           label:'表别名',
           name:'alias',
-          value:(data.data ? data.data.alias : '')
+          value:(data ? data.alias : '')
         })
       +manage_box({
         title:'表定义'

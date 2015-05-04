@@ -6,11 +6,6 @@ module.exports = {
   http: {
     timeout: 5000
   },
-  restful: {
-    host: 'localhost',
-    port: 3000,
-    defaultDb: 'nyouhui'
-  },
   mongodb: {
     host: ['localhost']
   }

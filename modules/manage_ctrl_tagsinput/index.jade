@@ -1,0 +1,9 @@
+mixin manage_ctrl_tagsinput(options)
+  - options = options || {};
+  if !__global.__manage_ctrl_tagsinput_id
+    - __global.__manage_ctrl_tagsinput_id = 1;
+  - var tagsinputid = 'tagsinput_' + __global.__manage_ctrl_tagsinput_id++
+  .form-group(data-module="manage_ctrl_tagsinput",data-form-control="tagsinput",data-db=options.db,data-collection=options.collection)
+    if options.label
+      label= options.label
+    input.form-control(id=tagsinputid,name=options.name,value=(options.value || ''),role="input")

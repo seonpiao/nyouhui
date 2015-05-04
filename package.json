@@ -17,6 +17,7 @@
     "mongodb": "^2.0.28",
     "mongodb-rest": "^0.10.12",
     "node-datapool": "*",
+    "node.extend": "^1.1.3",
     "npm": "^2.8.3",
     "request": "^2.55.0",
     "thunkify": "2.1.2",

@@ -6,21 +6,31 @@ var settings = require('../../../../settings');
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
+var Mongo = require('../../../../libs/server/mongodb');
+var extend = require('node.extend');
 
 module.exports = function(app) {
   app.route('/crud/:db/:collection').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + db + '/' + collection,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection
+        }, {
           qs: this.request.query
         });
-      var data = JSON.parse(result[1]);
-      result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + settings.restful.defaultDb + '/schema',
+      var schema =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.schema.db,
+          collection: app.config.schema.collection,
+          one: true
+        }, {
           qs: {
             query: JSON.stringify({
               db: db,
@@ -28,14 +38,14 @@ module.exports = function(app) {
             })
           }
         });
-      var schema = JSON.parse(result[1])[0];
+      extend(true, data, schema);
       this.result = {
         code: 200,
-        data: {
-          list: data,
-          schema: schema,
+        result: {
+          data: data,
           db: db,
-          collection: collection
+          collection: collection,
+          schema: app.config.schema
         }
       }
       if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'index.jade'))) {
@@ -54,9 +64,14 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + settings.restful.defaultDb + '/schema',
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.schema.db,
+          collection: app.config.schema.collection,
+          one: true
+        }, {
           qs: {
             query: JSON.stringify({
               db: db,
@@ -64,13 +79,13 @@ module.exports = function(app) {
             })
           }
         });
-      var schema = JSON.parse(result[1])[0];
       this.result = {
         code: 200,
-        data: {
-          schema: schema,
+        result: {
+          data: data,
           db: db,
-          collection: collection
+          collection: collection,
+          schema: app.config.schema
         }
       }
       if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
@@ -78,7 +93,6 @@ module.exports = function(app) {
       } else {
         this.view = 'update';
       }
-      console.log(this.result)
     } catch (e) {
       this.result = {
         code: 500,
@@ -94,15 +108,22 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + db + '/' + collection + '/' + id,
-          qs: this.request.query
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
         });
-      var data = JSON.parse(result[1]);
-      result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + settings.restful.defaultDb + '/schema',
+      var schema =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.schema.db,
+          collection: app.config.schema.collection,
+          one: true
+        }, {
           qs: {
             query: JSON.stringify({
               db: db,
@@ -110,12 +131,12 @@ module.exports = function(app) {
             })
           }
         });
-      var schema = JSON.parse(result[1])[0];
+      extend(true, data, schema);
       this.result = {
         code: 200,
-        data: {
+        result: {
           data: data,
-          schema: schema,
+          schema: app.config.schema,
           db: db,
           collection: collection
         }

@@ -96,6 +96,8 @@ module.exports = function(grunt) {
           }, {
             name: "apps/manage/pages/api/main"
           }, {
+            name: "apps/manage/pages/cron/main"
+          }, {
             name: "apps/manage/pages/crud/main"
           }, {
             name: "apps/manage/pages/index/main"

@@ -6,21 +6,25 @@ var settings = require('../../../../settings');
 var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
 
-module.exports = function(app, pageName, config) {
+module.exports = function(app) {
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://' + settings.restful.host + ':' + settings.restful.port + '/' + db + '/' + collection + (id ? '/' + id : ''),
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           qs: this.request.query
         });
-      var data = JSON.parse(result[1]);
       this.result = {
         code: 200,
-        data: data
+        result: data
       }
     } catch (e) {
       this.result = {
@@ -34,17 +38,21 @@ module.exports = function(app, pageName, config) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://localhost:3000/' + db + '/' + collection,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           json: this.request.body,
           method: this.method,
           headers: this.headers
         });
-      var data = result[1];
-      if (data.ok) {
+      if (data[db][collection]['ok']) {
         //新增schema，要调整索引
-        if (db === config.schema.db && collection === config.schema.collection) {
+        if (db === app.config.schema.db && collection === app.config.schema.collection) {
           var body = this.request.body;
           var fields = body.fields;
           var dbconn =
@@ -63,12 +71,12 @@ module.exports = function(app, pageName, config) {
         }
         this.result = {
           code: 200,
-          data: data
+          result: data
         }
       } else {
         this.result = {
           code: 500,
-          message: '用户名重复'
+          message: '数据重复'
         }
       }
     } catch (e) {
@@ -85,14 +93,19 @@ module.exports = function(app, pageName, config) {
     try {
       var newData = this.request.body;
       delete newData._id;
-      var result =
-        yield thunkify(request)({
-          url: 'http://localhost:3000/' + db + '/' + collection + '/' + id,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           json: newData,
           method: this.method
         });
       //修改schema，要调整索引
-      if (db === config.schema.db && collection === config.schema.collection) {
+      if (db === app.config.schema.db && collection === app.config.schema.collection) {
         var body = this.request.body;
         var fields = body.fields;
         var dropped = [];
@@ -119,10 +132,9 @@ module.exports = function(app, pageName, config) {
           }
         }
       }
-      var data = result[1];
       this.result = {
         code: 200,
-        data: data
+        result: data
       }
     } catch (e) {
       this.result = {
@@ -136,15 +148,19 @@ module.exports = function(app, pageName, config) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://localhost:3000/' + db + '/' + collection + '/' + id,
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           method: this.method
         });
-      var data = result[1];
       this.result = {
         code: 200,
-        data: data
+        result: data
       }
     } catch (e) {
       this.result = {
@@ -157,14 +173,15 @@ module.exports = function(app, pageName, config) {
 
   app.route('/api/dbs').get(function*(next) {
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://localhost:3000/dbs'
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          path: '/dbs'
         });
-      var data = JSON.parse(result[1]);
       this.result = {
         code: 200,
-        data: data
+        result: data
       }
     } catch (e) {
       this.result = {

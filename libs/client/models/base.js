@@ -27,7 +27,7 @@ define(function() {
       if (this.method === 'create') {
         return this.prefix + '/' + this.db + '/' + this.collection;
       } else {
-        return this.prefix + '/' + this.db + '/' + this.collection + '/' + this.id;
+        return this.prefix + '/' + this.db + '/' + this.collection + '/' + (this.id ? this.id : '');
       }
     },
     parse: function(resp) {

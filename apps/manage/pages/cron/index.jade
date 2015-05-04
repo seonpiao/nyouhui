@@ -14,20 +14,23 @@ block append content
   section.content
     include ../../../../modules/manage_table/index
     div
-      - var data = result.data[result.db][result.collection];
-      +manage_table(data,{
+      +manage_table(data.list,{
         fields:[{
-          name:'db',
-          alias:'数据库',
+          name:'name',
+          alias:'计划名',
           display:'yes'
         },{
-          name:'collection',
-          alias:'表名',
+          name:'task',
+          alias:'任务名',
+          display:'yes'
+        },{
+          name:'interval',
+          alias:'时间间隔',
           display:'yes'
         }]
       })
       .form-group
-        a.btn.btn-primary(href="/schema/create") 新建
+        a.btn.btn-primary(href="/cron/create") 新建
     +manage_box()
 
 block append pluginjs
@@ -36,4 +39,4 @@ block append pluginjs
   script(src='/plugins/datatables/dataTables.bootstrap.js')
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/schema.min.736ec98c78061725.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/cron.min.736ec98c78061725.js")
