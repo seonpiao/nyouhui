@@ -1,0 +1,12 @@
+mixin manage_ctrl_select(options)
+  - var name = options.name
+  - var sort = options.sort
+  - var source = options.source || {}
+  - var order = options.order || ''
+  - var db = options.db || ''
+  - var collection = options.collection || ''
+  - var label = options.label || ''
+  .form-group(data-module="manage_ctrl_select",data-form-control="input",data-db=db,data-collection=collection,data-order=order)
+    if label
+      label= label
+    select.small.m-wrap(name=name,data-result = (result  ? result[name] : ''))

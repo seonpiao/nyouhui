@@ -53,6 +53,14 @@ block append content
             -   params[key] = extra_componets[0].params[key]
             - }
             +manage_ctrl_tagsinput(params)
+          else if field.base === 'select'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            -params.value = data ? data[field.name].join(' ') : ''
+            - for(var key in extra_componets[0].params)
+            -   params[key] = extra_componets[0].params[key]
+            +manage_ctrl_select(params)  
       +manage_box({
         title:'表定义'
       })
