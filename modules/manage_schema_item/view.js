@@ -33,16 +33,25 @@ define(["libs/client/views/base"], function(Base) {
     initView: function() {
       var self = this;
       var fields = this.$('.schema-list').attr('data-fields');
+      var types = this.$('.schema-list').attr('data-types');
       if (fields) {
         fields = JSON.parse(fields);
       } else {
         fields = [null];
       }
+      if (types) {
+        types = _.map(JSON.parse(types), function(v) {
+          return v.name
+        })
+      } else {
+        types = [null];
+      }
       if (fields) {
         this.loadTemplate('item', function(template) {
           _.forEach(fields, function(field) {
             var html = template({
-              field: field
+              field: field,
+              types: types
             });
             self.$('.schema-list').append(html);
           });

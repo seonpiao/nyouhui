@@ -16,6 +16,7 @@ block append content
         - var data = result.data[result.db][result.collection];
         - console.log(result.db,result.collection,data)
         - var schema = result.data[result.schema.db][result.schema.collection];
+        - var types = result.types;
         if data && data._id
           +manage_ctrl_input({
             name:'_id',
@@ -23,27 +24,34 @@ block append content
             value:(data ? data._id + '' : '')
           })
         each field in schema.fields
-          if field.type === 'input'
-            +manage_ctrl_input({
-              label:field.alias,
-              name:field.name,
-              value:data ? data[field.name] : field.defaults
-            })
-          else if field.type === 'password'
-            +manage_ctrl_input({
-              label:field.alias,
-              name:field.name,
-              value:data ? data[field.name] : '',
-              type:'password'
-            })
-          else if field.type === 'category_tags'
-            +manage_ctrl_tagsinput({
-              label:field.alias,
-              name:field.name,
-              value: data ? data[field.name].join(' ') : '',
-              db:'nyouhui',
-              collection:'tags'
-            })
+          - var extra_componets = types.filter(function(v){
+          -   return v.name == field.type
+          - })
+          - field.base = extra_componets[0].base;
+          if field.base === 'input'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            -params.value = data ? data[field.name] : field.defaults
+            - for(var key in extra_componets[0].params)
+            -   params[key] = extra_componets[0].params[key]
+            +manage_ctrl_input(params)
+          else if field.base === 'password'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            -params.value = data ? data[field.name] : '',
+            - for(var key in extra_componets[0].params)
+            -   params[key] = extra_componets[0].params[key]
+            +manage_ctrl_input(params)
+          else if field.base === 'tag'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            -params.value = data ? data[field.name].join(' ') : ''
+            - for(var key in extra_componets[0].params)
+            -   params[key] = extra_componets[0].params[key]
+            +manage_ctrl_tagsinput(params)
       +manage_box({
         title:'表定义'
       })
@@ -53,4 +61,4 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.9fffd5d70bad2003.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.60d765a147be2bf2.js")
