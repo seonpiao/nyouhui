@@ -18,7 +18,21 @@ mixin manage_table(list,options)
         tr
           each field in options.fields
             if field.display === 'yes'
-              td!= (options.overrides && options.overrides[field.name] ? options.overrides[field.name](item[field.name]) : item[field.name])
+              - var value = item[field.name];
+              if field.db && field.collection
+                if typeof value === 'string'
+                  each foreignItem in result.data[field.db][field.collection]
+                    if foreignItem._id === value
+                      - value = foreignItem.name
+                else if Array.isArray(value)
+                  - value = value.map(function(oneOfValue){
+                  -   var foreignData = result.data[field.db][field.collection]
+                  -   for(var i = 0; i < foreignData.length; i++){
+                  -     var foreignItem = foreignData[i];
+                  -     if((foreignItem.id || foreignItem._id) === oneOfValue) return foreignItem.name;
+                  -   }
+                  - });
+              td!= (options.overrides && options.overrides[field.name] ? options.overrides[field.name](value) : value)
           td
             a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + (item.id || item._id))) 编辑
             | 

@@ -31,7 +31,7 @@ mixin drawMenu(menus)
 // sidebar menu: : style can be found in sidebar.less
 ul.sidebar-menu
   //- li.header MAIN NAVIGATION
-  - var menus = result.data.nyouhui.manage_menu;
+  - var menus = result.menu;
   - var menuTree = {name:'root',childs:{}};
   - var currNode = menuTree;
   each item in menus

@@ -24,7 +24,11 @@ module.exports = function(app) {
         });
       this.result = {
         code: 200,
-        result: data
+        result: {
+          db: db,
+          collection: collection,
+          data: data
+        }
       }
     } catch (e) {
       this.result = {

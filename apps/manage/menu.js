@@ -14,9 +14,7 @@ var menu = function(app) {
         yield thunkify(cursor.toArray.bind(cursor))();
       this.result = this.result || {};
       this.result.result = this.result.result || {};
-      this.result.result.data = this.result.result.data || {};
-      this.result.result.data[app.config.menu.db] = this.result.result.data[app.config.menu.db] || {};
-      this.result.result.data[app.config.menu.db][app.config.menu.collection] = data;
+      this.result.result.menu = data;
     }
   }
 };

@@ -14,6 +14,7 @@ block append content
     form(role="form",data-module="manage_form",data-db=result.db,data-collection=result.collection)
       div
         - var data = result.data[result.db][result.collection];
+        - console.log(result.db,result.collection,data)
         - var schema = result.data[result.schema.db][result.schema.collection];
         if data && data._id
           +manage_ctrl_input({

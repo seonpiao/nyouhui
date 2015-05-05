@@ -32,7 +32,7 @@ define(function() {
     },
     parse: function(resp) {
       if (resp.code === 200) {
-        return resp.data;
+        return resp.result;
       }
       this.error = resp;
       return {};

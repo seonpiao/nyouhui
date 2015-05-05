@@ -8,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var Mongo = require('../../../../libs/server/mongodb');
 var extend = require('node.extend');
+var co = require('co');
 
 module.exports = function(app) {
   app.route('/crud/:db/:collection').get(function*(next) {
@@ -39,6 +40,21 @@ module.exports = function(app) {
           }
         });
       extend(true, data, schema);
+      var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+      var fields = schemaData.fields;
+      for (var i = 0; i < fields.length; i++) {
+        var field = fields[i];
+        if (field.db && field.collection) {
+          var fieldData =
+            yield Mongo.request({
+              host: app.config.restful.host,
+              port: app.config.restful.port,
+              db: field.db,
+              collection: field.collection
+            });
+          extend(true, data, fieldData);
+        }
+      }
       this.result = {
         code: 200,
         result: {
@@ -141,6 +157,7 @@ module.exports = function(app) {
           collection: collection
         }
       }
+      console.log(this.result)
       if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
         this.view = path.join('views', db, collection, 'update');
       } else {
