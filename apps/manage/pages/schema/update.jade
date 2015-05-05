@@ -13,7 +13,9 @@ block append content
   section.content
     form(role="form",data-module="manage_form",data-db=result.db, data-collection=result.collection)
       div
-        - var data = result.data[result.db][result.collection];
+        - var data;
+        if result.data
+          - data = result.data[result.db][result.collection];
         if data && data._id
           +manage_ctrl_input({
             name:'_id',

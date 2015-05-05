@@ -33,25 +33,25 @@ define(["libs/client/views/base"], function(Base) {
     initView: function() {
       var self = this;
       var fields = this.$('.schema-list').attr('data-fields');
-      var types = this.$('.schema-list').attr('data-types');
+      var controls = this.$('.schema-list').attr('data-controls');
       if (fields) {
         fields = JSON.parse(fields);
       } else {
         fields = [null];
       }
-      if (types) {
-        types = _.map(JSON.parse(types), function(v) {
+      if (controls) {
+        controls = _.map(JSON.parse(controls), function(v) {
           return v.name
         })
       } else {
-        types = [null];
+        controls = [null];
       }
       if (fields) {
         this.loadTemplate('item', function(template) {
           _.forEach(fields, function(field) {
             var html = template({
               field: field,
-              types: types
+              controls: controls
             });
             self.$('.schema-list').append(html);
           });
@@ -61,7 +61,18 @@ define(["libs/client/views/base"], function(Base) {
     add: function(e) {
       e.preventDefault();
       var self = this;
-      this.buildHtml(function(html) {
+      var controls = this.$('.schema-list').attr('data-controls');
+      if (controls) {
+        controls = _.map(JSON.parse(controls), function(v) {
+          return v.name
+        })
+      } else {
+        controls = [null];
+      }
+      this.loadTemplate('item', function(template) {
+        var html = template({
+          controls: controls
+        });
         self.$('.schema-list').append(html);
         self.check();
       });

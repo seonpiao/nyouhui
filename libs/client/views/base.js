@@ -56,7 +56,7 @@ define(function() {
       View.views.push(this);
       self.init.apply(self, arguments);
       if (this.model) {
-        this.model.on('change', this.__triggrtChange.bind(this));
+        this.model.on('change', this.__triggerChange.bind(this));
       }
       setTimeout(function() {
         self.$el.trigger({
@@ -139,7 +139,7 @@ define(function() {
       this.trigger('remove');
       return this;
     },
-    __triggrtChange: function() {
+    __triggerChange: function() {
       var changed = this.model.changed;
       var self = this;
       _.each(changed, function(val, key) {

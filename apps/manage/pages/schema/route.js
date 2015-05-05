@@ -41,22 +41,24 @@ module.exports = function(app) {
     var db = app.config.schema.db;
     var collection = app.config.schema.collection;
     try {
-      var types =
+      var controls =
         yield Mongo.request({
           host: app.config.restful.host,
           port: app.config.restful.port,
-          db: 'nyouhui',
-          collection: 'extra_components'
-        }, {
-          qs: this.request.query
+          db: app.config.control.db,
+          collection: app.config.control.collection
         });
+      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
+        name: 'input',
+        base: 'input'
+      });
       this.result = {
         code: 200,
         result: {
           action: 'create',
           db: db,
           collection: collection,
-          types: types.nyouhui.extra_components
+          controls: controls[app.config.control.db][app.config.control.collection]
         }
       }
     } catch (e) {
@@ -84,27 +86,27 @@ module.exports = function(app) {
         }, {
           qs: this.request.query
         });
+      var controls =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.control.db,
+          collection: app.config.control.collection
+        });
+      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
+        name: 'input',
+        base: 'input'
+      });
       this.result = {
         code: 200,
         result: {
           action: 'update',
           data: data,
           db: db,
-          collection: collection
+          collection: collection,
+          controls: controls[app.config.control.db][app.config.control.collection]
         }
-      }
-      var types =
-        yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
-          db: 'nyouhui',
-          collection: 'extra_components'
-        }, {
-          qs: this.request.query
-        });
-      _.extend(this.result.result, {
-        types: types.nyouhui.extra_components
-      })
+      };
     } catch (e) {
       this.result = {
         code: 500,

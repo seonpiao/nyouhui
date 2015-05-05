@@ -10,7 +10,7 @@ module.exports = function(app) {
   return {
     port: '9002',
     restful: {
-      host: 'localhost',
+      host: 'nyouhui.com',
       port: 3000,
       defaultDb: 'nyouhui'
     },
@@ -29,6 +29,10 @@ module.exports = function(app) {
     menu: {
       db: 'nyouhui',
       collection: 'manage_menu'
+    },
+    control: {
+      db: 'nyouhui',
+      collection: 'controls'
     },
     middlewares: [session({
       cookie: {

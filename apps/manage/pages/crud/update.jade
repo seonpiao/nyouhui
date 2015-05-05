@@ -14,9 +14,8 @@ block append content
     form(role="form",data-module="manage_form",data-db=result.db,data-collection=result.collection)
       div
         - var data = result.data[result.db][result.collection];
-        - console.log(result.db,result.collection,data)
         - var schema = result.data[result.schema.db][result.schema.collection];
-        - var types = result.types;
+        - var controls = result.controls;
         if data && data._id
           +manage_ctrl_input({
             name:'_id',
@@ -24,7 +23,7 @@ block append content
             value:(data ? data._id + '' : '')
           })
         each field in schema.fields
-          - var extra_componets = types.filter(function(v){
+          - var extra_componets = controls.filter(function(v){
           -   return v.name == field.type
           - })
           - field.base = extra_componets[0].base;
@@ -33,8 +32,9 @@ block append content
             -params.label = field.alias;
             -params.name =field.name,
             -params.value = data ? data[field.name] : field.defaults
-            - for(var key in extra_componets[0].params)
-            -   params[key] = extra_componets[0].params[key]
+            if extra_componets[0].params
+              - for(var key in extra_componets[0].params)
+              -   params[key] = extra_componets[0].params[key]
             +manage_ctrl_input(params)
           else if field.base === 'password'
             -var params = {};
@@ -48,9 +48,10 @@ block append content
             -var params = {};
             -params.label = field.alias;
             -params.name =field.name,
-            -params.value = data ? data[field.name].join(' ') : ''
-            - for(var key in extra_componets[0].params)
+            -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
+            - for(var key in extra_componets[0].params){
             -   params[key] = extra_componets[0].params[key]
+            - }
             +manage_ctrl_tagsinput(params)
       +manage_box({
         title:'表定义'

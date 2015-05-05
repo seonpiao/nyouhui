@@ -5,16 +5,17 @@ var menu = function(app) {
   return function*(next) {
     yield next;
     if (!this.json && !this.text) {
-      var db =
-        yield Mongo.get(app.config.menu.db);
-      var collection = db.collection(app.config.menu.collection);
-      var cursor =
-        yield thunkify(collection.find.bind(collection))();
-      var data =
-        yield thunkify(cursor.toArray.bind(cursor))();
+      var menu =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.menu.db,
+          collection: app.config.menu.collection
+        });
+      menu = menu[app.config.menu.db][app.config.menu.collection];
       this.result = this.result || {};
       this.result.result = this.result.result || {};
-      this.result.result.menu = data;
+      this.result.result.menu = menu;
     }
   }
 };
