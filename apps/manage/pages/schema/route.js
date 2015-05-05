@@ -41,12 +41,22 @@ module.exports = function(app) {
     var db = app.config.schema.db;
     var collection = app.config.schema.collection;
     try {
+      var types =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: 'nyouhui',
+          collection: 'extra_components'
+        }, {
+          qs: this.request.query
+        });
       this.result = {
         code: 200,
         result: {
           action: 'create',
           db: db,
-          collection: collection
+          collection: collection,
+          types: types.nyouhui.extra_components
         }
       }
     } catch (e) {
@@ -83,6 +93,18 @@ module.exports = function(app) {
           collection: collection
         }
       }
+      var types =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: 'nyouhui',
+          collection: 'extra_components'
+        }, {
+          qs: this.request.query
+        });
+      _.extend(this.result.result, {
+        types: types.nyouhui.extra_components
+      })
     } catch (e) {
       this.result = {
         code: 500,

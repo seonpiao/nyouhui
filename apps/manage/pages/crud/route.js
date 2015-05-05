@@ -79,10 +79,24 @@ module.exports = function(app) {
             })
           }
         });
+      var types =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: 'nyouhui',
+          collection: 'extra_components'
+        }, {
+          qs: this.request.query
+        });
+      var extra_types = types.nyouhui.extra_components;
+      extra_types.forEach(function(v) {
+        v.params = (v.params !== '' ? JSON.parse(v.params) : {})
+      })
       this.result = {
         code: 200,
         result: {
           data: data,
+          types: extra_types,
           db: db,
           collection: collection,
           schema: app.config.schema
@@ -131,12 +145,26 @@ module.exports = function(app) {
             })
           }
         });
+      var types =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: 'nyouhui',
+          collection: 'extra_components'
+        }, {
+          qs: this.request.query
+        });
+      var extra_types = types.nyouhui.extra_components;
+      extra_types.forEach(function(v) {
+        v.params = (v.params !== '' ? JSON.parse(v.params) : {})
+      })
       extend(true, data, schema);
       this.result = {
         code: 200,
         result: {
           data: data,
           schema: app.config.schema,
+          types: extra_types,
           db: db,
           collection: collection
         }
