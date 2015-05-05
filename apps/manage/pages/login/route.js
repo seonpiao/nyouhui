@@ -9,16 +9,21 @@ module.exports = function(app) {
     var username = this.request.body.username;
     var password = this.request.body.password;
     this.status = 301;
-    var db =
-      yield Mongo.get(app.config.admins.db);
-    var collection = db.collection(app.config.admins.collection);
-    var cursor =
-      yield thunkify(collection.find.bind(collection))({
-        username: username,
-        password: password
+    var result =
+      yield Mongo.request({
+        host: app.config.restful.host,
+        port: app.config.restful.port,
+        db: app.config.admins.db,
+        collection: app.config.admins.collection
+      }, {
+        qs: {
+          query: JSON.stringify({
+            username: username,
+            password: password
+          })
+        }
       });
-    result =
-      yield thunkify(cursor.toArray.bind(cursor))();
+    result = result[app.config.admins.db][app.config.admins.collection];
     if (result && result.length === 1) {
       this.session.username = username;
       this.redirect(this.session.redirectUrl || '/');

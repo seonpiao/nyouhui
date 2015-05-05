@@ -27,6 +27,7 @@ block append content
           -   return v.name == field.type
           - })
           - field.base = extra_componets[0].base;
+          - console.log(field.base)
           if field.base === 'input'
             -var params = {};
             -params.label = field.alias;
@@ -44,7 +45,7 @@ block append content
             - for(var key in extra_componets[0].params)
             -   params[key] = extra_componets[0].params[key]
             +manage_ctrl_input(params)
-          else if field.base === 'tag'
+          else if field.base === 'tagsinput'
             -var params = {};
             -params.label = field.alias;
             -params.name =field.name,
@@ -53,6 +54,15 @@ block append content
             -   params[key] = extra_componets[0].params[key]
             - }
             +manage_ctrl_tagsinput(params)
+          else if field.base === 'orderwizard'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            //- -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
+            - for(var key in extra_componets[0].params){
+            -   params[key] = extra_componets[0].params[key]
+            - }
+            +manage_ctrl_orderwizard(params)
       +manage_box({
         title:'表定义'
       })

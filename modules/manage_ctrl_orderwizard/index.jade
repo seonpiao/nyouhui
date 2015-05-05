@@ -1,0 +1,12 @@
+mixin manage_ctrl_orderwizard(options)
+  - options = options || {};
+  .form-group(data-module="manage_ctrl_orderwizard",data-form-control="orderwizard")
+    if options.label
+      label= options.label
+    .wizard(data-title="Wizard Title")
+      .wizard-card(data-cardname="card1")
+        h3 Card 1
+        | Some content
+      .wizard-card(data-cardname="card2")
+        h3 Card 2
+        | Some content
