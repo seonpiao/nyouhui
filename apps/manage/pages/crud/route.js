@@ -146,10 +146,6 @@ module.exports = function(app) {
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
         control.params = (control.params !== '' ? JSON.parse(control.params) : {});
       });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
-      });
       this.result = {
         code: 200,
         result: {
@@ -213,10 +209,6 @@ module.exports = function(app) {
         });
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
         control.params = (control.params !== '' ? JSON.parse(control.params) : {});
-      });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
       });
       this.result = {
         code: 200,

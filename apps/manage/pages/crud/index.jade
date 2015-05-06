@@ -15,7 +15,6 @@ block append content
     div
       - var data = result.data[result.db][result.collection];
       - var schema = result.data[result.schema.db][result.schema.collection];
-      - console.log(schema)
       +manage_table(data,{
         fields:schema.fields
       })

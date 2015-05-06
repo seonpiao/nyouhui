@@ -22,7 +22,7 @@ mixin manage_table(list,options)
               if field.db && field.collection
                 if typeof value === 'string'
                   each foreignItem in result.data[field.db][field.collection]
-                    if foreignItem._id === value
+                    if (foreignItem.id || foreignItem._id) === value
                       - value = foreignItem.name
                 else if Array.isArray(value)
                   - value = value.map(function(oneOfValue){
