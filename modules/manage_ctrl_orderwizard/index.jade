@@ -3,10 +3,11 @@ mixin manage_ctrl_orderwizard(options)
   .form-group(data-module="manage_ctrl_orderwizard",data-form-control="orderwizard")
     if options.label
       label= options.label
-    .wizard(data-title="Wizard Title")
-      .wizard-card(data-cardname="card1")
-        h3 Card 1
-        | Some content
-      .wizard-card(data-cardname="card2")
-        h3 Card 2
-        | Some content
+    if options.data
+      div 我是结果
+    else
+      .wizard
+        h1 Card 1
+        div Some content
+        h1 Card 2
+        div Some content2

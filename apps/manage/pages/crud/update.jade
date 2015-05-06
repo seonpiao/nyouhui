@@ -57,7 +57,8 @@ block append content
           else if field.base === 'orderwizard'
             -var params = {};
             -params.label = field.alias;
-            -params.name =field.name,
+            -params.name =field.name;
+            -params.data = data;
             //- -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
             - for(var key in extra_componets[0].params){
             -   params[key] = extra_componets[0].params[key]

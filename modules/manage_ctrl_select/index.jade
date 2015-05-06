@@ -1,0 +1,9 @@
+mixin manage_ctrl_select(options)
+  .form-group(data-module="manage_ctrl_select",data-form-control="select",data-db=options.db,data-collection=options.collection)
+    if options.label
+      label= options.label
+    select.form-control(type="text",name="field_index")
+      if options.none
+        option(value=value,selected=(field && field.index === value))= title
+      each title,value in indexTypes
+        option(value=value,selected=(field && field.index === value))= title

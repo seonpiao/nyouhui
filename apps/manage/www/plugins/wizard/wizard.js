@@ -1,1188 +1,1911 @@
-/*
- * Copyright (C) 2013 Panopta, Andrew Moffat
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+/*! 
+ * jQuery Steps v1.1.0 - 09/04/2014
+ * Copyright (c) 2014 Rafael Staib (http://www.jquery-steps.com)
+ * Licensed under MIT http://www.opensource.org/licenses/MIT
  */
-(function($) {
-    $.fn.wizard = function(args) {
-        return new Wizard(this, args);
-    };
-
-    $.fn.wizard.logging = false;
-
-    var WizardCard = function(wizard, card, index, prev, next) {
-        this.wizard = wizard;
-        this.index = index;
-        this.prev = prev;
-        this.next = next;
-        this.el = card;
-        this.title = card.find("h3").first().text();
-        this.name = card.data("cardname") || this.title;
-
-        this.nav = this._createNavElement(this.title, index);
-
-        this._disabled = false;
-        this._loaded = false;
-        this._events = {};
-    };
-
-    WizardCard.prototype = {
-        select: function() {
-            this.log("selecting");
-            if (!this.isSelected()) {
-                this.nav.addClass("active");
-                this.el.show();
-
-                if (!this._loaded) {
-                    this.trigger("loaded");
-                    this.reload();
-                }
-
-                this.trigger("selected");
-            }
-
-
-            /*
-             * this is ugly, but we're handling the changing of the wizard's
-             * buttons here, in the WizardCard select.  so when a card is
-             * selected, we're figuring out if we're the first card or the
-             * last card and changing the wizard's buttons via the guts of
-             * the wizard
-             *
-             * ideally this logic should be encapsulated by some wizard methods
-             * that we can call from here, instead of messing with the guts
-             */
-            var w = this.wizard;
-
-            // The back button is only disabled on this first card...
-            w.backButton.toggleClass("disabled", this.index == 0);
-
-            if (this.index >= w._cards.length - 1) {
-                this.log("on last card, changing next button to submit");
-
-                w.changeNextButton(w.args.buttons.submitText, "btn-success");
-                w._readyToSubmit = true;
-                w.trigger("readySubmit");
-            } else {
-                w._readyToSubmit = false;
-                w.changeNextButton(w.args.buttons.nextText, "btn-primary");
-            }
-
-            return this;
+;
+(function($, undefined) {
+    $.fn.extend({
+        _aria: function(name, value) {
+            return this.attr("aria-" + name, value);
         },
 
-        _createNavElement: function(name, i) {
-            var li = $('<li class="wizard-nav-item"></li>');
-            var a = $('<a class="wizard-nav-link"></a>');
-            a.data("navindex", i);
-            li.append(a);
-            a.append('<span class="glyphicon glyphicon-chevron-right"></span> ');
-            a.append(name);
-            return li;
+        _removeAria: function(name) {
+            return this.removeAttr("aria-" + name);
         },
 
-        markVisited: function() {
-            this.log("marking as visited");
-            this.nav.addClass("already-visited");
-            this.trigger("markVisited");
-            return this;
+        _enableAria: function(enable) {
+            return (enable == null || enable) ?
+                this.removeClass("disabled")._aria("disabled", "false") :
+                this.addClass("disabled")._aria("disabled", "true");
         },
 
-        unmarkVisited: function() {
-            this.log("unmarking as visited");
-            this.nav.removeClass("already-visited");
-            this.trigger("unmarkVisited");
-            return this;
+        _showAria: function(show) {
+            return (show == null || show) ?
+                this.show()._aria("hidden", "false") :
+                this.hide()._aria("hidden", "true");
         },
 
-        deselect: function() {
-            this.nav.removeClass("active");
-            this.el.hide();
-            this.trigger("deselect");
-            return this;
+        _selectAria: function(select) {
+            return (select == null || select) ?
+                this.addClass("current")._aria("selected", "true") :
+                this.removeClass("current")._aria("selected", "false");
         },
 
-        enable: function() {
-            this.log("enabling");
-
-            // Issue #38 Hiding navigation link when hide card
-            // Awaiting approval
-            //
-            // this.nav.removeClass('hide');
-
-            this.nav.addClass("active");
-            this._disabled = false;
-            this.trigger("enabled");
-            return this;
-        },
-
-        disable: function(hideCard) {
-            this.log("disabling");
-            this._disabled = true;
-            this.nav.removeClass("active already-visited");
-            if (hideCard) {
-                this.el.hide();
-                // Issue #38 Hiding navigation link when hide card
-                // Awaiting approval
-                //
-                // this.nav.addClass('hide');
-            }
-            this.trigger("disabled");
-            return this;
-        },
-
-        isDisabled: function() {
-            return this._disabled;
-        },
-
-        alreadyVisited: function() {
-            return this.nav.hasClass("already-visited");
-        },
-
-        isSelected: function() {
-            return this.nav.hasClass("active");
-        },
-
-        reload: function() {
-            this._loaded = true;
-            this.trigger("reload");
-            return this;
-        },
-
-        on: function() {
-            return this.wizard.on.apply(this, arguments);
-        },
-
-        trigger: function() {
-            this.callListener("on" + arguments[0]);
-            return this.wizard.trigger.apply(this, arguments);
-        },
-
-        /*
-         * displays an alert box on the current card
-         */
-        toggleAlert: function(msg, toggle) {
-            this.log("toggling alert to: " + toggle);
-
-            toggle = typeof(toggle) == "undefined" ? true : toggle;
-
-            if (toggle) {
-                this.trigger("showAlert");
-            } else {
-                this.trigger("hideAlert");
-            }
-
-            var div;
-            var alert = this.el.children("h3").first().next("div.alert");
-
-            if (alert.length == 0) {
-                /*
-                 * we're hiding anyways, so no need to create anything.
-                 * we'll do that if we ever are actually showing the alert
-                 */
-                if (!toggle) {
-                    return this;
-                }
-
-                this.log("couldn't find existing alert div, creating one");
-                div = $("<div />");
-                div.addClass("alert");
-                div.addClass("hide");
-                div.insertAfter(this.el.find("h3").first());
-            } else {
-                this.log("found existing alert div");
-                div = alert.first();
-            }
-
-            if (toggle) {
-                if (msg != null) {
-                    this.log("setting alert msg to", msg);
-                    div.html(msg);
-                }
-                div.show();
-            } else {
-                div.hide();
-            }
-            return this;
-        },
-
-        /*
-         * this looks for event handlers embedded into the html of the
-         * wizard card itself, in the form of a data- attribute
-         */
-        callListener: function(name) {
-            // a bug(?) in jquery..can't access data-<name> if name is camelCase
-            name = name.toLowerCase();
-
-            this.log("looking for listener " + name);
-            var listener = window[this.el.data(name)];
-            if (listener) {
-                this.log("calling listener " + name);
-                var wizard = this.wizard;
-
-                try {
-                    var vret = listener(this);
-                } catch (e) {
-                    this.log("exception calling listener " + name + ": ", e);
-                }
-            } else {
-                this.log("didn't find listener " + name);
-            }
-        },
-
-        problem: function(toggle) {
-            this.nav.find("a").toggleClass("wizard-step-error", toggle);
-        },
-
-        validate: function() {
-            var failures = false;
-            var self = this;
-
-            /*
-             * run all the validators embedded on the inputs themselves
-             */
-            this.el.find("[data-validate]").each(function(i, el) {
-                self.log("validating individiual inputs");
-                el = $(el);
-
-                var v = el.data("validate");
-                if (!v) {
-                    return;
-                }
-
-                var ret = {
-                    status: true,
-                    title: "Error",
-                    msg: ""
-                };
-
-                var vret = window[v](el);
-                $.extend(ret, vret);
-
-                // Add-On
-                // This allows the use of a INPUT+BTN used as one according to boostrap layout
-                // for the wizard it is required to add an id with btn-(ID of Input)
-                // this will make sure the popover is drawn on the correct element
-                if ($('#btn-' + el.attr('id')).length === 1) {
-                    el = $('#btn-' + el.attr('id'));
-                }
-
-                if (!ret.status) {
-                    failures = true;
-
-                    // Updated to show error on correct form-group
-                    el.parents("div.form-group").toggleClass("has-error", true);
-
-                    // This allows the use of a INPUT+BTN used as one according to boostrap layout
-                    // for the wizard it is required to add an id with btn-(ID of Input)
-                    // this will make sure the popover is drawn on the correct element
-                    if ($('#btn-' + el.attr('id')).length === 1) {
-                        el = $('#btn-' + el.attr('id'));
-                    }
-
-                    self.wizard.errorPopover(el, ret.msg);
-                } else {
-                    el.parents("div.form-group").toggleClass("has-error", false);
-
-                    // This allows the use of a INPUT+BTN used as one according to boostrap layout
-                    // for the wizard it is required to add an id with btn-(ID of Input)
-                    // this will make sure the popover is drawn on the correct element
-                    if ($('#btn-' + el.attr('id')).length === 1) {
-                        el = $('#btn-' + el.attr('id'));
-                    }
-
-                    try {
-                        el.popover("destroy");
-                    }
-                    /*
-                     * older versions of bootstrap don't have a destroy call
-                     * for popovers
-                     */
-                    catch (e) {
-                        el.popover("hide");
-                    }
-                }
-            });
-            this.log("after validating inputs, failures is", failures);
-
-            /*
-             * run the validator embedded in the card
-             */
-            var cardValidator = window[this.el.data("validate")];
-            if (cardValidator) {
-                this.log("running html-embedded card validator");
-                var cardValidated = cardValidator(this);
-                if (typeof(cardValidated) == "undefined" || cardValidated == null) {
-                    cardValidated = true;
-                }
-                if (!cardValidated) failures = true;
-                this.log("after running html-embedded card validator, failures is", failures);
-            }
-
-            /*
-             * run the validate listener
-             */
-            this.log("running listener validator");
-            var listenerValidated = this.trigger("validate");
-            if (typeof(listenerValidated) == "undefined" || listenerValidated == null) {
-                listenerValidated = true;
-            }
-            if (!listenerValidated) failures = true;
-            this.log("after running listener validator, failures is", failures);
-
-            var validated = !failures;
-            if (validated) {
-                this.log("validated, calling listeners");
-                this.trigger("validated");
-            } else {
-                this.log("invalid");
-                this.trigger("invalid");
-            }
-            return validated;
-        },
-
-        log: function() {
-            if (!window.console || !$.fn.wizard.logging) {
-                return;
-            }
-            var prepend = "card '" + this.name + "': ";
-            var args = [prepend];
-            args.push.apply(args, arguments);
-
-            console.log.apply(console, args);
-        },
-
-        isActive: function() {
-            return this.nav.hasClass("active");
+        _id: function(id) {
+            return (id) ? this.attr("id", id) : this.attr("id");
         }
-    };
+    });
 
-    Wizard = function(markup, args) {
-
-        /* TEMPLATE */
-        this.wizard_template = [
-            '<div  class="modal fade wizard">',
-            '<div class="modal-dialog wizard-dialog">',
-            '<div class="modal-content wizard-content">',
-            '<div class="modal-header wizard-header">',
-            '<button type="button" class="close wizard-close" aria-hidden="true">&times;</button>',
-            '<h3 class="modal-title wizard-title"></h3>',
-            '<span class="wizard-subtitle"></span>',
-            '</div>',
-            '<div class="modal-body wizard-body">',
-            '<div class="pull-left wizard-steps">',
-            '<div class="wizard-nav-container">',
-            '<ul class="nav wizard-nav-list">',
-            '</ul>',
-            '</div>',
-            '<div class="wizard-progress-container">',
-            '<div class="progress progress-striped">',
-            '<div class="progress-bar" style="width: 0%;"></div>',
-            '</div>',
-            '</div>',
-            '</div>',
-            '<form>',
-            '<div class="wizard-cards">',
-            '<div class="wizard-card-container">',
-            '</div>',
-            '<div class="wizard-footer">',
-            '<div class="wizard-buttons-container">',
-            '<button class="btn wizard-cancel wizard-close" type="button">Cancel</button>',
-            '<div class="btn-group-single pull-right">',
-            '<button class="btn wizard-back" type="button">Back</button>',
-            '<button class="btn btn-primary wizard-next" type="button">Next</button>',
-            '</div>',
-            '</div>',
-            '</div>',
-            '</div>',
-            '</form>',
-            '</div>',
-
-            '</div>',
-            '</div>',
-            '</div>'
-        ];
-
-        this.args = {
-            keyboard: true,
-            backdrop: true,
-            show: false,
-            submitUrl: "",
-            showCancel: false,
-            showClose: true,
-            progressBarCurrent: false,
-            increaseHeight: 0,
-            contentHeight: 300,
-            contentWidth: 580,
-            buttons: {
-                cancelText: "Cancel",
-                nextText: "Next",
-                backText: "Back",
-                submitText: "Submit",
-                submittingText: "Submitting...",
-            },
-            formClass: "form-horizontal"
+    if (!String.prototype.format) {
+        String.prototype.format = function() {
+            var args = (arguments.length === 1 && $.isArray(arguments[0])) ? arguments[0] : arguments;
+            var formattedString = this;
+            for (var i = 0; i < args.length; i++) {
+                var pattern = new RegExp("\\{" + i + "\\}", "gm");
+                formattedString = formattedString.replace(pattern, args[i]);
+            }
+            return formattedString;
         };
+    }
 
-        $.extend(this.args, args || {});
+    /**
+     * A global unique id count.
+     *
+     * @static
+     * @private
+     * @property _uniqueId
+     * @type Integer
+     **/
+    var _uniqueId = 0;
 
-        this._create(markup);
-    };
+    /**
+     * The plugin prefix for cookies.
+     *
+     * @final
+     * @private
+     * @property _cookiePrefix
+     * @type String
+     **/
+    var _cookiePrefix = "jQu3ry_5teps_St@te_";
 
-    Wizard.prototype = {
-        log: function() {
-            if (!window.console || !$.fn.wizard.logging) {
-                return;
+    /**
+     * Suffix for the unique tab id.
+     *
+     * @final
+     * @private
+     * @property _tabSuffix
+     * @type String
+     * @since 0.9.7
+     **/
+    var _tabSuffix = "-t-";
+
+    /**
+     * Suffix for the unique tabpanel id.
+     *
+     * @final
+     * @private
+     * @property _tabpanelSuffix
+     * @type String
+     * @since 0.9.7
+     **/
+    var _tabpanelSuffix = "-p-";
+
+    /**
+     * Suffix for the unique title id.
+     *
+     * @final
+     * @private
+     * @property _titleSuffix
+     * @type String
+     * @since 0.9.7
+     **/
+    var _titleSuffix = "-h-";
+
+    /**
+     * An error message for an "index out of range" error.
+     *
+     * @final
+     * @private
+     * @property _indexOutOfRangeErrorMessage
+     * @type String
+     **/
+    var _indexOutOfRangeErrorMessage = "Index out of range.";
+
+    /**
+     * An error message for an "missing corresponding element" error.
+     *
+     * @final
+     * @private
+     * @property _missingCorrespondingElementErrorMessage
+     * @type String
+     **/
+    var _missingCorrespondingElementErrorMessage = "One or more corresponding step {0} are missing.";
+
+    /**
+     * Adds a step to the cache.
+     *
+     * @static
+     * @private
+     * @method addStepToCache
+     * @param wizard {Object} A jQuery wizard object
+     * @param step {Object} The step object to add
+     **/
+    function addStepToCache(wizard, step) {
+        getSteps(wizard).push(step);
+    }
+
+    function analyzeData(wizard, options, state) {
+        var stepTitles = wizard.children(options.headerTag),
+            stepContents = wizard.children(options.bodyTag);
+
+        // Validate content
+        if (stepTitles.length > stepContents.length) {
+            throwError(_missingCorrespondingElementErrorMessage, "contents");
+        } else if (stepTitles.length < stepContents.length) {
+            throwError(_missingCorrespondingElementErrorMessage, "titles");
+        }
+
+        var startIndex = options.startIndex;
+
+        state.stepCount = stepTitles.length;
+
+        // Tries to load the saved state (step position)
+        if (options.saveState && $.cookie) {
+            var savedState = $.cookie(_cookiePrefix + getUniqueId(wizard));
+            // Sets the saved position to the start index if not undefined or out of range 
+            var savedIndex = parseInt(savedState, 0);
+            if (!isNaN(savedIndex) && savedIndex < state.stepCount) {
+                startIndex = savedIndex;
             }
-            var prepend = "wizard " + this.el.id + ": ";
-            var args = [prepend];
-            args.push.apply(args, arguments);
-            console.log.apply(console, args);
-        },
+        }
 
-        _create: function(markup) {
-            this.markup = $(markup);
-            this.title = this.markup.data('title');
-            this.submitCards = this.markup.find(".wizard-error,.wizard-failure,.wizard-success,.wizard-loading");
-            this.el = $(this.wizard_template.join('\n'));
-            $('body').append(this.el);
+        state.currentIndex = startIndex;
 
-            this.modal = this.el.modal({
-                keyboard: this.args.keyboard,
-                show: this.args.show,
-                backdrop: this.args.backdrop
-            });
-
-            this.dimensions = {
-                contentHeight: this.args.contentHeight,
-                contentWidth: this.args.contentWidth
-            };
-            this.dialog = this.modal.find('.wizard-dialog');
-            this.content = this.modal.find('.wizard-content');
-            this.header = this.modal.find('.wizard-header');
-            this.body = this.modal.find('.wizard-body');
-            this.wizardSteps = this.modal.find('.wizard-steps');
-            this.wizardCards = this.modal.find('.wizard-cards');
-            this.wizardCardContainer = this.modal.find('.wizard-card-container');
-            this.wizardCardContainer
-                .append(this.markup.find('.wizard-card'))
-                .append(this.submitCards);
-            this.navContainer = this.modal.find('.wizard-nav-container');
-            this.navList = this.modal.find('.wizard-nav-list');
-            this.progressContainer = this.modal.find('.wizard-progress-container');
-            this.progress = this.progressContainer.find('.progress-bar');
-            this.closeButton = this.modal.find('button.wizard-close.close');
-            this.cardsContainer = this.modal.find('wizard-cards-container');
-            this.form = this.modal.find('form');
-            this.footer = this.modal.find(".wizard-footer");
-            this.cancelButton = this.footer.find(".wizard-cancel");
-            this.backButton = this.footer.find(".wizard-back");
-            this.nextButton = this.footer.find(".wizard-next");
-
-            this._cards = [];
-            this.cards = {};
-            this._readyToSubmit = false;
-            this.percentComplete = 0;
-            this._submitting = false;
-            this._events = {};
-            this._firstShow = true;
-
-            this._createCards();
-
-            this.nextButton.click(this, this._handleNextClick);
-            this.backButton.click(this, this._handleBackClick);
-
-            this.cancelButton.text(this.args.buttons.cancelText);
-            this.backButton.text(this.args.buttons.backText);
-            this.nextButton.text(this.args.buttons.nextText);
-
-            // Apply Form Class(es)
-            this.form.addClass(this.args.formClass);
-
-            // Register Array Holder for popovers
-            this.popovers = [];
-
-            var self = this;
-            var _close = function() {
-                self.reset();
-                self.close();
-                self.trigger("closed");
-            };
-
-            // Register Close Button
-            this.closeButton.click(_close);
-            this.cancelButton.click(_close);
-
-            this.wizardSteps.on("click", "li.already-visited a.wizard-nav-link", this,
-                function(event) {
-                    var index = parseInt($(event.target).data("navindex"));
-                    event.data.setCard(index);
+        stepTitles.each(function(index) {
+            var item = $(this), // item == header
+                content = stepContents.eq(index),
+                modeData = content.data("mode"),
+                mode = (modeData == null) ? contentMode.html : getValidEnumValue(contentMode, (/^\s*$/.test(modeData) || isNaN(modeData)) ? modeData : parseInt(modeData, 0)),
+                contentUrl = (mode === contentMode.html || content.data("url") === undefined) ?
+                "" : content.data("url"),
+                contentLoaded = (mode !== contentMode.html && content.data("loaded") === "1"),
+                step = $.extend({}, stepModel, {
+                    title: item.html(),
+                    content: (mode === contentMode.html) ? content.html() : "",
+                    contentUrl: contentUrl,
+                    contentMode: mode,
+                    contentLoaded: contentLoaded
                 });
 
-            if (this.title.length != 0) {
-                this.setTitle(this.title);
+            addStepToCache(wizard, step);
+        });
+    }
+
+    /**
+     * Triggers the onCanceled event.
+     *
+     * @static
+     * @private
+     * @method cancel
+     * @param wizard {Object} The jQuery wizard object
+     **/
+    function cancel(wizard) {
+        wizard.triggerHandler("canceled");
+    }
+
+    function decreaseCurrentIndexBy(state, decreaseBy) {
+        return state.currentIndex - decreaseBy;
+    }
+
+    /**
+     * Removes the control functionality completely and transforms the current state to the initial HTML structure.
+     *
+     * @static
+     * @private
+     * @method destroy
+     * @param wizard {Object} A jQuery wizard object
+     **/
+    function destroy(wizard, options) {
+        var eventNamespace = getEventNamespace(wizard);
+
+        // Remove virtual data objects from the wizard
+        wizard.unbind(eventNamespace).removeData("uid").removeData("options")
+            .removeData("state").removeData("steps").removeData("eventNamespace")
+            .find(".actions a").unbind(eventNamespace);
+
+        // Remove attributes and CSS classes from the wizard
+        wizard.removeClass(options.clearFixCssClass + " vertical");
+
+        var contents = wizard.find(".content > *");
+
+        // Remove virtual data objects from panels and their titles
+        contents.removeData("loaded").removeData("mode").removeData("url");
+
+        // Remove attributes, CSS classes and reset inline styles on all panels and their titles
+        contents.removeAttr("id").removeAttr("role").removeAttr("tabindex")
+            .removeAttr("class").removeAttr("style")._removeAria("labelledby")
+            ._removeAria("hidden");
+
+        // Empty panels if the mode is set to 'async' or 'iframe'
+        wizard.find(".content > [data-mode='async'],.content > [data-mode='iframe']").empty();
+
+        var wizardSubstitute = $("<{0} class=\"{1}\"></{0}>".format(wizard.get(0).tagName, wizard.attr("class")));
+
+        var wizardId = wizard._id();
+        if (wizardId != null && wizardId !== "") {
+            wizardSubstitute._id(wizardId);
+        }
+
+        wizardSubstitute.html(wizard.find(".content").html());
+        wizard.after(wizardSubstitute);
+        wizard.remove();
+
+        return wizardSubstitute;
+    }
+
+    /**
+     * Triggers the onFinishing and onFinished event.
+     *
+     * @static
+     * @private
+     * @method finishStep
+     * @param wizard {Object} The jQuery wizard object
+     * @param state {Object} The state container of the current wizard
+     **/
+    function finishStep(wizard, state) {
+        var currentStep = wizard.find(".steps li").eq(state.currentIndex);
+
+        if (wizard.triggerHandler("finishing", [state.currentIndex])) {
+            currentStep.addClass("done").removeClass("error");
+            wizard.triggerHandler("finished", [state.currentIndex]);
+        } else {
+            currentStep.addClass("error");
+        }
+    }
+
+    /**
+     * Gets or creates if not exist an unique event namespace for the given wizard instance.
+     *
+     * @static
+     * @private
+     * @method getEventNamespace
+     * @param wizard {Object} A jQuery wizard object
+     * @return {String} Returns the unique event namespace for the given wizard
+     */
+    function getEventNamespace(wizard) {
+        var eventNamespace = wizard.data("eventNamespace");
+
+        if (eventNamespace == null) {
+            eventNamespace = "." + getUniqueId(wizard);
+            wizard.data("eventNamespace", eventNamespace);
+        }
+
+        return eventNamespace;
+    }
+
+    function getStepAnchor(wizard, index) {
+        var uniqueId = getUniqueId(wizard);
+
+        return wizard.find("#" + uniqueId + _tabSuffix + index);
+    }
+
+    function getStepPanel(wizard, index) {
+        var uniqueId = getUniqueId(wizard);
+
+        return wizard.find("#" + uniqueId + _tabpanelSuffix + index);
+    }
+
+    function getStepTitle(wizard, index) {
+        var uniqueId = getUniqueId(wizard);
+
+        return wizard.find("#" + uniqueId + _titleSuffix + index);
+    }
+
+    function getOptions(wizard) {
+        return wizard.data("options");
+    }
+
+    function getState(wizard) {
+        return wizard.data("state");
+    }
+
+    function getSteps(wizard) {
+        return wizard.data("steps");
+    }
+
+    /**
+     * Gets a specific step object by index.
+     *
+     * @static
+     * @private
+     * @method getStep
+     * @param index {Integer} An integer that belongs to the position of a step
+     * @return {Object} A specific step object
+     **/
+    function getStep(wizard, index) {
+        var steps = getSteps(wizard);
+
+        if (index < 0 || index >= steps.length) {
+            throwError(_indexOutOfRangeErrorMessage);
+        }
+
+        return steps[index];
+    }
+
+    /**
+     * Gets or creates if not exist an unique id from the given wizard instance.
+     *
+     * @static
+     * @private
+     * @method getUniqueId
+     * @param wizard {Object} A jQuery wizard object
+     * @return {String} Returns the unique id for the given wizard
+     */
+    function getUniqueId(wizard) {
+        var uniqueId = wizard.data("uid");
+
+        if (uniqueId == null) {
+            uniqueId = wizard._id();
+            if (uniqueId == null) {
+                uniqueId = "steps-uid-".concat(_uniqueId);
+                wizard._id(uniqueId);
             }
 
-            this.on("submit", this._defaultSubmit);
+            _uniqueId++;
+            wizard.data("uid", uniqueId);
+        }
 
-            // Set Modal Dimensions
-            this.autoDimensions();
-        },
+        return uniqueId;
+    }
 
-        autoDimensions: function() {
-            // DO NOT REMOVE DISPLAY ; Temporary display is required for calculation
-            this.modal.css('display', 'block');
+    /**
+     * Gets a valid enum value by checking a specific enum key or value.
+     *
+     * @static
+     * @private
+     * @method getValidEnumValue
+     * @param enumType {Object} Type of enum
+     * @param keyOrValue {Object} Key as `String` or value as `Integer` to check for
+     */
+    function getValidEnumValue(enumType, keyOrValue) {
+        validateArgument("enumType", enumType);
+        validateArgument("keyOrValue", keyOrValue);
 
-            this.dimensions.header = this.header.outerHeight(true);
-
-            // Navigation Pane is dyanmic build on card content
-            // Navigation Pane === BASE Inner Content Height
-            this.dimensions.navigation = this.wizardSteps.outerHeight(true);
-            if (this.dimensions.navigation < this.dimensions.contentHeight) {
-                this.dimensions.navigation = this.dimensions.contentHeight;
-                this.navContainer.height((this.dimensions.contentHeight - 30) - this.progressContainer.outerHeight(true));
+        // Is key
+        if (typeof keyOrValue === "string") {
+            var value = enumType[keyOrValue];
+            if (value === undefined) {
+                throwError("The enum key '{0}' does not exist.", keyOrValue);
             }
 
-            // Dimension Alias ( Body Height === (Navigation Height) )
-            this.dimensions.body = this.dimensions.navigation;
-
-            // Apply OuterHeight of navigation to it's parent wizardSteps
-            this.wizardSteps.height(this.dimensions.body);
-
-            // Modal Height === (Header + Content)
-            this.dimensions.modal = (this.dimensions.header + this.dimensions.navigation);
-            this.content.height(this.dimensions.modal + 'px');
-            this.dialog.width(this.dimensions.contentWidth);
-
-            this.body.height(this.dimensions.body + 'px');
-            this.wizardCards.height(this.dimensions.body + 'px');
-
-            // Footer Height
-            this.dimensions.footer = this.footer.outerHeight(true);
-
-            // Card Container === (Body - Footer)
-            this.dimensions.cardContainer = (this.dimensions.body - this.dimensions.footer);
-            this.wizardCardContainer.height(this.dimensions.cardContainer);
-
-            // Reposition
-            this.dimensions.offset = ($(window).height() - this.dialog.height()) / 2;
-            this.dialog.css({
-                'margin-top': this.dimensions.offset + 'px',
-                'padding-top': 0
-            });
-
-            // DO NOT REMOVE NEXT LINE
-            this.modal.css('display', '');
-        },
-
-        setTitle: function(title) {
-            this.log("setting title to", title);
-            this.modal.find(".wizard-title").first().text(title);
-            return this;
-        },
-
-        setSubtitle: function(title) {
-            this.log("setting subtitle to", title);
-            this.modal.find(".wizard-subtitle").first().text(title);
-            return this;
-        },
-
-        errorPopover: function(el, msg, allowHtml) {
-            this.log("launching popover on", el);
-            allowHtml = typeof allowHtml !== "undefined" ? allowHtml : false;
-            var popover = el.popover({
-                content: msg,
-                trigger: "manual",
-                html: allowHtml,
-                container: el.parents('.form-group')
-            }).addClass("error-popover").popover("show").next(".popover");
-
-            el.parents('.form-group').find('.popover').addClass("error-popover");
-
-            this.popovers.push(el);
-
-            return popover;
-        },
-
-        destroyPopover: function(pop) {
-            pop = $(pop);
-
-            /*
-             * this is the element that the popover was created for
-             */
-            try {
-                pop.popover("destroy");
-            }
-            /*
-             * older versions of bootstrap don't have a destroy call
-             * for popovers
-             */
-            catch (e) {
-                pop.popover("hide");
-            }
-        },
-
-        hidePopovers: function(el) {
-            this.log("hiding all popovers");
-            var self = this;
-
-            $.each(this.popovers, function(i, p) {
-                self.destroyPopover(p);
-            });
-
-            this.modal.find('.has-error').removeClass('has-error');
-            this.popovers = [];
-        },
-
-        eachCard: function(fn) {
-            $.each(this._cards, fn);
-            return this;
-        },
-
-        getActiveCard: function() {
-            this.log("getting active card");
-            var currentCard = null;
-
-            $.each(this._cards, function(i, card) {
-                if (card.isActive()) {
-                    currentCard = card;
-                    return false;
+            return value;
+        }
+        // Is value
+        else if (typeof keyOrValue === "number") {
+            for (var key in enumType) {
+                if (enumType[key] === keyOrValue) {
+                    return keyOrValue;
                 }
+            }
+
+            throwError("Invalid enum value '{0}'.", keyOrValue);
+        }
+        // Type is not supported
+        else {
+            throwError("Invalid key or value type.");
+        }
+    }
+
+    /**
+     * Routes to the next step.
+     *
+     * @static
+     * @private
+     * @method goToNextStep
+     * @param wizard {Object} The jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @return {Boolean} Indicates whether the action executed
+     **/
+    function goToNextStep(wizard, options, state) {
+        return paginationClick(wizard, options, state, increaseCurrentIndexBy(state, 1));
+    }
+
+    /**
+     * Routes to the previous step.
+     *
+     * @static
+     * @private
+     * @method goToPreviousStep
+     * @param wizard {Object} The jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @return {Boolean} Indicates whether the action executed
+     **/
+    function goToPreviousStep(wizard, options, state) {
+        return paginationClick(wizard, options, state, decreaseCurrentIndexBy(state, 1));
+    }
+
+    /**
+     * Routes to a specific step by a given index.
+     *
+     * @static
+     * @private
+     * @method goToStep
+     * @param wizard {Object} The jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param index {Integer} The position (zero-based) to route to
+     * @return {Boolean} Indicates whether the action succeeded or failed
+     **/
+    function goToStep(wizard, options, state, index) {
+        if (index < 0 || index >= state.stepCount) {
+            throwError(_indexOutOfRangeErrorMessage);
+        }
+
+        if (options.forceMoveForward && index < state.currentIndex) {
+            return;
+        }
+
+        var oldIndex = state.currentIndex;
+        if (wizard.triggerHandler("stepChanging", [state.currentIndex, index])) {
+            // Save new state
+            state.currentIndex = index;
+            saveCurrentStateToCookie(wizard, options, state);
+
+            // Change visualisation
+            refreshStepNavigation(wizard, options, state, oldIndex);
+            refreshPagination(wizard, options, state);
+            loadAsyncContent(wizard, options, state);
+            startTransitionEffect(wizard, options, state, index, oldIndex, function() {
+                wizard.triggerHandler("stepChanged", [index, oldIndex]);
             });
-            if (currentCard) {
-                this.log("found active card", currentCard);
-            } else {
-                this.log("couldn't find an active card");
+        } else {
+            wizard.find(".steps li").eq(oldIndex).addClass("error");
+        }
+
+        return true;
+    }
+
+    function increaseCurrentIndexBy(state, increaseBy) {
+        return state.currentIndex + increaseBy;
+    }
+
+    /**
+     * Initializes the component.
+     *
+     * @static
+     * @private
+     * @method initialize
+     * @param options {Object} The component settings
+     **/
+    function initialize(options) {
+        /*jshint -W040 */
+        var opts = $.extend(true, {}, defaults, options);
+
+        return this.each(function() {
+            var wizard = $(this);
+            var state = {
+                currentIndex: opts.startIndex,
+                currentStep: null,
+                stepCount: 0,
+                transitionElement: null
+            };
+
+            // Create data container
+            wizard.data("options", opts);
+            wizard.data("state", state);
+            wizard.data("steps", []);
+
+            analyzeData(wizard, opts, state);
+            render(wizard, opts, state);
+            registerEvents(wizard, opts);
+
+            // Trigger focus
+            if (opts.autoFocus && _uniqueId === 0) {
+                getStepAnchor(wizard, opts.startIndex).focus();
             }
-            return currentCard;
-        },
 
-        changeNextButton: function(text, cls) {
-            this.log("changing next button, text: " + text, "class: " + cls);
-            if (typeof(cls) != "undefined") {
-                this.nextButton.removeClass("btn-success btn-primary");
-            }
+            wizard.triggerHandler("init", [opts.startIndex]);
+        });
+    }
 
-            if (cls) {
-                this.nextButton.addClass(cls);
-            }
-            this.nextButton.text(text);
-            return this;
-        },
+    /**
+     * Inserts a new step to a specific position.
+     *
+     * @static
+     * @private
+     * @method insertStep
+     * @param wizard {Object} The jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param index {Integer} The position (zero-based) to add
+     * @param step {Object} The step object to add
+     * @example
+     *     $("#wizard").steps().insert(0, {
+     *         title: "Title",
+     *         content: "", // optional
+     *         contentMode: "async", // optional
+     *         contentUrl: "/Content/Step/1" // optional
+     *     });
+     * @chainable
+     **/
+    function insertStep(wizard, options, state, index, step) {
+        if (index < 0 || index > state.stepCount) {
+            throwError(_indexOutOfRangeErrorMessage);
+        }
 
-        hide: function() {
-            this.log("hiding");
-            this.modal.modal("hide");
-            return this;
-        },
+        // TODO: Validate step object
 
-        close: function() {
-            this.log("closing");
-            this.modal.modal("hide");
-            return this;
-        },
+        // Change data
+        step = $.extend({}, stepModel, step);
+        insertStepToCache(wizard, index, step);
+        if (state.currentIndex !== state.stepCount && state.currentIndex >= index) {
+            state.currentIndex++;
+            saveCurrentStateToCookie(wizard, options, state);
+        }
+        state.stepCount++;
 
+        var contentContainer = wizard.find(".content"),
+            header = $("<{0}>{1}</{0}>".format(options.headerTag, step.title)),
+            body = $("<{0}></{0}>".format(options.bodyTag));
 
-        show: function(modalOptions) {
-            this.log("showing");
-            if (this._firstShow) {
-                this.setCard(0);
-                this._firstShow = false;
-            }
-            if (this.args.showCancel) {
-                this.cancelButton.show();
-            } else {
-                this.cancelButton.hide();
-            }
-            if (this.args.showClose) {
-                this.closeButton.show();
-            }
-            this.modal.modal('show');
+        if (step.contentMode == null || step.contentMode === contentMode.html) {
+            body.html(step.content);
+        }
 
-            return this;
-        },
+        if (index === 0) {
+            contentContainer.prepend(body).prepend(header);
+        } else {
+            getStepPanel(wizard, (index - 1)).after(body).after(header);
+        }
 
-        on: function(name, fn) {
-            this.log("adding listener to event " + name);
-            this._events[name] = fn;
-            return this;
-        },
+        renderBody(wizard, state, body, index);
+        renderTitle(wizard, options, state, header, index);
+        refreshSteps(wizard, options, state, index);
+        if (index === state.currentIndex) {
+            refreshStepNavigation(wizard, options, state);
+        }
+        refreshPagination(wizard, options, state);
 
-        trigger: function() {
-            var name = arguments[0];
-            var args = Array.prototype.slice.call(arguments);
-            args.shift();
-            args.unshift(this);
+        return wizard;
+    }
 
-            this.log("firing event " + name);
-            var handler = this._events[name];
-            if (handler === undefined && this.wizard !== undefined) {
-                handler = this.wizard._events[name];
-            }
-            var ret = null;
+    /**
+     * Inserts a step object to the cache at a specific position.
+     *
+     * @static
+     * @private
+     * @method insertStepToCache
+     * @param wizard {Object} A jQuery wizard object
+     * @param index {Integer} The position (zero-based) to add
+     * @param step {Object} The step object to add
+     **/
+    function insertStepToCache(wizard, index, step) {
+        getSteps(wizard).splice(index, 0, step);
+    }
 
-            if (typeof(handler) == "function") {
-                this.log("found event handler, calling " + name);
-                try {
-                    ret = handler.apply(this, args);
-                } catch (e) {
-                    this.log("event handler " + name + " had an exception");
-                }
-            } else {
-                this.log("couldn't find an event handler for " + name);
-            }
-            return ret;
-        },
+    /**
+     * Handles the keyup DOM event for pagination.
+     *
+     * @static
+     * @private
+     * @event keyup
+     * @param event {Object} An event object
+     */
+    function keyUpHandler(event) {
+        var wizard = $(this),
+            options = getOptions(wizard),
+            state = getState(wizard);
 
+        if (options.suppressPaginationOnFocus && wizard.find(":focus").is(":input")) {
+            event.preventDefault();
+            return false;
+        }
 
-        reset: function() {
-            this.log("resetting");
+        var keyCodes = {
+            left: 37,
+            right: 39
+        };
+        if (event.keyCode === keyCodes.left) {
+            event.preventDefault();
+            goToPreviousStep(wizard, options, state);
+        } else if (event.keyCode === keyCodes.right) {
+            event.preventDefault();
+            goToNextStep(wizard, options, state);
+        }
+    }
 
-            this.updateProgressBar(0);
-            this.hideSubmitCards();
+    /**
+     * Loads and includes async content.
+     *
+     * @static
+     * @private
+     * @method loadAsyncContent
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     */
+    function loadAsyncContent(wizard, options, state) {
+        if (state.stepCount > 0) {
+            var currentIndex = state.currentIndex,
+                currentStep = getStep(wizard, currentIndex);
 
-            this.setCard(0);
-            this.lockCards();
-
-            this.enableNextButton();
-            this.showButtons();
-
-            this.hidePopovers();
-
-            this.trigger("reset");
-            return this;
-        },
-
-        /*
-         * this handles switching to the next card or previous card, taking
-         * care to skip over disabled cards
-         */
-        _abstractIncrementStep: function(direction, getNext) {
-            var current = this.getActiveCard();
-            var next;
-
-            if (current) {
-                /*
-                 * loop until we find a card that isn't disabled
-                 */
-                this.log("searching for valid next card");
-                while (true) {
-                    next = getNext(current);
-                    if (next) {
-                        this.log("looking at card", next.index);
-                        if (next.isDisabled()) {
-                            this.log("card " + next.index + " is disabled/locked, continuing");
-                            current = next;
-                            continue;
-                        } else {
-                            return this.setCard(current.index + direction);
-                        }
-                    } else {
-                        this.log("next card is not defined, breaking");
+            if (!options.enableContentCache || !currentStep.contentLoaded) {
+                switch (getValidEnumValue(contentMode, currentStep.contentMode)) {
+                    case contentMode.iframe:
+                        wizard.find(".content > .body").eq(state.currentIndex).empty()
+                            .html("<iframe src=\"" + currentStep.contentUrl + "\" frameborder=\"0\" scrolling=\"no\" />")
+                            .data("loaded", "1");
                         break;
-                    }
+
+                    case contentMode.async:
+                        var currentStepContent = getStepPanel(wizard, currentIndex)._aria("busy", "true")
+                            .empty().append(renderTemplate(options.loadingTemplate, {
+                                text: options.labels.loading
+                            }));
+
+                        $.ajax({
+                            url: currentStep.contentUrl,
+                            cache: false
+                        }).done(function(data) {
+                            currentStepContent.empty().html(data)._aria("busy", "false").data("loaded", "1");
+                            wizard.triggerHandler("contentLoaded", [currentIndex]);
+                        });
+                        break;
                 }
+            }
+        }
+    }
+
+    /**
+     * Fires the action next or previous click event.
+     *
+     * @static
+     * @private
+     * @method paginationClick
+     * @param wizard {Object} The jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param index {Integer} The position (zero-based) to route to
+     * @return {Boolean} Indicates whether the event fired successfully or not
+     **/
+    function paginationClick(wizard, options, state, index) {
+        var oldIndex = state.currentIndex;
+
+        if (index >= 0 && index < state.stepCount && !(options.forceMoveForward && index < state.currentIndex)) {
+            var anchor = getStepAnchor(wizard, index),
+                parent = anchor.parent(),
+                isDisabled = parent.hasClass("disabled");
+
+            // Enable the step to make the anchor clickable!
+            parent._enableAria();
+            anchor.click();
+
+            // An error occured
+            if (oldIndex === state.currentIndex && isDisabled) {
+                // Disable the step again if current index has not changed; prevents click action.
+                parent._enableAria(false);
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Fires when a pagination click happens.
+     *
+     * @static
+     * @private
+     * @event click
+     * @param event {Object} An event object
+     */
+    function paginationClickHandler(event) {
+        event.preventDefault();
+
+        var anchor = $(this),
+            wizard = anchor.parent().parent().parent().parent(),
+            options = getOptions(wizard),
+            state = getState(wizard),
+            href = anchor.attr("href");
+
+        switch (href.substring(href.lastIndexOf("#") + 1)) {
+            case "cancel":
+                cancel(wizard);
+                break;
+
+            case "finish":
+                finishStep(wizard, state);
+                break;
+
+            case "next":
+                goToNextStep(wizard, options, state);
+                break;
+
+            case "previous":
+                goToPreviousStep(wizard, options, state);
+                break;
+        }
+    }
+
+    /**
+     * Refreshs the visualization state for the entire pagination.
+     *
+     * @static
+     * @private
+     * @method refreshPagination
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     */
+    function refreshPagination(wizard, options, state) {
+        if (options.enablePagination) {
+            var finish = wizard.find(".actions a[href$='#finish']").parent(),
+                next = wizard.find(".actions a[href$='#next']").parent();
+
+            if (!options.forceMoveForward) {
+                var previous = wizard.find(".actions a[href$='#previous']").parent();
+                previous._enableAria(state.currentIndex > 0);
+            }
+
+            if (options.enableFinishButton && options.showFinishButtonAlways) {
+                finish._enableAria(state.stepCount > 0);
+                next._enableAria(state.stepCount > 1 && state.stepCount > (state.currentIndex + 1));
             } else {
-                this.log("current card is undefined");
+                finish._showAria(options.enableFinishButton && state.stepCount === (state.currentIndex + 1));
+                next._showAria(state.stepCount === 0 || state.stepCount > (state.currentIndex + 1)).
+                _enableAria(state.stepCount > (state.currentIndex + 1) || !options.enableFinishButton);
             }
-        },
+        }
+    }
 
+    /**
+     * Refreshs the visualization state for the step navigation (tabs).
+     *
+     * @static
+     * @private
+     * @method refreshStepNavigation
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param [oldIndex] {Integer} The index of the prior step
+     */
+    function refreshStepNavigation(wizard, options, state, oldIndex) {
+        var currentOrNewStepAnchor = getStepAnchor(wizard, state.currentIndex),
+            currentInfo = $("<span class=\"current-info audible\">" + options.labels.current + " </span>"),
+            stepTitles = wizard.find(".content > .title");
 
-        incrementCard: function() {
-            this.log("incrementing card");
-            var card = this._abstractIncrementStep(1, function(current) {
-                return current.next;
-            });
-            this.trigger("incrementCard");
-            return card;
-        },
+        if (oldIndex != null) {
+            var oldStepAnchor = getStepAnchor(wizard, oldIndex);
+            oldStepAnchor.parent().addClass("done").removeClass("error")._selectAria(false);
+            stepTitles.eq(oldIndex).removeClass("current").next(".body").removeClass("current");
+            currentInfo = oldStepAnchor.find(".current-info");
+            currentOrNewStepAnchor.focus();
+        }
 
-        decrementCard: function() {
-            this.log("decrementing card");
-            var card = this._abstractIncrementStep(-1, function(current) {
-                return current.prev;
-            });
-            this.trigger("decrementCard");
-            return card;
-        },
+        currentOrNewStepAnchor.prepend(currentInfo).parent()._selectAria().removeClass("done")._enableAria();
+        stepTitles.eq(state.currentIndex).addClass("current").next(".body").addClass("current");
+    }
 
-        setCard: function(i) {
-            this.log("setting card to " + i);
-            this.hideSubmitCards();
-            var currentCard = this.getActiveCard();
+    /**
+     * Refreshes step buttons and their related titles beyond a certain position.
+     *
+     * @static
+     * @private
+     * @method refreshSteps
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param index {Integer} The start point for refreshing ids
+     */
+    function refreshSteps(wizard, options, state, index) {
+        var uniqueId = getUniqueId(wizard);
 
-            if (this._submitting) {
-                this.log("we're submitting the wizard already, can't change cards");
-                return currentCard;
+        for (var i = index; i < state.stepCount; i++) {
+            var uniqueStepId = uniqueId + _tabSuffix + i,
+                uniqueBodyId = uniqueId + _tabpanelSuffix + i,
+                uniqueHeaderId = uniqueId + _titleSuffix + i,
+                title = wizard.find(".title").eq(i)._id(uniqueHeaderId);
+
+            wizard.find(".steps a").eq(i)._id(uniqueStepId)
+                ._aria("controls", uniqueBodyId).attr("href", "#" + uniqueHeaderId)
+                .html(renderTemplate(options.titleTemplate, {
+                    index: i + 1,
+                    title: title.html()
+                }));
+            wizard.find(".body").eq(i)._id(uniqueBodyId)
+                ._aria("labelledby", uniqueHeaderId);
+        }
+    }
+
+    function registerEvents(wizard, options) {
+        var eventNamespace = getEventNamespace(wizard);
+
+        wizard.bind("canceled" + eventNamespace, options.onCanceled);
+        wizard.bind("contentLoaded" + eventNamespace, options.onContentLoaded);
+        wizard.bind("finishing" + eventNamespace, options.onFinishing);
+        wizard.bind("finished" + eventNamespace, options.onFinished);
+        wizard.bind("init" + eventNamespace, options.onInit);
+        wizard.bind("stepChanging" + eventNamespace, options.onStepChanging);
+        wizard.bind("stepChanged" + eventNamespace, options.onStepChanged);
+
+        if (options.enableKeyNavigation) {
+            wizard.bind("keyup" + eventNamespace, keyUpHandler);
+        }
+
+        wizard.find(".actions a").bind("click" + eventNamespace, paginationClickHandler);
+    }
+
+    /**
+     * Removes a specific step by an given index.
+     *
+     * @static
+     * @private
+     * @method removeStep
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param index {Integer} The position (zero-based) of the step to remove
+     * @return Indecates whether the item is removed.
+     **/
+    function removeStep(wizard, options, state, index) {
+        // Index out of range and try deleting current item will return false.
+        if (index < 0 || index >= state.stepCount || state.currentIndex === index) {
+            return false;
+        }
+
+        // Change data
+        removeStepFromCache(wizard, index);
+        if (state.currentIndex > index) {
+            state.currentIndex--;
+            saveCurrentStateToCookie(wizard, options, state);
+        }
+        state.stepCount--;
+
+        getStepTitle(wizard, index).remove();
+        getStepPanel(wizard, index).remove();
+        getStepAnchor(wizard, index).parent().remove();
+
+        // Set the "first" class to the new first step button 
+        if (index === 0) {
+            wizard.find(".steps li").first().addClass("first");
+        }
+
+        // Set the "last" class to the new last step button 
+        if (index === state.stepCount) {
+            wizard.find(".steps li").eq(index).addClass("last");
+        }
+
+        refreshSteps(wizard, options, state, index);
+        refreshPagination(wizard, options, state);
+
+        return true;
+    }
+
+    function removeStepFromCache(wizard, index) {
+        getSteps(wizard).splice(index, 1);
+    }
+
+    /**
+     * Transforms the base html structure to a more sensible html structure.
+     *
+     * @static
+     * @private
+     * @method render
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     **/
+    function render(wizard, options, state) {
+        // Create a content wrapper and copy HTML from the intial wizard structure
+        var wrapperTemplate = "<{0} class=\"{1}\">{2}</{0}>",
+            orientation = getValidEnumValue(stepsOrientation, options.stepsOrientation),
+            verticalCssClass = (orientation === stepsOrientation.vertical) ? " vertical" : "",
+            contentWrapper = $(wrapperTemplate.format(options.contentContainerTag, "content " + options.clearFixCssClass, wizard.html())),
+            stepsWrapper = $(wrapperTemplate.format(options.stepsContainerTag, "steps " + options.clearFixCssClass, "<ul role=\"tablist\"></ul>")),
+            stepTitles = contentWrapper.children(options.headerTag),
+            stepContents = contentWrapper.children(options.bodyTag);
+
+        // Transform the wizard wrapper and remove the inner HTML
+        wizard.attr("role", "application").empty().append(stepsWrapper).append(contentWrapper)
+            .addClass(options.cssClass + " " + options.clearFixCssClass + verticalCssClass);
+
+        // Add WIA-ARIA support
+        stepContents.each(function(index) {
+            renderBody(wizard, state, $(this), index);
+        });
+
+        stepTitles.each(function(index) {
+            renderTitle(wizard, options, state, $(this), index);
+        });
+
+        refreshStepNavigation(wizard, options, state);
+        renderPagination(wizard, options, state);
+    }
+
+    /**
+     * Transforms the body to a proper tabpanel.
+     *
+     * @static
+     * @private
+     * @method renderBody
+     * @param wizard {Object} A jQuery wizard object
+     * @param body {Object} A jQuery body object
+     * @param index {Integer} The position of the body
+     */
+    function renderBody(wizard, state, body, index) {
+        var uniqueId = getUniqueId(wizard),
+            uniqueBodyId = uniqueId + _tabpanelSuffix + index,
+            uniqueHeaderId = uniqueId + _titleSuffix + index;
+
+        body._id(uniqueBodyId).attr("role", "tabpanel")._aria("labelledby", uniqueHeaderId)
+            .addClass("body")._showAria(state.currentIndex === index);
+    }
+
+    /**
+     * Renders a pagination if enabled.
+     *
+     * @static
+     * @private
+     * @method renderPagination
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     */
+    function renderPagination(wizard, options, state) {
+        if (options.enablePagination) {
+            var pagination = "<{0} class=\"actions {1}\"><ul role=\"menu\" aria-label=\"{2}\">{3}</ul></{0}>",
+                buttonTemplate = "<li><a href=\"#{0}\" role=\"menuitem\">{1}</a></li>",
+                buttons = "";
+
+            if (!options.forceMoveForward) {
+                buttons += buttonTemplate.format("previous", options.labels.previous);
             }
 
-            var newCard = this._cards[i];
-            if (newCard) {
-                if (newCard.isDisabled()) {
-                    this.log("new card is currently disabled, returning");
-                    return currentCard;
-                }
+            buttons += buttonTemplate.format("next", options.labels.next);
 
-                if (currentCard) {
+            if (options.enableFinishButton) {
+                buttons += buttonTemplate.format("finish", options.labels.finish);
+            }
 
-                    /*
-                     * here, we're only validating if we're going forward,
-                     * not if we're going backwards in a step
-                     */
-                    if (i > currentCard.index) {
-                        var cardToValidate = currentCard;
-                        var ok = false;
+            if (options.enableCancelButton) {
+                buttons += buttonTemplate.format("cancel", options.labels.cancel);
+            }
 
-                        /*
-                         * we need to loop over every card between our current
-                         * card and the card that we clicked, and re-validate
-                         * them.  if there's an error, we need to select the
-                         * first card to have an error
-                         */
-                        while (cardToValidate.index != newCard.index) {
-                            /*
-                             * unless we're validating the card that we're
-                             * leaving, we need to select the card, so that
-                             * any validators that trigger errorPopovers can
-                             * display correctly
-                             */
-                            if (cardToValidate.index != currentCard.index) {
-                                cardToValidate.prev.deselect();
-                                cardToValidate.prev.markVisited();
-                                cardToValidate.select();
-                            }
-                            ok = cardToValidate.validate();
-                            if (!ok) {
-                                return cardToValidate;
-                            }
-                            cardToValidate = cardToValidate.next;
-                        }
+            wizard.append(pagination.format(options.actionContainerTag, options.clearFixCssClass,
+                options.labels.pagination, buttons));
 
-                        cardToValidate.prev.deselect();
-                        cardToValidate.prev.markVisited();
+            refreshPagination(wizard, options, state);
+            loadAsyncContent(wizard, options, state);
+        }
+    }
+
+    /**
+     * Renders a template and replaces all placeholder.
+     *
+     * @static
+     * @private
+     * @method renderTemplate
+     * @param template {String} A template
+     * @param substitutes {Object} A list of substitute
+     * @return {String} The rendered template
+     */
+    function renderTemplate(template, substitutes) {
+        var matches = template.match(/#([a-z]*)#/gi);
+
+        for (var i = 0; i < matches.length; i++) {
+            var match = matches[i],
+                key = match.substring(1, match.length - 1);
+
+            if (substitutes[key] === undefined) {
+                throwError("The key '{0}' does not exist in the substitute collection!", key);
+            }
+
+            template = template.replace(match, substitutes[key]);
+        }
+
+        return template;
+    }
+
+    /**
+     * Transforms the title to a step item button.
+     *
+     * @static
+     * @private
+     * @method renderTitle
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     * @param header {Object} A jQuery header object
+     * @param index {Integer} The position of the header
+     */
+    function renderTitle(wizard, options, state, header, index) {
+        var uniqueId = getUniqueId(wizard),
+            uniqueStepId = uniqueId + _tabSuffix + index,
+            uniqueBodyId = uniqueId + _tabpanelSuffix + index,
+            uniqueHeaderId = uniqueId + _titleSuffix + index,
+            stepCollection = wizard.find(".steps > ul"),
+            title = renderTemplate(options.titleTemplate, {
+                index: index + 1,
+                title: header.html()
+            }),
+            stepItem = $("<li role=\"tab\"><a id=\"" + uniqueStepId + "\" href=\"#" + uniqueHeaderId +
+                "\" aria-controls=\"" + uniqueBodyId + "\">" + title + "</a></li>");
+
+        stepItem._enableAria(options.enableAllSteps || state.currentIndex > index);
+
+        if (state.currentIndex > index) {
+            stepItem.addClass("done");
+        }
+
+        header._id(uniqueHeaderId).attr("tabindex", "-1").addClass("title");
+
+        if (index === 0) {
+            stepCollection.prepend(stepItem);
+        } else {
+            stepCollection.find("li").eq(index - 1).after(stepItem);
+        }
+
+        // Set the "first" class to the new first step button
+        if (index === 0) {
+            stepCollection.find("li").removeClass("first").eq(index).addClass("first");
+        }
+
+        // Set the "last" class to the new last step button
+        if (index === (state.stepCount - 1)) {
+            stepCollection.find("li").removeClass("last").eq(index).addClass("last");
+        }
+
+        // Register click event
+        stepItem.children("a").bind("click" + getEventNamespace(wizard), stepClickHandler);
+    }
+
+    /**
+     * Saves the current state to a cookie.
+     *
+     * @static
+     * @private
+     * @method saveCurrentStateToCookie
+     * @param wizard {Object} A jQuery wizard object
+     * @param options {Object} Settings of the current wizard
+     * @param state {Object} The state container of the current wizard
+     */
+    function saveCurrentStateToCookie(wizard, options, state) {
+        if (options.saveState && $.cookie) {
+            $.cookie(_cookiePrefix + getUniqueId(wizard), state.currentIndex);
+        }
+    }
+
+    function startTransitionEffect(wizard, options, state, index, oldIndex, doneCallback) {
+        var stepContents = wizard.find(".content > .body"),
+            effect = getValidEnumValue(transitionEffect, options.transitionEffect),
+            effectSpeed = options.transitionEffectSpeed,
+            newStep = stepContents.eq(index),
+            currentStep = stepContents.eq(oldIndex);
+
+        switch (effect) {
+            case transitionEffect.fade:
+            case transitionEffect.slide:
+                var hide = (effect === transitionEffect.fade) ? "fadeOut" : "slideUp",
+                    show = (effect === transitionEffect.fade) ? "fadeIn" : "slideDown";
+
+                state.transitionElement = newStep;
+                currentStep[hide](effectSpeed, function() {
+                    var wizard = $(this)._showAria(false).parent().parent(),
+                        state = getState(wizard);
+
+                    if (state.transitionElement) {
+                        state.transitionElement[show](effectSpeed, function() {
+                            $(this)._showAria();
+                        }).promise().done(doneCallback);
+                        state.transitionElement = null;
                     }
-
-                    currentCard.deselect();
-                    currentCard.markVisited();
-                }
-
-                newCard.select();
-
-                if (this.args.progressBarCurrent) {
-                    this.percentComplete = i * 100.0 / this._cards.length;
-                    this.updateProgressBar(this.percentComplete);
-                } else {
-                    var lastPercent = this.percentComplete;
-                    this.percentComplete = i * 100.0 / this._cards.length;
-                    this.percentComplete = Math.max(lastPercent, this.percentComplete);
-                    this.updateProgressBar(this.percentComplete);
-                }
-
-                return newCard;
-            } else {
-                this.log("couldn't find card " + i);
-            }
-        },
-
-        updateProgressBar: function(percent) {
-            this.log("updating progress to " + percent + "%");
-            this.progress.css({
-                width: percent + "%"
-            });
-            this.percentComplete = percent;
-
-            this.trigger("progressBar", percent);
-
-            if (percent == 100) {
-                this.log("progress is 100, animating progress bar");
-                this.progressContainer.find('.progress').addClass("active");
-            } else if (percent == 0) {
-                this.log("progress is 0, disabling animation");
-                this.progressContainer.find('.progress').removeClass("active");
-            }
-        },
-
-        getNextCard: function() {
-            var currentCard = this.getActiveCard();
-            if (currentCard) return currentCard.next;
-        },
-
-        lockCards: function() {
-            this.log("locking nav cards");
-            this.eachCard(function(i, card) {
-                card.unmarkVisited();
-            });
-            return this;
-        },
-
-        disableCards: function() {
-            this.log("disabling all nav cards");
-            this.eachCard(function(i, card) {
-                card.disable();
-            });
-            return this;
-        },
-
-        enableCards: function() {
-            this.log("enabling all nav cards");
-            this.eachCard(function(i, card) {
-                card.enable();
-            });
-            return this;
-        },
-
-        hideCards: function() {
-            this.log("hiding cards");
-            this.eachCard(function(i, card) {
-                card.deselect();
-            });
-            this.hideSubmitCards();
-            return this;
-        },
-
-        hideButtons: function() {
-            this.log("hiding buttons");
-            this.cancelButton.hide();
-            this.closeButton.hide();
-            this.nextButton.hide();
-            this.backButton.hide();
-            return this;
-        },
-
-        showButtons: function() {
-            this.log("showing buttons");
-            if (this.args.showCancel) {
-                this.cancelButton.show();
-            } else {
-                this.cancelButton.hide();
-            }
-            if (this.args.showClose) {
-                this.closeButton.show();
-            };
-            this.nextButton.show();
-            this.backButton.show();
-            return this;
-        },
-
-        getCard: function(el) {
-            var cardDOMEl = $(el).parents(".wizard-card").first()[0];
-            if (cardDOMEl) {
-                var foundCard = null;
-                this.eachCard(function(i, card) {
-                    if (cardDOMEl == card.el[0]) {
-                        foundCard = card;
-                        return false;
-                    }
-                    return true;
                 });
-                return foundCard;
-            } else {
-                return null;
-            }
-        },
+                break;
 
-        _createCards: function() {
-            var prev = null;
-            var next = null;
-            var currentCard = null;
-            var wizard = this;
-            var self = this;
+            case transitionEffect.slideLeft:
+                var outerWidth = currentStep.outerWidth(true),
+                    posFadeOut = (index > oldIndex) ? -(outerWidth) : outerWidth,
+                    posFadeIn = (index > oldIndex) ? outerWidth : -(outerWidth);
 
-            self.log("Creating Cards");
+                $.when(currentStep.animate({
+                            left: posFadeOut
+                        }, effectSpeed,
+                        function() {
+                            $(this)._showAria(false);
+                        }),
+                    newStep.css("left", posFadeIn + "px")._showAria()
+                    .animate({
+                        left: 0
+                    }, effectSpeed)).done(doneCallback);
+                break;
 
-            var cards = this.modal.find(".wizard-cards .wizard-card");
-            $.each(cards, function(i, card) {
-                card = $(card);
+            default:
+                $.when(currentStep._showAria(false), newStep._showAria())
+                    .done(doneCallback);
+                break;
+        }
+    }
 
-                prev = currentCard;
-                currentCard = new WizardCard(wizard, card, i, prev, next);
-                self._cards.push(currentCard);
-                if (currentCard.name) {
-                    self.cards[currentCard.name] = currentCard;
-                }
-                if (prev) {
-                    prev.next = currentCard;
-                }
+    /**
+     * Fires when a step click happens.
+     *
+     * @static
+     * @private
+     * @event click
+     * @param event {Object} An event object
+     */
+    function stepClickHandler(event) {
+        event.preventDefault();
 
-                self.modal.find(".wizard-steps .wizard-nav-list").append(currentCard.nav);
-            });
-        },
+        var anchor = $(this),
+            wizard = anchor.parent().parent().parent().parent(),
+            options = getOptions(wizard),
+            state = getState(wizard),
+            oldIndex = state.currentIndex;
 
-        showSubmitCard: function(name) {
-            this.log("showing " + name + " submit card");
+        if (anchor.parent().is(":not(.disabled):not(.current)")) {
+            var href = anchor.attr("href"),
+                position = parseInt(href.substring(href.lastIndexOf("-") + 1), 0);
 
-            var card = this.el.find(".wizard-" + name);
-            if (card.length) {
-                this.hideCards();
-                this.el.find(".wizard-" + name).show();
-            } else {
-                this.log("couldn't find submit card " + name);
-            }
-        },
+            goToStep(wizard, options, state, position);
+        }
 
-        hideSubmitCard: function(name) {
-            this.log("hiding " + name + " submit card");
-            this.el.find(".wizard-" + name).hide();
-        },
+        // If nothing has changed
+        if (oldIndex === state.currentIndex) {
+            getStepAnchor(wizard, oldIndex).focus();
+            return false;
+        }
+    }
 
-        hideSubmitCards: function() {
-            var wizard = this;
-            $.each(["success", "error", "failure", "loading"], function(i, name) {
-                wizard.hideSubmitCard(name);
-            });
-        },
+    function throwError(message) {
+        if (arguments.length > 1) {
+            message = message.format(Array.prototype.slice.call(arguments, 1));
+        }
 
-        enableNextButton: function() {
-            this.log("enabling next button");
-            this.nextButton.removeAttr("disabled");
-            return this;
-        },
+        throw new Error(message);
+    }
 
-        disableNextButton: function() {
-            this.log("disabling next button");
-            this.nextButton.attr("disabled", "disabled");
-            return this;
-        },
+    /**
+     * Checks an argument for null or undefined and throws an error if one check applies.
+     *
+     * @static
+     * @private
+     * @method validateArgument
+     * @param argumentName {String} The name of the given argument
+     * @param argumentValue {Object} The argument itself
+     */
+    function validateArgument(argumentName, argumentValue) {
+        if (argumentValue == null) {
+            throwError("The argument '{0}' is null or undefined.", argumentName);
+        }
+    }
 
-        serializeArray: function() {
-            var form = this.form.serializeArray();
-            this.form.find('input[disabled][data-serialize="1"]').each(function() {
-                formObj = {
-                    name: $(this).attr('name'),
-                    value: $(this).val()
-                };
-
-                form.push(formObj);
-            });
-
-            return form;
-        },
-
-        serialize: function() {
-            var form = this.form.serialize();
-            this.form.find('input[disabled][data-serialize="1"]').each(function() {
-                form = form + '&' + $(this).attr('name') + '=' + $(this).val();
-            });
-
-            return form;
-        },
-
-        find: function(selector) {
-            return this.modal.find(selector);
-        },
-
-
-        /*
-         * the next 3 functions are to be called by the custom submit event
-         * handler.  the idea is that after you make an ajax call to submit
-         * your wizard data (or whatever it is you want to do at the end of
-         * the wizard), you call one of these 3 handlers to display a specific
-         * card for either success, failure, or error
-         */
-        submitSuccess: function() {
-            this.log("submit success");
-            this._submitting = false;
-            this.showSubmitCard("success");
-            this.trigger("submitSuccess");
-        },
-
-        submitFailure: function() {
-            this.log("submit failure");
-            this._submitting = false;
-            this.showSubmitCard("failure");
-            this.trigger("submitFailure");
-        },
-
-        submitError: function() {
-            this.log("submit error");
-            this._submitting = false;
-            this.showSubmitCard("error");
-            this.trigger("submitError");
-        },
-
-
-        _submit: function() {
-            this.log("submitting wizard");
-            this._submitting = true;
-
-            this.lockCards();
-            this.cancelButton.hide();
-            this.closeButton.hide();
-            this.backButton.hide();
-
-            this.showSubmitCard("loading");
-            this.updateProgressBar(100);
-
-            this.changeNextButton(this.args.buttons.submittingText, false);
-            this.disableNextButton();
-
-            var ret = this.trigger("submit");
-            this.trigger("loading");
-        },
-
-        _onNextClick: function() {
-            this.log("handling 'next' button click");
-            var currentCard = this.getActiveCard();
-            if (this._readyToSubmit && currentCard.validate()) {
-                this._submit();
-            } else {
-                currentCard = this.incrementCard();
-            }
-        },
-
-        _onBackClick: function() {
-            this.log("handling 'back' button click");
-            var currentCard = this.decrementCard();
-        },
-
-        _handleNextClick: function(event) {
-            var wizard = event.data;
-            wizard._onNextClick.call(wizard);
-        },
-
-        _handleBackClick: function(event) {
-            var wizard = event.data;
-            wizard._onBackClick.call(wizard);
-        },
-
-
-        /*
-         * this function is attached by default to the wizard's "submit" event.
-         * if you choose to implement your own custom submit logic, you should
-         * copy how this function works
-         */
-        _defaultSubmit: function(wizard) {
-            $.ajax({
-                type: "POST",
-                url: wizard.args.submitUrl,
-                data: wizard.serialize(),
-                dataType: "json"
-            }).done(function(response) {
-                wizard.submitSuccess();
-                wizard.hideButtons();
-                wizard.updateProgressBar(0);
-            }).fail(function() {
-                wizard.submitFailure();
-                wizard.hideButtons();
-            });
+    /**
+     * Represents a jQuery wizard plugin.
+     *
+     * @class steps
+     * @constructor
+     * @param [method={}] The name of the method as `String` or an JSON object for initialization
+     * @param [params=]* {Array} Additional arguments for a method call
+     * @chainable
+     **/
+    $.fn.steps = function(method) {
+        if ($.fn.steps[method]) {
+            return $.fn.steps[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === "object" || !method) {
+            return initialize.apply(this, arguments);
+        } else {
+            $.error("Method " + method + " does not exist on jQuery.steps");
         }
     };
 
+    /**
+     * Adds a new step.
+     *
+     * @method add
+     * @param step {Object} The step object to add
+     * @chainable
+     **/
+    $.fn.steps.add = function(step) {
+        var state = getState(this);
+        return insertStep(this, getOptions(this), state, state.stepCount, step);
+    };
 
-}(window.jQuery));
+    /**
+     * Removes the control functionality completely and transforms the current state to the initial HTML structure.
+     *
+     * @method destroy
+     * @chainable
+     **/
+    $.fn.steps.destroy = function() {
+        return destroy(this, getOptions(this));
+    };
+
+    /**
+     * Triggers the onFinishing and onFinished event.
+     *
+     * @method finish
+     **/
+    $.fn.steps.finish = function() {
+        finishStep(this, getState(this));
+    };
+
+    /**
+     * Gets the current step index.
+     *
+     * @method getCurrentIndex
+     * @return {Integer} The actual step index (zero-based)
+     * @for steps
+     **/
+    $.fn.steps.getCurrentIndex = function() {
+        return getState(this).currentIndex;
+    };
+
+    /**
+     * Gets the current step object.
+     *
+     * @method getCurrentStep
+     * @return {Object} The actual step object
+     **/
+    $.fn.steps.getCurrentStep = function() {
+        return getStep(this, getState(this).currentIndex);
+    };
+
+    /**
+     * Gets a specific step object by index.
+     *
+     * @method getStep
+     * @param index {Integer} An integer that belongs to the position of a step
+     * @return {Object} A specific step object
+     **/
+    $.fn.steps.getStep = function(index) {
+        return getStep(this, index);
+    };
+
+    /**
+     * Inserts a new step to a specific position.
+     *
+     * @method insert
+     * @param index {Integer} The position (zero-based) to add
+     * @param step {Object} The step object to add
+     * @example
+     *     $("#wizard").steps().insert(0, {
+     *         title: "Title",
+     *         content: "", // optional
+     *         contentMode: "async", // optional
+     *         contentUrl: "/Content/Step/1" // optional
+     *     });
+     * @chainable
+     **/
+    $.fn.steps.insert = function(index, step) {
+        return insertStep(this, getOptions(this), getState(this), index, step);
+    };
+
+    /**
+     * Routes to the next step.
+     *
+     * @method next
+     * @return {Boolean} Indicates whether the action executed
+     **/
+    $.fn.steps.next = function() {
+        return goToNextStep(this, getOptions(this), getState(this));
+    };
+
+    /**
+     * Routes to the previous step.
+     *
+     * @method previous
+     * @return {Boolean} Indicates whether the action executed
+     **/
+    $.fn.steps.previous = function() {
+        return goToPreviousStep(this, getOptions(this), getState(this));
+    };
+
+    /**
+     * Removes a specific step by an given index.
+     *
+     * @method remove
+     * @param index {Integer} The position (zero-based) of the step to remove
+     * @return Indecates whether the item is removed.
+     **/
+    $.fn.steps.remove = function(index) {
+        return removeStep(this, getOptions(this), getState(this), index);
+    };
+
+    /**
+     * Sets a specific step object by index.
+     *
+     * @method setStep
+     * @param index {Integer} An integer that belongs to the position of a step
+     * @param step {Object} The step object to change
+     **/
+    $.fn.steps.setStep = function(index, step) {
+        throw new Error("Not yet implemented!");
+    };
+
+    /**
+     * Skips an certain amount of steps.
+     *
+     * @method skip
+     * @param count {Integer} The amount of steps that should be skipped
+     * @return {Boolean} Indicates whether the action executed
+     **/
+    $.fn.steps.skip = function(count) {
+        throw new Error("Not yet implemented!");
+    };
+
+    /**
+     * An enum represents the different content types of a step and their loading mechanisms.
+     *
+     * @class contentMode
+     * @for steps
+     **/
+    var contentMode = $.fn.steps.contentMode = {
+        /**
+         * HTML embedded content
+         *
+         * @readOnly
+         * @property html
+         * @type Integer
+         * @for contentMode
+         **/
+        html: 0,
+
+        /**
+         * IFrame embedded content
+         *
+         * @readOnly
+         * @property iframe
+         * @type Integer
+         * @for contentMode
+         **/
+        iframe: 1,
+
+        /**
+         * Async embedded content
+         *
+         * @readOnly
+         * @property async
+         * @type Integer
+         * @for contentMode
+         **/
+        async: 2
+    };
+
+    /**
+     * An enum represents the orientation of the steps navigation.
+     *
+     * @class stepsOrientation
+     * @for steps
+     **/
+    var stepsOrientation = $.fn.steps.stepsOrientation = {
+        /**
+         * Horizontal orientation
+         *
+         * @readOnly
+         * @property horizontal
+         * @type Integer
+         * @for stepsOrientation
+         **/
+        horizontal: 0,
+
+        /**
+         * Vertical orientation
+         *
+         * @readOnly
+         * @property vertical
+         * @type Integer
+         * @for stepsOrientation
+         **/
+        vertical: 1
+    };
+
+    /**
+     * An enum that represents the various transition animations.
+     *
+     * @class transitionEffect
+     * @for steps
+     **/
+    var transitionEffect = $.fn.steps.transitionEffect = {
+        /**
+         * No transition animation
+         *
+         * @readOnly
+         * @property none
+         * @type Integer
+         * @for transitionEffect
+         **/
+        none: 0,
+
+        /**
+         * Fade in transition
+         *
+         * @readOnly
+         * @property fade
+         * @type Integer
+         * @for transitionEffect
+         **/
+        fade: 1,
+
+        /**
+         * Slide up transition
+         *
+         * @readOnly
+         * @property slide
+         * @type Integer
+         * @for transitionEffect
+         **/
+        slide: 2,
+
+        /**
+         * Slide left transition
+         *
+         * @readOnly
+         * @property slideLeft
+         * @type Integer
+         * @for transitionEffect
+         **/
+        slideLeft: 3
+    };
+
+    var stepModel = $.fn.steps.stepModel = {
+        title: "",
+        content: "",
+        contentUrl: "",
+        contentMode: contentMode.html,
+        contentLoaded: false
+    };
+
+    /**
+     * An object that represents the default settings.
+     * There are two possibities to override the sub-properties.
+     * Either by doing it generally (global) or on initialization.
+     *
+     * @static
+     * @class defaults
+     * @for steps
+     * @example
+     *   // Global approach
+     *   $.steps.defaults.headerTag = "h3";
+     * @example
+     *   // Initialization approach
+     *   $("#wizard").steps({ headerTag: "h3" });
+     **/
+    var defaults = $.fn.steps.defaults = {
+        /**
+         * The header tag is used to find the step button text within the declared wizard area.
+         *
+         * @property headerTag
+         * @type String
+         * @default "h1"
+         * @for defaults
+         **/
+        headerTag: "h1",
+
+        /**
+         * The body tag is used to find the step content within the declared wizard area.
+         *
+         * @property bodyTag
+         * @type String
+         * @default "div"
+         * @for defaults
+         **/
+        bodyTag: "div",
+
+        /**
+         * The content container tag which will be used to wrap all step contents.
+         *
+         * @property contentContainerTag
+         * @type String
+         * @default "div"
+         * @for defaults
+         **/
+        contentContainerTag: "div",
+
+        /**
+         * The action container tag which will be used to wrap the pagination navigation.
+         *
+         * @property actionContainerTag
+         * @type String
+         * @default "div"
+         * @for defaults
+         **/
+        actionContainerTag: "div",
+
+        /**
+         * The steps container tag which will be used to wrap the steps navigation.
+         *
+         * @property stepsContainerTag
+         * @type String
+         * @default "div"
+         * @for defaults
+         **/
+        stepsContainerTag: "div",
+
+        /**
+         * The css class which will be added to the outer component wrapper.
+         *
+         * @property cssClass
+         * @type String
+         * @default "wizard"
+         * @for defaults
+         * @example
+         *     <div class="wizard">
+         *         ...
+         *     </div>
+         **/
+        cssClass: "wizard",
+
+        /**
+         * The css class which will be used for floating scenarios.
+         *
+         * @property clearFixCssClass
+         * @type String
+         * @default "clearfix"
+         * @for defaults
+         **/
+        clearFixCssClass: "clearfix",
+
+        /**
+         * Determines whether the steps are vertically or horizontally oriented.
+         *
+         * @property stepsOrientation
+         * @type stepsOrientation
+         * @default horizontal
+         * @for defaults
+         * @since 1.0.0
+         **/
+        stepsOrientation: stepsOrientation.horizontal,
+
+        /*
+         * Tempplates
+         */
+
+        /**
+         * The title template which will be used to create a step button.
+         *
+         * @property titleTemplate
+         * @type String
+         * @default "<span class=\"number\">#index#.</span> #title#"
+         * @for defaults
+         **/
+        titleTemplate: "<span class=\"number\">#index#.</span> #title#",
+
+        /**
+         * The loading template which will be used to create the loading animation.
+         *
+         * @property loadingTemplate
+         * @type String
+         * @default "<span class=\"spinner\"></span> #text#"
+         * @for defaults
+         **/
+        loadingTemplate: "<span class=\"spinner\"></span> #text#",
+
+        /*
+         * Behaviour
+         */
+
+        /**
+         * Sets the focus to the first wizard instance in order to enable the key navigation from the begining if `true`.
+         *
+         * @property autoFocus
+         * @type Boolean
+         * @default false
+         * @for defaults
+         * @since 0.9.4
+         **/
+        autoFocus: false,
+
+        /**
+         * Enables all steps from the begining if `true` (all steps are clickable).
+         *
+         * @property enableAllSteps
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        enableAllSteps: false,
+
+        /**
+         * Enables keyboard navigation if `true` (arrow left and arrow right).
+         *
+         * @property enableKeyNavigation
+         * @type Boolean
+         * @default true
+         * @for defaults
+         **/
+        enableKeyNavigation: true,
+
+        /**
+         * Enables pagination if `true`.
+         *
+         * @property enablePagination
+         * @type Boolean
+         * @default true
+         * @for defaults
+         **/
+        enablePagination: true,
+
+        /**
+         * Suppresses pagination if a form field is focused.
+         *
+         * @property suppressPaginationOnFocus
+         * @type Boolean
+         * @default true
+         * @for defaults
+         **/
+        suppressPaginationOnFocus: true,
+
+        /**
+         * Enables cache for async loaded or iframe embedded content.
+         *
+         * @property enableContentCache
+         * @type Boolean
+         * @default true
+         * @for defaults
+         **/
+        enableContentCache: true,
+
+        /**
+         * Shows the cancel button if enabled.
+         *
+         * @property enableCancelButton
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        enableCancelButton: false,
+
+        /**
+         * Shows the finish button if enabled.
+         *
+         * @property enableFinishButton
+         * @type Boolean
+         * @default true
+         * @for defaults
+         **/
+        enableFinishButton: true,
+
+        /**
+         * Not yet implemented.
+         *
+         * @property preloadContent
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        preloadContent: false,
+
+        /**
+         * Shows the finish button always (on each step; right beside the next button) if `true`.
+         * Otherwise the next button will be replaced by the finish button if the last step becomes active.
+         *
+         * @property showFinishButtonAlways
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        showFinishButtonAlways: false,
+
+        /**
+         * Prevents jumping to a previous step.
+         *
+         * @property forceMoveForward
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        forceMoveForward: false,
+
+        /**
+         * Saves the current state (step position) to a cookie.
+         * By coming next time the last active step becomes activated.
+         *
+         * @property saveState
+         * @type Boolean
+         * @default false
+         * @for defaults
+         **/
+        saveState: false,
+
+        /**
+         * The position to start on (zero-based).
+         *
+         * @property startIndex
+         * @type Integer
+         * @default 0
+         * @for defaults
+         **/
+        startIndex: 0,
+
+        /*
+         * Animation Effect Configuration
+         */
+
+        /**
+         * The animation effect which will be used for step transitions.
+         *
+         * @property transitionEffect
+         * @type transitionEffect
+         * @default none
+         * @for defaults
+         **/
+        transitionEffect: transitionEffect.none,
+
+        /**
+         * Animation speed for step transitions (in milliseconds).
+         *
+         * @property transitionEffectSpeed
+         * @type Integer
+         * @default 200
+         * @for defaults
+         **/
+        transitionEffectSpeed: 200,
+
+        /*
+         * Events
+         */
+
+        /**
+         * Fires before the step changes and can be used to prevent step changing by returning `false`.
+         * Very useful for form validation.
+         *
+         * @property onStepChanging
+         * @type Event
+         * @default function (event, currentIndex, newIndex) { return true; }
+         * @for defaults
+         **/
+        onStepChanging: function(event, currentIndex, newIndex) {
+            return true;
+        },
+
+        /**
+         * Fires after the step has change.
+         *
+         * @property onStepChanged
+         * @type Event
+         * @default function (event, currentIndex, priorIndex) { }
+         * @for defaults
+         **/
+        onStepChanged: function(event, currentIndex, priorIndex) {},
+
+        /**
+         * Fires after cancelation.
+         *
+         * @property onCanceled
+         * @type Event
+         * @default function (event) { }
+         * @for defaults
+         **/
+        onCanceled: function(event) {},
+
+        /**
+         * Fires before finishing and can be used to prevent completion by returning `false`.
+         * Very useful for form validation.
+         *
+         * @property onFinishing
+         * @type Event
+         * @default function (event, currentIndex) { return true; }
+         * @for defaults
+         **/
+        onFinishing: function(event, currentIndex) {
+            return true;
+        },
+
+        /**
+         * Fires after completion.
+         *
+         * @property onFinished
+         * @type Event
+         * @default function (event, currentIndex) { }
+         * @for defaults
+         **/
+        onFinished: function(event, currentIndex) {},
+
+        /**
+         * Fires after async content is loaded.
+         *
+         * @property onContentLoaded
+         * @type Event
+         * @default function (event, index) { }
+         * @for defaults
+         **/
+        onContentLoaded: function(event, currentIndex) {},
+
+        /**
+         * Fires when the wizard is initialized.
+         *
+         * @property onInit
+         * @type Event
+         * @default function (event) { }
+         * @for defaults
+         **/
+        onInit: function(event, currentIndex) {},
+
+        /**
+         * Contains all labels.
+         *
+         * @property labels
+         * @type Object
+         * @for defaults
+         **/
+        labels: {
+            /**
+             * Label for the cancel button.
+             *
+             * @property cancel
+             * @type String
+             * @default "Cancel"
+             * @for defaults
+             **/
+            cancel: "Cancel",
+
+            /**
+             * This label is important for accessability reasons.
+             * Indicates which step is activated.
+             *
+             * @property current
+             * @type String
+             * @default "current step:"
+             * @for defaults
+             **/
+            current: "current step:",
+
+            /**
+             * This label is important for accessability reasons and describes the kind of navigation.
+             *
+             * @property pagination
+             * @type String
+             * @default "Pagination"
+             * @for defaults
+             * @since 0.9.7
+             **/
+            pagination: "Pagination",
+
+            /**
+             * Label for the finish button.
+             *
+             * @property finish
+             * @type String
+             * @default "Finish"
+             * @for defaults
+             **/
+            finish: "Finish",
+
+            /**
+             * Label for the next button.
+             *
+             * @property next
+             * @type String
+             * @default "Next"
+             * @for defaults
+             **/
+            next: "Next",
+
+            /**
+             * Label for the previous button.
+             *
+             * @property previous
+             * @type String
+             * @default "Previous"
+             * @for defaults
+             **/
+            previous: "Previous",
+
+            /**
+             * Label for the loading animation.
+             *
+             * @property loading
+             * @type String
+             * @default "Loading ..."
+             * @for defaults
+             **/
+            loading: "Loading ..."
+        }
+    };
+})(jQuery);
