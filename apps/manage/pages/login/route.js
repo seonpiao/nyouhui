@@ -26,7 +26,7 @@ module.exports = function(app) {
     result = result[app.config.admins.db][app.config.admins.collection];
     if (result && result.length === 1) {
       this.session.username = username;
-      this.redirect(this.session.redirectUrl || '/');
+      this.redirect(this.session.redirectUrl || '/schema');
     } else {
       this.redirect('/login');
     }
