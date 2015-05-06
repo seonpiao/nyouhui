@@ -141,9 +141,9 @@ if [ "$choice" = "y" ]; then
   for((i=0;i<num;i++));do
     echo deploy to ${hosts[i]}
     if [ "$env" = "production" ]; then
-      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd ${server_code} && git pull && npm install && /usr/local/node/bin/pm2 reload ${pm2_pname}'"
+      ssh root@${hosts[i]} "dsh -M -r ssh -g node -q -- 'cd ${server_code} && git pull && /usr/local/node/bin/npm install && /usr/local/node/bin/pm2 reload ${pm2_pname}'"
     else
-      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && npm install && /usr/local/bin/pm2 reload $2"
+      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && /usr/local/node/bin/npm install && /usr/local/bin/pm2 reload $2"
     fi
   done
 fi
