@@ -52,6 +52,10 @@ module.exports = function(app) {
         name: 'input',
         base: 'input'
       });
+      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
+        name: 'select',
+        base: 'select'
+      });
       this.result = {
         code: 200,
         result: {
@@ -96,6 +100,10 @@ module.exports = function(app) {
       controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
         name: 'input',
         base: 'input'
+      });
+      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
+        name: 'select',
+        base: 'select'
       });
       this.result = {
         code: 200,

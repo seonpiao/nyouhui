@@ -109,6 +109,17 @@ module.exports = function(app) {
   app.route('/crud/:db/:collection/create').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    // 后续做基础组件选择时用
+    // this.global = this.global || {};
+    // this.global.allModules = fs.readdirSync('modules');
+    // if (this.global.allModules && this.global.allModules.length > 0) {
+    //   this.global.allModules = this.global.allModules.filter(function(name) {
+    //     if (name.charAt(0) != '.') {
+    //       return true;
+    //     }
+    //     return false;
+    //   });
+    // }
     try {
       var data =
         yield Mongo.request({
@@ -138,6 +149,10 @@ module.exports = function(app) {
       controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
         name: 'input',
         base: 'input'
+      });
+      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
+        name: 'select',
+        base: 'select'
       });
       this.result = {
         code: 200,

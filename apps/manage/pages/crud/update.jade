@@ -27,6 +27,7 @@ block append content
           -   return v.name == field.type
           - })
           - field.base = extra_componets[0].base;
+          - console.log(field.base)
           if field.base === 'input'
             -var params = {};
             -params.label = field.alias;
@@ -44,7 +45,7 @@ block append content
             - for(var key in extra_componets[0].params)
             -   params[key] = extra_componets[0].params[key]
             +manage_ctrl_input(params)
-          else if field.base === 'tag'
+          else if field.base === 'tagsinput'
             -var params = {};
             -params.label = field.alias;
             -params.name =field.name,
@@ -61,6 +62,15 @@ block append content
             - for(var key in extra_componets[0].params)
             -   params[key] = extra_componets[0].params[key]
             +manage_ctrl_select(params)  
+          else if field.base === 'orderwizard'
+            -var params = {};
+            -params.label = field.alias;
+            -params.name =field.name,
+            //- -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
+            - for(var key in extra_componets[0].params){
+            -   params[key] = extra_componets[0].params[key]
+            - }
+            +manage_ctrl_orderwizard(params)
       +manage_box({
         title:'表定义'
       })
@@ -70,4 +80,4 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.60d765a147be2bf2.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.501924f951c8d752.js")
