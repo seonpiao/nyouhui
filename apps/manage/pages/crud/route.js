@@ -11,6 +11,51 @@ var extend = require('node.extend');
 var co = require('co');
 
 module.exports = function(app) {
+
+  var getFieldExtData = function*(fields) {
+    var extDatas = [];
+    for (var i = 0; i < fields.length; i++) {
+      var field = fields[i];
+      //从controls表里面，获取字段的附件数据
+      var fieldExtData =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.control.db,
+          collection: app.config.control.collection
+        }, {
+          qs: {
+            query: JSON.stringify({
+              name: field.type
+            })
+          }
+        });
+      fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
+      if (fieldExtData.length > 0) {
+        fieldExtData = fieldExtData[0];
+        var fieldParams = fieldExtData.params;
+        if (fieldParams) {
+          fieldParams = JSON.parse(fieldParams);
+          //有db和collection，说明这个字段的数据是与外表有关联的
+          if (fieldParams.db && fieldParams.collection) {
+            //把db和collection附加到field定义上，表名这个字段有关联的外表数据
+            field.db = fieldParams.db;
+            field.collection = fieldParams.collection;
+            var fieldData =
+              yield Mongo.request({
+                host: app.config.restful.host,
+                port: app.config.restful.port,
+                db: fieldParams.db,
+                collection: fieldParams.collection
+              });
+            extDatas.push(fieldData);
+          }
+        }
+      }
+    }
+    return extDatas;
+  };
+
   app.route('/crud/:db/:collection').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -26,6 +71,7 @@ module.exports = function(app) {
           qs: this.request.query
         });
       //列表的字段定义数据
+      var _data = {};
       var schema =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -44,54 +90,24 @@ module.exports = function(app) {
       var schemaData = schema[app.config.schema.db][app.config.schema.collection];
       var fields = schemaData.fields;
       //下面是要获取有外联的字段的附加数据
-      for (var i = 0; i < fields.length; i++) {
-        var field = fields[i];
-        //从controls表里面，获取字段的附件数据
-        var fieldExtData =
-          yield Mongo.request({
-            host: app.config.restful.host,
-            port: app.config.restful.port,
-            db: app.config.control.db,
-            collection: app.config.control.collection
-          }, {
-            qs: {
-              query: JSON.stringify({
-                name: field.type
-              })
-            }
-          });
-        fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
-        if (fieldExtData.length > 0) {
-          fieldExtData = fieldExtData[0];
-          var fieldParams = fieldExtData.params;
-          if (fieldParams) {
-            fieldParams = JSON.parse(fieldParams);
-            //有db和collection，说明这个字段的数据是与外表有关联的
-            if (fieldParams.db && fieldParams.collection) {
-              //把db和collection附加到field定义上，表名这个字段有关联的外表数据
-              field.db = fieldParams.db;
-              field.collection = fieldParams.collection;
-              var fieldData =
-                yield Mongo.request({
-                  host: app.config.restful.host,
-                  port: app.config.restful.port,
-                  db: fieldParams.db,
-                  collection: fieldParams.collection
-                });
-              //获取到关联的外表数据
-              extend(true, data, fieldData);
-            }
-          }
-        }
-      }
-      extend(true, data, schema);
+      //获取到关联的外表数据
+      var extDatas =
+        yield getFieldExtData(fields);
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
+      });
+      extend(true, _data, schema);
       this.result = {
         code: 200,
         result: {
           data: data,
+          _data: _data,
           db: db,
           collection: collection,
-          schema: app.config.schema
+          config: {
+            schema: app.config.schema,
+            control: app.config.control
+          }
         }
       }
       if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'index.jade'))) {
@@ -121,6 +137,7 @@ module.exports = function(app) {
     //   });
     // }
     try {
+      //table data
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -136,6 +153,32 @@ module.exports = function(app) {
             })
           }
         });
+
+      //private internal data
+      var _data = {};
+      var schema =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: app.config.schema.db,
+          collection: app.config.schema.collection,
+          one: true
+        }, {
+          qs: {
+            query: JSON.stringify({
+              db: db,
+              collection: collection
+            })
+          }
+        });
+      var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+      var fields = schemaData.fields;
+      var extDatas =
+        yield getFieldExtData(fields);
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
+      });
+      extend(true, _data, schema);
       var controls =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -146,14 +189,18 @@ module.exports = function(app) {
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
         control.params = (control.params !== '' ? JSON.parse(control.params) : {});
       });
+      extend(true, _data, controls);
       this.result = {
         code: 200,
         result: {
           data: data,
-          controls: controls[app.config.control.db][app.config.control.collection],
+          _data: _data,
           db: db,
           collection: collection,
-          schema: app.config.schema
+          config: {
+            schema: app.config.schema,
+            control: app.config.control
+          }
         }
       }
       if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
@@ -176,6 +223,7 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
+      //table data
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -184,6 +232,8 @@ module.exports = function(app) {
           collection: collection,
           id: id
         });
+      //private internal data
+      var _data = {};
       var schema =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -199,7 +249,14 @@ module.exports = function(app) {
             })
           }
         });
-      extend(true, data, schema);
+      var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+      var fields = schemaData.fields;
+      var extDatas =
+        yield getFieldExtData(fields);
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
+      });
+      extend(true, _data, schema);
       var controls =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -210,12 +267,17 @@ module.exports = function(app) {
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
         control.params = (control.params !== '' ? JSON.parse(control.params) : {});
       });
+      extend(true, _data, controls);
       this.result = {
         code: 200,
         result: {
           data: data,
+          _data: _data,
+          config: {
+            schema: app.config.schema,
+            control: app.config.control
+          },
           schema: app.config.schema,
-          controls: controls[app.config.control.db][app.config.control.collection] || [],
           db: db,
           collection: collection
         }

@@ -14,7 +14,7 @@ block append content
   section.content
     div
       - var data = result.data[result.db][result.collection];
-      - var schema = result.data[result.schema.db][result.schema.collection];
+      - var schema = result._data[result.config.schema.db][result.config.schema.collection];
       +manage_table(data,{
         fields:schema.fields
       })
