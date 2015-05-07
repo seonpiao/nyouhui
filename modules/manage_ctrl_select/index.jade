@@ -4,4 +4,4 @@ mixin manage_ctrl_select(options)
       label= options.label
     select.form-control(name=options.name,data-value=options.value)
       if options.none
-        option= option.none
+        option(value="")= options.none

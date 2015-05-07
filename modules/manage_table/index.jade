@@ -21,12 +21,12 @@ mixin manage_table(list,options)
               - var value = item[field.name];
               if field.db && field.collection
                 if typeof value === 'string'
-                  each foreignItem in result.data[field.db][field.collection]
+                  each foreignItem in result._data[field.db][field.collection]
                     if (foreignItem.id || foreignItem._id) === value
                       - value = foreignItem.name
                 else if Array.isArray(value)
                   - value = value.map(function(oneOfValue){
-                  -   var foreignData = result.data[field.db][field.collection]
+                  -   var foreignData = result._data[field.db][field.collection]
                   -   for(var i = 0; i < foreignData.length; i++){
                   -     var foreignItem = foreignData[i];
                   -     if((foreignItem.id || foreignItem._id) === oneOfValue) return foreignItem.name;
