@@ -15,7 +15,6 @@ block append content
     div
       - var data = result.data[result.db][result.collection];
       - var schema = result.data[result.schema.db][result.schema.collection];
-      - console.log(schema)
       +manage_table(data,{
         fields:schema.fields
       })
@@ -29,4 +28,4 @@ block append pluginjs
   script(src='/plugins/datatables/dataTables.bootstrap.js')
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.501924f951c8d752.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.bf340c1f1f8b93e0.js")

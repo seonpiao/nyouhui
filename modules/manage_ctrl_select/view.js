@@ -2,41 +2,35 @@ define(["libs/client/views/base"], function(Base) {
 	var View = Base.extend({
 		moduleName: "manage_ctrl_select",
 		init: function() {
-			this.listenTo(this.model, 'sync', this.initSelect, this);
-			this.on('afterrender', this.selected.bind(this));
-			this.model.db = (this.$el.attr('data-db'));
-			var list = this.$el.attr('data-list');
-			var collection = (this.$el.attr('data-collection'))
-			this.model.collection = list ? list + '_' + this.$el.attr('data-name') : collection;
-			var params = {};
-			var order = this.$el.attr('data-order');
-			if (order) {
-				params.sort = order;
-			}
-			if (collection) {
-				this.model.fetch({
-					data: params
-				});
-			}
-		},
-		value: function() {
-			return [this.$('select').val(), this.$('select').find('option:selected').text()];
-		},
-		name: function() {
-			return [this.$('select').attr('name'), this.$('select').attr('name') + '_zn'];
+			this.model.db = this.$el.attr('data-db');
+			this.model.collection = this.$el.attr('data-collection');
+			this.listenTo(this.model, 'sync', this.initSelect.bind(this));
+			this.model.fetch();
+			this.idMaps = {};
+			this.nameMaps = {};
+			this.$select = this.$('select');
 		},
 		initSelect: function() {
-			this.renderTo(this.$('select'));
+			var self = this;
+			var result = this.model.toJSON();
+			var list = result.data[result.db][result.collection];
+			_.forEach(list, function(item) {
+				self.idMaps[item.id] = item.name;
+				self.nameMaps[item.name] = item.id;
+			});
+			this.loadTemplate('option', function(template) {
+				var html = template({
+					value: self.$select.attr('data-value'),
+					list: list
+				});
+				self.$select.append(html);
+			});
 		},
-		selected: function() {
-			var value = this.$('select').attr('data-result');
-			var index = this.model.toJSON().results.map(function(v) {
-				return v._id
-			}).indexOf(value);
-			if (index == -1) {
-				index = 0;
-			}
-			this.$('select')[0].selectedIndex = index;
+		value: function() {
+			return this.$select.val();
+		},
+		name: function() {
+			return this.$select.attr('name');
 		}
 	});
 	return View;
