@@ -30,7 +30,7 @@ var appendID = function(url, id) {
   }
 }
 
-Mongo.get = function*(options) {
+Mongo.get = function*(dbname) {
   if (dbs[dbname]) {
     return dbs[dbname];
   }

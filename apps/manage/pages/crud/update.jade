@@ -55,6 +55,8 @@ block append content
             +manage_ctrl_select(params)
           else if field.base === 'textarea'
             +manage_ctrl_textarea(params)
+          else if field.base === 'editor'
+            +manage_ctrl_editor(params)
           else
             +manage_ctrl_input(params)
       +manage_box({
