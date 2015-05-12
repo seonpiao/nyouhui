@@ -21,7 +21,8 @@ define(["libs/client/views/base"], function(Base) {
           index: $field.find('[name="field_index"]').val(),
           defaults: $field.find('[name="field_defaults"]').val(),
           display: $field.find('[name="field_display"]').val(),
-          get: $field.find('[name="field_get"]').val()
+          get: $field.find('[name="field_get"]').val(),
+          required: $field.find('[name="field_required"]').val()
         });
       });
       return fields;

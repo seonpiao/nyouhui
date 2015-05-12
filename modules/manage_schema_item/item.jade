@@ -24,5 +24,10 @@
         each title,value in yesorno
           option(value=value,selected=(field && field.display === value))= title
     .col-xs-1
+      label 必填
+      select.form-control(type="text",name="field_required")
+        each title,value in yesorno
+          option(value=value,selected=(field && field.required === value))= title
+    .col-xs-1
       label 默认值
       input.form-control(type="text",name="field_defaults",value=(field ? field.defaults : ''))

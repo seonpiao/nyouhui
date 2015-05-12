@@ -7,26 +7,21 @@ var Mongo = require('../../../../libs/server/mongodb');
 
 module.exports = function(app) {
   app.route('/cron').get(function*(next) {
-    var db = app.config.cron.db;
-    var collection = app.config.cron.collection;
+    var taskNames = fs.readdirSync(path.join(__dirname, 'tasks'));
+    var tasks = taskNames.map(function(fileName) {
+      var taskid = path.basename(fileName, '.js');
+      var task = require(path.join(__dirname, 'tasks', fileName))
+      task.id = taskid;
+      return task;
+    });
     try {
-      var data =
-        yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
-          db: db,
-          collection: collection
-        }, {
-          qs: this.request.query
-        });
       this.result = {
         code: 200,
         result: {
-          data: data || [],
-          db: db,
-          collection: collection
+          data: tasks
         }
       }
+      console.log(this.result)
     } catch (e) {
       this.result = {
         code: 500,

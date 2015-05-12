@@ -2,6 +2,8 @@ mixin manage_ctrl_select(options)
   .form-group(data-module="manage_ctrl_select",data-form-control="select",data-db=options.db,data-collection=options.collection)
     if options.label
       label= options.label
+    if options.required === 'yes'
+      span.text-red *
     select.form-control(name=options.name,data-value=options.value)
       if options.none
         option(value="")= options.none

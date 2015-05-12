@@ -1,0 +1,12 @@
+mixin manage_ctrl_wizard(options)
+  - options = options || {};
+  .form-group(data-module="manage_ctrl_wizard",data-form-control="wizard")
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    .wizard
+      h1 Card 1
+      div Some content
+      h1 Card 2
+      div Some content2

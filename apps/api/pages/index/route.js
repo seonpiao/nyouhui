@@ -1,6 +1,7 @@
 var request = require('request');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('manage:api');
+var Mongo = require('../../../../libs/server/mongodb');
 
 module.exports = function(app) {
   app.route('/:db/:collection/:id?').get(function*(next) {
@@ -9,15 +10,23 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
-      var result =
-        yield thunkify(request)({
-          url: 'http://localhost:3000/' + db + '/' + collection + (id ? '/' + id : ''),
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        }, {
           qs: this.request.query
         });
-      var data = JSON.parse(result[1]);
       this.result = {
         code: 200,
-        data: data
+        result: {
+          db: db,
+          collection: collection,
+          data: data
+        }
       }
     } catch (e) {
       this.result = {
