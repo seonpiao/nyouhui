@@ -60,7 +60,10 @@ module.exports = function(app) {
           var body = this.request.body;
           var fields = body.fields;
           var dbconn =
-            yield Mongo.get(body.db);
+            yield Mongo.get({
+              db: body.db,
+              hosts: app.config.db.hosts
+            });
           var collection = dbconn.collection(body.collection);
           for (var i = 0; i < fields.length; i++) {
             var field = fields[i];
@@ -114,7 +117,10 @@ module.exports = function(app) {
         var fields = body.fields;
         var dropped = [];
         var dbconn =
-          yield Mongo.get(body.db);
+          yield Mongo.get({
+            db: body.db,
+            hosts: app.config.db.hosts
+          });
         var collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
           var field = fields[i];

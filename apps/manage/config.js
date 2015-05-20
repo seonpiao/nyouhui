@@ -34,6 +34,9 @@ module.exports = function(app) {
       db: 'nyouhui',
       collection: 'controls'
     },
+    db: {
+      hosts: ['nyouhui.com']
+    },
     middlewares: [session({
       cookie: {
         domain: global.DOMAIN,

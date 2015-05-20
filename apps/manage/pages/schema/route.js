@@ -48,10 +48,6 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
-      });
       this.result = {
         code: 200,
         result: {
@@ -93,10 +89,6 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
-      });
       this.result = {
         code: 200,
         result: {

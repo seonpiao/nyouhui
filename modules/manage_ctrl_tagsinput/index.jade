@@ -8,4 +8,4 @@ mixin manage_ctrl_tagsinput(options)
       label= options.label
     if options.required === 'yes'
       strong.text-red *
-    input.form-control(id=tagsinputid,name=options.name,value=(options.value || ''),role="input",required=options.required)
+    input.form-control(id=tagsinputid,name=options.name,value=(options.value || ''),role="input",required=(options.required === 'yes'))

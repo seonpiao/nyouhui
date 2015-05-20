@@ -22,20 +22,18 @@ module.exports = function(app) {
           host: app.config.restful.host,
           port: app.config.restful.port,
           db: app.config.control.db,
-          collection: app.config.control.collection
-        }, {
-          qs: {
-            query: JSON.stringify({
-              name: field.type
-            })
-          }
+          collection: app.config.control.collection,
+          id: field.type
         });
       fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
-      if (fieldExtData.length > 0) {
-        fieldExtData = fieldExtData[0];
+      if (fieldExtData) {
         var fieldParams = fieldExtData.params;
         if (fieldParams) {
-          fieldParams = JSON.parse(fieldParams);
+          try {
+            fieldParams = JSON.parse(fieldParams);
+          } catch (e) {
+            fieldParams = {};
+          }
           //有db和collection，说明这个字段的数据是与外表有关联的
           if (fieldParams.db && fieldParams.collection) {
             //把db和collection附加到field定义上，表名这个字段有关联的外表数据
@@ -187,7 +185,9 @@ module.exports = function(app) {
           collection: app.config.control.collection
         });
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
-        control.params = (control.params !== '' ? JSON.parse(control.params) : {});
+        try {
+          control.params = (control.params !== '' ? JSON.parse(control.params) : {});
+        } catch (e) {}
       });
       extend(true, _data, controls);
       this.result = {
@@ -265,7 +265,9 @@ module.exports = function(app) {
           collection: app.config.control.collection
         });
       controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
-        control.params = (control.params !== '' ? JSON.parse(control.params) : {});
+        try {
+          control.params = (control.params !== '' ? JSON.parse(control.params) : {});
+        } catch (e) {}
       });
       extend(true, _data, controls);
       this.result = {

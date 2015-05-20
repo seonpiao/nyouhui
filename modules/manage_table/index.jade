@@ -19,6 +19,7 @@ mixin manage_table(list,options)
           each field in options.fields
             if field.display === 'yes'
               - var value = item[field.name];
+              - console.log(result._data)
               if field.db && field.collection
                 if typeof value === 'string'
                   each foreignItem in result._data[field.db][field.collection]

@@ -30,15 +30,17 @@ var appendID = function(url, id) {
   }
 }
 
-Mongo.get = function*(dbname) {
+Mongo.get = function*(options) {
+  var dbname = options.db;
+  var hosts = options.hosts;
   if (dbs[dbname]) {
     return dbs[dbname];
   }
-  var constr = format('mongodb://%s/%s', settings.mongodb.host.join(','), dbname);
+  var constr = format('mongodb://%s/%s', hosts.join(','), dbname);
   var db =
     yield thunkify(MongoClient.connect.bind(MongoClient))(constr, {
       db: {
-        w: settings.mongodb.host.length,
+        w: hosts.length,
         readPreference: 'secondary'
       }
     });

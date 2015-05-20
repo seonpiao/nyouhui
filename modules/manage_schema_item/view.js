@@ -41,9 +41,7 @@ define(["libs/client/views/base"], function(Base) {
         fields = [null];
       }
       if (controls) {
-        controls = _.map(JSON.parse(controls), function(v) {
-          return v.name
-        })
+        controls = JSON.parse(controls);
       } else {
         controls = [null];
       }
@@ -64,9 +62,7 @@ define(["libs/client/views/base"], function(Base) {
       var self = this;
       var controls = this.$('.schema-list').attr('data-controls');
       if (controls) {
-        controls = _.map(JSON.parse(controls), function(v) {
-          return v.name
-        })
+        controls = JSON.parse(controls);
       } else {
         controls = [null];
       }

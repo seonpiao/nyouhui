@@ -13,9 +13,11 @@ block append content
   section.content
     form(role="form",data-module="manage_form",data-db=result.db,data-collection=result.collection)
       div
-        - var data = result.data[result.db][result.collection];
+        - var data;
         - var schema = result._data[result.config.schema.db][result.config.schema.collection];
         - var controls = result._data[result.config.control.db][result.config.control.collection];
+        if result.data && result.data[result.db]
+          - data = result.data[result.db][result.collection];
         if data && data._id
           +manage_ctrl_input({
             name:'_id',
@@ -24,9 +26,9 @@ block append content
           })
         each field in schema.fields
           - var extraControl = controls.filter(function(v){
-          -   return v.name == field.type
+          -   return v._id.toString() == field.type
           - })[0];
-          - field.base = extraControl.base || field.type;
+          - field.base = extraControl.base || extraControl.name;
           - var baseCtrl = controls.filter(function(v){
           -   return v._id == field.base;
           - })
@@ -57,6 +59,8 @@ block append content
             +manage_ctrl_textarea(params)
           else if field.base === 'editor'
             +manage_ctrl_editor(params)
+          else if field.base === 'draggableselector'
+            +manage_ctrl_draggableselector(params)
           else
             +manage_ctrl_input(params)
       +manage_box({

@@ -4,4 +4,4 @@ mixin manage_ctrl_editor(options)
       label= options.label
     if options.required === 'yes'
       span.text-red *
-    textarea.form-control(style="height:300px;",name=options.name, required=options.required)!= (options.value || '')
+    textarea.form-control(style="height:300px;",name=options.name, required=(options.required === 'yes'))!= (options.value || '')
