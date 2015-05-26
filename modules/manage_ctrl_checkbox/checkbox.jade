@@ -1,0 +1,8 @@
+.checkbox
+  each item in list
+    if !__global.__manage_checkbox_id
+      - __global.__manage_checkbox_id = 1;
+    - var checkboxid = 'box_' + __global.__manage_checkbox_id++
+    label.margin
+      input(id=checkboxid,name=name,value=(item.id || item._id),type="checkbox",checked=(value.indexOf(item.id || item._id) != -1))
+      = item.name

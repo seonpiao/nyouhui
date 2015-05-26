@@ -11,6 +11,7 @@ module.exports = function(app) {
     port: '9002',
     restful: {
       host: 'nyouhui.com',
+      // host: 'localhost',
       port: 3000,
       defaultDb: 'nyouhui'
     },
@@ -25,6 +26,10 @@ module.exports = function(app) {
     admins: {
       db: 'nyouhui',
       collection: 'admins'
+    },
+    users: {
+      db: 'nyouhui',
+      collection: 'users'
     },
     menu: {
       db: 'nyouhui',

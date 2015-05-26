@@ -39,7 +39,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.body = this.result || {};
-  } else if (this.text) {
+  } else if (this.text || this.raw) {
     this.body = this.result || '';
   } else {
     this.locals = this.result
@@ -48,7 +48,7 @@ module.exports = function*(view) {
   if (this.json) {
     this.status = 200;
     _.extend(this.body, defaultLocals);
-  } else if (this.text) {
+  } else if (this.text || this.raw) {
     this.status = 200;
   } else if (this.body && typeof this.body.pipe === 'function') {
     this.status = 200;

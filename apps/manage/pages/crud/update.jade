@@ -28,21 +28,20 @@ block append content
           - var extraControl = controls.filter(function(v){
           -   return v._id.toString() == field.type
           - })[0];
-          - field.base = extraControl.base || extraControl.name;
-          - var baseCtrl = controls.filter(function(v){
-          -   return v._id == field.base;
-          - })
-          if !baseCtrl || baseCtrl.length === 0
-            - field.base = field.type;
-          else
-            - field.base = baseCtrl[0].name;
+          if extraControl
+            - field.base = extraControl.base || extraControl._id;
+            - var baseCtrl = controls.filter(function(v){
+            -   return v._id == field.base;
+            - })
+            if baseCtrl && baseCtrl.length > 0
+              - field.base = baseCtrl[0].name;
           -var params = {};
           // 都改为label，暂时兼容老的alias，以后要删掉alias
           -params.label = field.label || field.alias;
           -params.name = field.name;
           -params.required = field.required;
           -params.value = data ? data[field.name] : field.defaults
-          if extraControl.params
+          if extraControl && extraControl.params
             - for(var key in extraControl.params){
             -   params[key] = extraControl.params[key]
             - }
@@ -55,6 +54,8 @@ block append content
             +manage_ctrl_wizard(params)
           else if field.base === 'select'
             +manage_ctrl_select(params)
+          else if field.base === 'checkbox'
+            +manage_ctrl_checkbox(params)
           else if field.base === 'textarea'
             +manage_ctrl_textarea(params)
           else if field.base === 'editor'

@@ -92,11 +92,11 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/index/main"
           }, {
+            name: "apps/api/pages/user/main"
+          }, {
             name: "apps/m/pages/index/main"
           }, {
             name: "apps/manage/pages/api/main"
-          }, {
-            name: "apps/manage/pages/cron/main"
           }, {
             name: "apps/manage/pages/crud/main"
           }, {
@@ -105,6 +105,8 @@ module.exports = function(grunt) {
             name: "apps/manage/pages/login/main"
           }, {
             name: "apps/manage/pages/schema/main"
+          }, {
+            name: "apps/manage/pages/task/main"
           }, {
             name: "apps/www/pages/index/main"
           } ]
