@@ -4,14 +4,25 @@ define(["libs/client/views/base"], function(Base) {
     init: function() {
       this.model.db = this.$el.attr('data-db');
       this.model.collection = this.$el.attr('data-collection');
+      var url = this.$el.attr('data-url');
       this.listenTo(this.model, 'sync', this.initSelect.bind(this));
-      this.model.fetch();
+      if (url) {
+        this.model.fetch({
+          url: url
+        });
+      } else {
+        this.model.fetch();
+      }
       this.$select = this.$('select');
     },
     initSelect: function() {
       var self = this;
       var result = this.model.toJSON();
-      var list = result.data[result.db][result.collection];
+      var data = result.data;
+      if (result.db && result.collection) {
+        data = data[result.db][result.collection];
+      }
+      var list = data;
       this.loadTemplate('option', function(template) {
         var html = template({
           value: self.$select.attr('data-value'),

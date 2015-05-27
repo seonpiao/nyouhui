@@ -37,6 +37,11 @@ block append content
           name:'alias',
           value:(data ? data.alias : '')
         })
+        +manage_ctrl_input({
+          label:'参数',
+          name:'params',
+          value:(data ? data.params : '')
+        })
       +manage_box({
         title:'表定义'
       })

@@ -28,14 +28,14 @@ define(["libs/client/views/base"], function(Base) {
       }
       var objs = {};
       var list = _.map(data || [], function(item) {
-        objs[item.id] = {
-          id: item.id,
+        objs[(item.id || item._id)] = {
+          id: (item.id || item._id),
           name: item.name
         };
-        return objs[item.id];
+        return objs[(item.id || item._id)];
       });
       var allIDs = _.map(list, function(item) {
-        return item.id;
+        return (item.id || item._id);
       });
       this.loadTemplate('li', function(template) {
         var usingIDs = self.$using.attr('data-value') || '[]';
@@ -47,7 +47,7 @@ define(["libs/client/views/base"], function(Base) {
         var mappedValue = [];
         _.forEach(usingIDs, function(id) {
           var orig = _.filter(list, function(item) {
-            return item.id === id;
+            return (item.id || item._id) === id;
           });
           if (orig.length > 0) {
             mappedValue = mappedValue.concat(orig);

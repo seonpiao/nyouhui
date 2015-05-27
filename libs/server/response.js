@@ -47,7 +47,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.status = 200;
-    _.extend(this.body, defaultLocals);
+    // _.extend(this.body, defaultLocals);
   } else if (this.text || this.raw) {
     this.status = 200;
   } else if (this.body && typeof this.body.pipe === 'function') {

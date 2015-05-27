@@ -40,6 +40,18 @@ module.exports = function(app) {
       db: 'nyouhui',
       collection: 'manage_menu'
     },
+    step: {
+      db: 'nyouhui',
+      collection: 'step'
+    },
+    task: {
+      db: 'nyouhui',
+      collection: 'task'
+    },
+    tasklog: {
+      db: 'nyouhui',
+      collection: 'tasklog'
+    },
     control: {
       db: 'nyouhui',
       collection: 'controls'

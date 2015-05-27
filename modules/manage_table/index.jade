@@ -34,9 +34,13 @@ mixin manage_table(list,options)
                   - });
               td!= (options.overrides && options.overrides[field.name] ? options.overrides[field.name](value) : value)
           td
-            a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + (item.id || item._id))) 编辑
-            | 
-            a.del-row(data-id=(item._id + ''), href="javascript:;") 删除
+            if !options.readonly
+              a(href=(options.overrides.link.update ? options.overrides.link.update : path.replace(/\/$/,'') + '/update/' + (item.id || item._id))) 编辑
+              | 
+              a.del-row(data-id=(item.id || item._id), href="javascript:;") 删除
+            if options.showExec
+              | 
+              a.exec-row(data-id=(item.id || item._id), href="javascript:;") 执行
     //- tfoot
     //-   tr
     //-     each field in options.fields
