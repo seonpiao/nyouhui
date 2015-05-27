@@ -24,10 +24,6 @@ module.exports = function(app) {
       db: 'nyouhui',
       collection: 'schema'
     },
-    cron: {
-      db: 'nyouhui',
-      collection: 'cron'
-    },
     admins: {
       db: 'nyouhui',
       collection: 'admins'

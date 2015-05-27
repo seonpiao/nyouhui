@@ -1,1 +1,1 @@
-require([ "apps/manage/pages/cron/modules" ], function() {});
+require(["apps/manage/pages/task/modules"], function() {});

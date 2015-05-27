@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var logger = require('log4js').getLogger('cron');
+var logger = require('log4js').getLogger('task');
 var thunkify = require('thunkify');
 var request = require('request');
 var Mongo = require('../../../../libs/server/mongodb');

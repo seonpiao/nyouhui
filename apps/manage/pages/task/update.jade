@@ -11,7 +11,7 @@ block append headjs
 block append content
   // Main content
   section.content
-    form(role="form",data-module="manage_form",data-db='nyouhui',data-collection='cron')
+    form(role="form",data-module="manage_form",data-db='nyouhui',data-collection='task')
       div
         if data.data && data.data._id
           +manage_ctrl_input({
