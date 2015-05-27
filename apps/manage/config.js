@@ -2,6 +2,7 @@ var session = require('koa-generic-session');
 var auth = require('./auth');
 var menu = require('./menu');
 var jsonApi = require('./jsonApi');
+var redisStore = require('koa-redis');
 
 module.exports = function(app) {
 
@@ -14,6 +15,10 @@ module.exports = function(app) {
       // host: 'localhost',
       port: 3000,
       defaultDb: 'nyouhui'
+    },
+    redis: {
+      host: 'localhost',
+      port: 6379
     },
     schema: {
       db: 'nyouhui',
@@ -43,6 +48,7 @@ module.exports = function(app) {
       hosts: ['nyouhui.com']
     },
     middlewares: [session({
+      store: redisStore(),
       cookie: {
         domain: global.DOMAIN,
         path: '/',

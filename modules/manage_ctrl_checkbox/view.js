@@ -12,10 +12,16 @@ define(["libs/client/views/base"], function(Base) {
       var self = this;
       var result = this.model.toJSON();
       var list = result.data[result.db][result.collection];
-      var value = [];
-      try {
-        value = JSON.parse(self.$el.attr('data-value') || '[]');
-      } catch (e) {}
+      var value = self.$el.attr('data-value');
+      if (value) {
+        try {
+          value = JSON.parse(self.$el.attr('data-value'));
+        } catch (e) {
+          value = [value];
+        }
+      } else {
+        value = [];
+      }
       this.loadTemplate('checkbox', function(template) {
         var html = template({
           value: value,
