@@ -66,6 +66,11 @@ module.exports = function(app) {
         steps.push(step);
       }
       if (steps.length > 0) {
+        var beginData = {};
+        try {
+          beginData = JSON.parse(data.data);
+        } catch (e) {}
+        beginData.restful = app.config.restful;
         try {
           yield thunkify(function(done) {
             steps.forEach(function(step) {
@@ -74,7 +79,7 @@ module.exports = function(app) {
             flow.on('end', function() {
               done();
             });
-            flow.begin();
+            flow.begin(beginData);
             steps.forEach(function(step) {
               flow.go(step.id);
             });

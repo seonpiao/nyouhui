@@ -6,6 +6,7 @@ var assert = require('assert');
 var request = require('request');
 var querystring = require('querystring');
 var _ = require('underscore');
+var logger = require('log4js').getLogger('mongo');
 
 var dbs = {};
 
@@ -67,7 +68,12 @@ Mongo.request = function*(dbOptions, requestOptions) {
   if (_.isObject(result[1])) {
     result = result[1];
   } else {
-    result = JSON.parse(result[1]);
+    try {
+      result = JSON.parse(result[1]);
+    } catch (e) {
+      logger.error(result[1]);
+      logger.error(e.stack);
+    }
   }
   //如果传了id，就只返回一条
   if (dbOptions.id) {
