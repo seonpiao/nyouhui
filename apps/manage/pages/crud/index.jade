@@ -15,11 +15,14 @@ block append content
     div
       - var data = result.data[result.db][result.collection];
       - var schema = result._data[result.config.schema.db][result.config.schema.collection];
-      +manage_table(data,{
-        fields:schema.fields
-      })
-      .form-group
-        a.btn.btn-primary(href="/crud/" + result.db + "/" + result.collection + "/create") 新建
+      - var params = {};
+      - try{params = JSON.parse(schema.params)}catch(e){}
+      - var options = {fields:schema.fields}
+      - for(var key in params){options[key] = params[key]}
+      +manage_table(data,options)
+      if !params.readonly
+        .form-group
+          a.btn.btn-primary(href="/crud/" + result.db + "/" + result.collection + "/create") 新建
     +manage_box()
 
 block append pluginjs
@@ -28,4 +31,4 @@ block append pluginjs
   script(src='/plugins/datatables/dataTables.bootstrap.js')
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.771cb8310fa19b85.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.541535c33e604aff.js")

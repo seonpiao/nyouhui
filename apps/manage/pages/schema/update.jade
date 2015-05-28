@@ -37,6 +37,11 @@ block append content
           name:'alias',
           value:(data ? data.alias : '')
         })
+        +manage_ctrl_input({
+          label:'参数',
+          name:'params',
+          value:(data ? data.params : '')
+        })
       +manage_box({
         title:'表定义'
       })
@@ -52,4 +57,4 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/schema.min.53cb92f5fd81884e.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/schema.min.f687bb41803aeff6.js")

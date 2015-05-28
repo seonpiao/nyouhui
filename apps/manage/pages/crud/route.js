@@ -66,9 +66,7 @@ module.exports = function(app) {
           db: db,
           collection: collection
         }, {
-          qs: {
-            query: JSON.stringify(this.request.query)
-          }
+          qs: this.request.query
         });
       //列表的字段定义数据
       var _data = {};

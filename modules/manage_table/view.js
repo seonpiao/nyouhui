@@ -2,7 +2,8 @@ define(["libs/client/views/base"], function(Base) {
   var View = Base.extend({
     moduleName: "manage_table",
     events: {
-      'click .del-row': 'del'
+      'click .del-row': 'del',
+      'click .exec-row': 'exec'
     },
     init: function() {
       this.$el.dataTable({
@@ -30,6 +31,11 @@ define(["libs/client/views/base"], function(Base) {
         this.model.once('error', this.success.bind(this));
         this.model.destroy();
       }
+    },
+    exec: function(e) {
+      var $target = $(e.currentTarget);
+      var id = $target.attr('data-id');
+      this.model.exec(id);
     },
     success: function(model, resp, options) {
       if (resp.code === 200) {

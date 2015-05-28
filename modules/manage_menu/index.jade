@@ -47,7 +47,8 @@ ul.sidebar-menu
     - currNode.childs[item.name] = item;
     - item.parent = currNode;
     - currNode = menuTree;
-    if path.indexOf(item.url) !== -1
+    - var pattern = new RegExp(item.url.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") + '(?:\\/|$)');
+    if path.match(pattern)
       - var activeNode = item
       while activeNode.name !== 'root'
         - activeNode.active = true;
