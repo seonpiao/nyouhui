@@ -10,12 +10,12 @@ module.exports = {
   output: ['fellstocks'],
   go: function(data, done) {
     if (!data.felldays) {
-      data.felldays = 2;
+      data.felldays = 5;
     }
     //取6天数据，才能计算出是不是连跌5天
     data.felldays = parseInt(data.felldays) + 1;
     var fellstocks = [];
-    data.allstocks = data.allstocks.slice(0, 50);
+    // data.allstocks = data.allstocks.slice(0, 50);
     async.eachLimit(data.allstocks, 1, function(stockCode, finishOne) {
       co(function*() {
         var stockData =
