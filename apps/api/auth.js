@@ -61,7 +61,7 @@ var auth = function(app) {
           })();
         });
         if (data[field]) {
-          reply = data[field];
+          reply = yield thunkify(client.hget.bind(client))(key, field);
         }
       }
     }
@@ -97,6 +97,7 @@ var auth = function(app) {
     var pathArray = requestPath.split('/');
     var db = pathArray[1];
     var collection = pathArray[2];
+
     var token = this.request.query.token;
     var isTokenValid = false;
     var username, userGroup, privilege;
@@ -115,7 +116,9 @@ var auth = function(app) {
         yield getHashCacheByQuery('nyouhui', 'users', {
           username: username
         }, 'group');
+      console.log('userGroup: ' + userGroup);
     }
+
     // 判断权限
     if (userGroup) {
       var permissibleGroup =
@@ -123,17 +126,20 @@ var auth = function(app) {
           db: db,
           collection: collection
         }, 'read');
-      userGroup = userGroup.split(',');
-      permissibleGroup = permissibleGroup.split(',');
+
+      userGroup = (userGroup || '').split(',');
+      permissibleGroup = (permissibleGroup || '').split(',');
+      console.log(userGroup, permissibleGroup);
       privilege = userGroup.some(function(m) {
         return permissibleGroup.some(function(n) {
           return m == n;
         });
       });
-      console.log(privilege);
+      console.log('privilege: ' + privilege);
     }
     if (privilege) {
       yield next;
+      
     } else {
       this.json = true;
       this.result = {
