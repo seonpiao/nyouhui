@@ -80,12 +80,6 @@ module.exports = function(app) {
     }
   });
   app.route('/task/run/:id').get(function*(next) {
-    if (!this.session.taskQueue) {
-      this.session.taskQueue = {};
-    }
-    if (!this.session.runningTask) {
-      this.session.runningTask = {};
-    }
     this.json = true;
     var start = Date.now();
     var taskid = this.request.params.id;

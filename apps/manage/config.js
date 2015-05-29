@@ -1,5 +1,6 @@
 var session = require('koa-generic-session');
 var auth = require('./auth');
+var task = require('./task');
 var menu = require('./menu');
 var jsonApi = require('./jsonApi');
 var redisStore = require('koa-redis');
@@ -70,7 +71,7 @@ module.exports = function(app) {
     }), auth, jsonApi, menu(app), function*(next) {
       this.global.socket = app.config.socket
       yield next;
-    }]
+    }, task(app)]
   }
 
   var server = require('http').createServer(app.callback());
