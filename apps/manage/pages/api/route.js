@@ -277,6 +277,36 @@ module.exports = function(app) {
       this.result = {
         code: 200,
         result: data
+      };
+
+      // 判断是否需要清空 redis 缓存
+      try {
+        var decoded = jwt.verify(token || '', 'private key for carrier');
+        isTokenValid = !!decoded;
+      } catch (e) {}
+      if (this.session) {
+        username = this.session.username;
+      } else if (isTokenValid) {
+        username = decoded.username;
+      }
+      if (!client) {
+        client = redis.createClient(app.config.redis.port, app.config.redis.host);
+      }
+      if (this.method != 'GET') {
+        var data =
+          yield queryByQuery(db, 'update_cache', {
+            db: db,
+            collection: collection
+          });
+        if (data) {
+          co(function*() {
+            var key = serializeKeyByQuery(db, collection, {
+              username: username
+            });
+            console.log('del: ' + key);
+            yield thunkify(client.del.bind(client))(key);
+          })();
+        }
       }
     } catch (e) {
       this.result = {
