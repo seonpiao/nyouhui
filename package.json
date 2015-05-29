@@ -31,6 +31,7 @@
     "request": "^2.55.0",
     "retryjs": "^1.0.1",
     "seajs": "^3.0.1",
+    "socket.io": "^1.3.5",
     "thunkify": "2.1.2",
     "underscore": "1.7.0"
   },

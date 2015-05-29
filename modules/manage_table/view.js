@@ -35,7 +35,11 @@ define(["libs/client/views/base"], function(Base) {
     exec: function(e) {
       var $target = $(e.currentTarget);
       var id = $target.attr('data-id');
-      this.model.exec(id);
+      this.model.exec(id, function(err) {
+        if (err) {
+          alert(err.message);
+        }
+      });
     },
     success: function(model, resp, options) {
       if (resp.code === 200) {

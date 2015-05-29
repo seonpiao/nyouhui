@@ -8,6 +8,51 @@ require('seajs');
 var Flow = require('flow-js');
 var co = require('co');
 var moment = require('moment');
+var tokenGenerator = require('random-token');
+
+var enqueue = function(task) {
+  var taskQueue = this.session.taskQueue;
+  var runningTask = this.session.runningTask;
+  var queueid = tokenGenerator(16);
+  if (!runningTask[task.id]) {
+    taskQueue[queueid] = ({
+      queueid: queueid,
+      task: task
+    });
+  } else {
+    queueid = runningTask[task.id].queueid
+  }
+  return queueid;
+};
+
+var dequeue = function() {
+  var taskQueue = this.session.taskQueue;
+  var runningTask = this.session.runningTask;
+  var queueid = Object.keys(taskQueue).shift();
+  var queueItem = taskQueue[queueid];
+  var task = queueItem.task;
+  runningTask[task.id] = queueItem;
+  task.flow.on('end', function() {
+    global.io.emit('task end', {
+      queueid: queueid,
+      task: {
+        name: task.name
+      }
+    });
+    delete runningTask[task.id];
+    delete taskQueue[queueid];
+  });
+  task.flow.begin(task.beginData);
+  task.steps.forEach(function(step) {
+    task.flow.go(step.id);
+  });
+  global.io.emit('task start', {
+    queueid: queueid,
+    task: {
+      name: task.name
+    }
+  });
+};
 
 module.exports = function(app) {
   app.route('/task/steps').get(function*(next) {
@@ -35,15 +80,22 @@ module.exports = function(app) {
     }
   });
   app.route('/task/run/:id').get(function*(next) {
+    if (!this.session.taskQueue) {
+      this.session.taskQueue = {};
+    }
+    if (!this.session.runningTask) {
+      this.session.runningTask = {};
+    }
     this.json = true;
     var start = Date.now();
+    var taskid = this.request.params.id;
     var data =
       yield Mongo.request({
         host: app.config.restful.host,
         port: app.config.restful.port,
         db: app.config.task.db,
         collection: app.config.task.collection,
-        id: this.request.params.id
+        id: taskid
       });
     data = (data[app.config.task.db][app.config.task.collection]);
     if (data) {
@@ -72,6 +124,7 @@ module.exports = function(app) {
         } catch (e) {}
         beginData.restful = app.config.restful;
         try {
+          var self = this;
           yield thunkify(function(done) {
             steps.forEach(function(step) {
               flow.addStep(step.id, step);
@@ -79,10 +132,14 @@ module.exports = function(app) {
             flow.on('end', function() {
               done();
             });
-            flow.begin(beginData);
-            steps.forEach(function(step) {
-              flow.go(step.id);
+            enqueue.call(self, {
+              id: taskid,
+              name: data.name,
+              flow: flow,
+              steps: steps,
+              beginData: beginData
             });
+            dequeue.call(self);
           })();
           this.result = {
             code: 200
@@ -113,7 +170,7 @@ module.exports = function(app) {
       body: {
         start: moment(start).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
         end: moment(end).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
-        taskid: this.request.params.id,
+        taskid: taskid,
         result: JSON.stringify(this.result)
       }
     })

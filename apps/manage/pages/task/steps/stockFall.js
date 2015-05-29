@@ -15,10 +15,13 @@ module.exports = {
     //取6天数据，才能计算出是不是连跌5天
     data.felldays = parseInt(data.felldays) + 1;
     var fellstocks = [];
+    var count = 0;
     // data.allstocks = data.allstocks.slice(0, 50);
     async.eachLimit(data.allstocks, 1, function(stockCode, finishOne) {
+      count++;
+      var stockData;
       co(function*() {
-        var stockData =
+        stockData =
           yield Mongo.request({
             host: data.restful.host,
             port: data.restful.port,
@@ -42,14 +45,17 @@ module.exports = {
             return day.close < latestDays[index + 1].close;
           });
           if (isFall) {
-            console.log('Yes!' + stockCode);
+            console.log(count + ':Yes!' + stockCode);
             fellstocks.push(stockCode);
           } else {
-            console.log('No!' + stockCode);
+            console.log(count + ':No!' + stockCode);
           }
+        } else {
+          console.log(count + ':Invalid!' + stockCode);
         }
+      })(function() {
         finishOne(null, stockData);
-      })()
+      })
     }, function(err) {
       console.log(fellstocks)
       co(function*() {

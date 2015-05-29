@@ -12,7 +12,7 @@ module.exports = {
   input: ['allstocks', 'db', 'collection', 'restful', 'startYear', 'startMonth', 'startDay'],
   output: [],
   go: function(data, done) {
-    async.eachLimit(data.allstocks, 10, function(stockcode, callback) {
+    async.eachLimit(data.allstocks, 1, function(stockcode, callback) {
       var url = 'http://table.finance.yahoo.com/table.csv?s=' + stockcode + '&g=d&a=' + (parseInt(data.startMonth || moment().format('MM'), 10) - 1) + '&b=' + parseInt(data.startDay || moment().add(-1, 'days').format('DD'), 10) + '&c=' + (data.startYear || moment().format('YYYY')) + '&ignore=.csv';
       var retry = new Retry({
         max: 5,
@@ -61,7 +61,9 @@ module.exports = {
                       body: stockData
                     });
                     console.log('insert: ' + stockcode + ', ' + dataArr[0]);
-                  } catch (e) {}
+                  } catch (e) {
+                    console.log('skip: ' + stockcode);
+                  }
                   savedOne();
                 })();
               } else {

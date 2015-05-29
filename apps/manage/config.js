@@ -8,11 +8,15 @@ module.exports = function(app) {
 
   app.keys = ['nyouhui', 'cookie'];
 
-  return {
+  var config = {
     port: '9002',
+    socket: {
+      host: 'localhost',
+      port: 3001
+    },
     restful: {
-      host: 'nyouhui.com',
-      // host: 'localhost',
+      // host: 'nyouhui.com',
+      host: 'localhost',
       port: 3000,
       defaultDb: 'nyouhui'
     },
@@ -53,7 +57,8 @@ module.exports = function(app) {
       collection: 'controls'
     },
     db: {
-      hosts: ['nyouhui.com']
+      // hosts: ['nyouhui.com']
+      hosts: ['localhost']
     },
     middlewares: [session({
       store: redisStore(),
@@ -62,6 +67,17 @@ module.exports = function(app) {
         path: '/',
         maxage: 1000 * 60 * 60 * 24 * 30
       }
-    }), auth, jsonApi, menu(app)]
+    }), auth, jsonApi, menu(app), function*(next) {
+      this.global.socket = app.config.socket
+      yield next;
+    }]
   }
+
+  var server = require('http').createServer(app.callback());
+  var io = require('socket.io')(server);
+  global.io = io;
+  server.listen(config.socket.port);
+  console.log('socket listen: ' + config.socket.port);
+
+  return config;
 };
