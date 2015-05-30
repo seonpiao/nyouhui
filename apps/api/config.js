@@ -5,7 +5,7 @@ var redisStore = require('koa-redis');
 module.exports = function(app) {
 
   app.keys = ['nyouhui', 'cookie'];
-  app.jwt_secret = 'jwt_secret_carrier'
+  app.jwt_secret = 'jwt_secret_carrier';
 
   app.Errors = {
     //通用错误

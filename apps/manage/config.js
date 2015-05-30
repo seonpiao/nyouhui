@@ -8,6 +8,7 @@ var redisStore = require('koa-redis');
 module.exports = function(app) {
 
   app.keys = ['nyouhui', 'cookie'];
+  app.jwt_secret = 'jwt_secret_carrier';
 
   var config = {
     port: '9002',
