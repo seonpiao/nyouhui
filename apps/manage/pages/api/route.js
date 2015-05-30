@@ -187,9 +187,6 @@ module.exports = function(app) {
           id: id
         });
       originData = originData[db][collection];
-      if (!originData) {
-        originData = {};
-      }
       extend(originData, newData);
       delete originData._id;
       var data =
@@ -251,8 +248,9 @@ module.exports = function(app) {
       if (db === app.config.users.db && collection === app.config.users.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'users', {
-            uid: uid
+            uid: originData.uid
           });
+          console.log('del:' + key)
           yield thunkify(client.del.bind(client))(key);
         })();
       }
@@ -269,6 +267,15 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
+      var originData =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      originData = originData[db][collection];
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -287,17 +294,17 @@ module.exports = function(app) {
       // 判断是否需要清空 redis 缓存
       if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
         co(function*() {
-          var key = serializeKeyByQuery(db, 'privilege', {
-            db: db,
-            collection: 'users'
+          var key = serializeKeyByQuery(db, collection, {
+            db: app.config.users.db,
+            collection: app.config.users.collection
           });
           yield thunkify(client.del.bind(client))(key);
         })();
       }
       if (db === app.config.users.db && collection === app.config.users.collection) {
         co(function*() {
-          var key = serializeKeyByQuery(db, 'users', {
-            uid: uid
+          var key = serializeKeyByQuery(db, collection, {
+            uid: originData.uid
           });
           yield thunkify(client.del.bind(client))(key);
         })();
