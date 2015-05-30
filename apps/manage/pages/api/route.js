@@ -199,13 +199,13 @@ module.exports = function(app) {
             db: body.db,
             hosts: app.config.db.hosts
           });
-        var collection = dbconn.collection(body.collection);
+        var _collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
           var field = fields[i];
           if (field.index !== 'no') {
             var indexes = {};
             indexes[field.name] = 1;
-            yield thunkify(collection.ensureIndex.bind(collection))(indexes, {
+            yield thunkify(_collection.ensureIndex.bind(_collection))(indexes, {
               unique: field.index === 'unique'
             });
           } else {
@@ -214,9 +214,9 @@ module.exports = function(app) {
         }
         for (var i = 0; i < dropped.length; i++) {
           var exist =
-            yield thunkify(collection.indexExists.bind(collection))(dropped[i] + '_1');
+            yield thunkify(_collection.indexExists.bind(_collection))(dropped[i] + '_1');
           if (exist) {
-            yield thunkify(collection.dropIndex.bind(collection))(dropped[i] + '_1');
+            yield thunkify(_collection.dropIndex.bind(_collection))(dropped[i] + '_1');
           }
         }
       }
