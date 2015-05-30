@@ -30,6 +30,7 @@ var dequeue = function() {
   var runningTask = global.runningTask[this.session.username];
   var queueid = Object.keys(taskQueue).shift();
   var queueItem = taskQueue[queueid];
+  delete taskQueue[queueid];
   var task = queueItem.task;
   runningTask[task.id] = queueItem;
   console.log(task.flow)
