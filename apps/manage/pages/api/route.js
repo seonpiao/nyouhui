@@ -7,9 +7,10 @@ var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
 var redis = require("redis");
 var co = require('co');
-var client;
+
 module.exports = function(app) {
 
+  var client = redis.createClient(app.config.redis.port, app.config.redis.host);
 
   var queryByQuery = function*(db, collection, query) {
     var data =
@@ -55,7 +56,8 @@ module.exports = function(app) {
           })();
         });
         if (data[field]) {
-          reply = yield thunkify(client.hget.bind(client))(key, field);
+          reply =
+            yield thunkify(client.hget.bind(client))(key, field);
         }
       }
     }
@@ -226,26 +228,30 @@ module.exports = function(app) {
       // 判断是否需要清空 redis 缓存
       try {
         var decoded = jwt.verify(token || '', 'private key for carrier');
-        isTokenValid = !!decoded;
       } catch (e) {}
       if (this.session) {
         username = this.session.username;
-      } else if (isTokenValid) {
+      } else {
         username = decoded.username;
       }
-      if (!client) {
-        client = redis.createClient(app.config.redis.port, app.config.redis.host);
-      }
-      if (this.method != 'GET') {
+
+      if (this.method.toUpperCase() != 'GET') {
         var data =
           yield queryByQuery(db, 'update_cache', {
             db: db,
             collection: collection
           });
         if (data) {
+          console.log(data)
           co(function*() {
-            var key = serializeKeyByQuery(db, collection, {
+            var key = serializeKeyByQuery(db, 'users', {
               username: username
+            });
+            console.log('del: ' + key);
+            yield thunkify(client.del.bind(client))(key);
+            var key = serializeKeyByQuery(db, 'privilege', {
+              db: db,
+              collection: 'users'
             });
             console.log('del: ' + key);
             yield thunkify(client.del.bind(client))(key);

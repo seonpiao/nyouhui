@@ -52,6 +52,7 @@ Mongo.get = function*(options) {
 
 Mongo.request = function*(dbOptions, requestOptions) {
   requestOptions = requestOptions || {};
+  requestOptions.method = requestOptions.method || 'get';
   var requestUrl;
   if (dbOptions.path) {
     requestUrl = 'http://' + dbOptions.host + ':' + dbOptions.port + '/' + dbOptions.path;
@@ -74,6 +75,9 @@ Mongo.request = function*(dbOptions, requestOptions) {
       logger.error(result[1]);
       logger.error(e.stack);
     }
+  }
+  if (requestOptions.method !== 'get' && !result.ok) {
+    throw new Error('operation failed');
   }
   //如果传了id，就只返回一条
   if (dbOptions.id) {
