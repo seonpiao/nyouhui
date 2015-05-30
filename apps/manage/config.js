@@ -34,6 +34,10 @@ module.exports = function(app) {
       db: 'nyouhui',
       collection: 'admins'
     },
+    privilege: {
+      db: 'nyouhui',
+      collection: 'privilege'
+    },
     users: {
       db: 'nyouhui',
       collection: 'users'
