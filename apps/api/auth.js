@@ -61,7 +61,7 @@ var auth = function(app) {
           })();
         });
         if (data[field]) {
-          reply = data[field];
+          reply = yield thunkify(client.hget.bind(client))(key, field);
         }
       }
     }
@@ -93,9 +93,14 @@ var auth = function(app) {
     if (!client) {
       client = redis.createClient(app.config.redis.port, app.config.redis.host);
     }
+    var requestPath = this.request.path;
+    var pathArray = requestPath.split('/');
+    var db = pathArray[1];
+    var collection = pathArray[2];
+
     var token = this.request.query.token;
     var isTokenValid = false;
-    var username, privilege;
+    var username, userGroup, privilege;
     try {
       var decoded = jwt.verify(token || '', 'private key for carrier');
       isTokenValid = !!decoded;
@@ -106,21 +111,43 @@ var auth = function(app) {
       username = decoded.username;
     }
     if (username) {
-      privilege =
+      // 根据 db 和 query 进行查询该用户所在用户组
+      userGroup =
         yield getHashCacheByQuery('nyouhui', 'users', {
-          username: 'root'
-        }, 'username');
+          username: username
+        }, 'group');
+      console.log('userGroup: ' + userGroup);
+    }
+
+    // 判断权限
+    if (userGroup) {
+      var permissibleGroup =
+        yield getHashCacheByQuery('nyouhui', 'privilege', {
+          db: db,
+          collection: collection
+        }, 'read');
+
+      userGroup = (userGroup || '').split(',');
+      permissibleGroup = (permissibleGroup || '').split(',');
+      console.log(userGroup, permissibleGroup);
+      privilege = userGroup.some(function(m) {
+        return permissibleGroup.some(function(n) {
+          return m == n;
+        });
+      });
+      console.log('privilege: ' + privilege);
     }
     if (privilege) {
       yield next;
+      
     } else {
       this.json = true;
       this.result = {
         code: 403,
         message: 'Not Allowed.'
-      }
+      };
     }
-  }
-}
+  };
+};
 
 module.exports = auth;

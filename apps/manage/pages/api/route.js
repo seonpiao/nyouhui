@@ -5,8 +5,84 @@ var auth = require('../../auth');
 var settings = require('../../../../settings');
 var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
-
+var redis = require("redis");
+var co = require('co');
+var client;
 module.exports = function(app) {
+
+
+  var queryByQuery = function*(db, collection, query) {
+    var data =
+      yield Mongo.request({
+        host: app.config.restful.host,
+        port: app.config.restful.port,
+        db: db,
+        collection: collection,
+        one: true
+      }, {
+        qs: {
+          query: JSON.stringify(query)
+        }
+      });
+    data = data[db][collection];
+    return data;
+  }
+
+  var serializeKeyByQuery = function(db, collection, query) {
+    var sortedQuery = {};
+    Object.keys(query).sort().forEach(function(key) {
+      sortedQuery[key] = query[key];
+    });
+    var key = db + '|' + collection + '|' + JSON.stringify(sortedQuery);
+    return key;
+  };
+
+  var serializeKeyById = function(db, collection, id) {
+    return db + '|' + collection + '|' + id;
+  };
+
+  var getHashCacheByQuery = function*(db, collection, query, field) {
+    var key = serializeKeyByQuery(db, collection, query);
+    var reply =
+      yield thunkify(client.hget.bind(client))(key, field);
+    if (!reply) {
+      var data =
+        yield queryByQuery(db, collection, query);
+      if (data) {
+        Object.keys(data).forEach(function(field) {
+          co(function*() {
+            yield thunkify(client.hset.bind(client))(key, field, data[field]);
+          })();
+        });
+        if (data[field]) {
+          reply = yield thunkify(client.hget.bind(client))(key, field);
+        }
+      }
+    }
+    return reply;
+  };
+
+  var getHashCacheById = function*(db, collection, id, field) {
+    var key = serializeKeyById(db, collection, id);
+    var reply =
+      yield thunkify(client[getCmd].bind(client))(key);
+    if (!reply) {
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      if (data) {
+        data = data[db][collection];
+        yield thunkify(client.hset.bind(client))(key, field, data[field]);
+        reply = data[field];
+      }
+    }
+  };
+
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -146,6 +222,36 @@ module.exports = function(app) {
         code: 200,
         result: data
       }
+
+      // 判断是否需要清空 redis 缓存
+      try {
+        var decoded = jwt.verify(token || '', 'private key for carrier');
+        isTokenValid = !!decoded;
+      } catch (e) {}
+      if (this.session) {
+        username = this.session.username;
+      } else if (isTokenValid) {
+        username = decoded.username;
+      }
+      if (!client) {
+        client = redis.createClient(app.config.redis.port, app.config.redis.host);
+      }
+      if (this.method != 'GET') {
+        var data =
+          yield queryByQuery(db, 'update_cache', {
+            db: db,
+            collection: collection
+          });
+        if (data) {
+          co(function*() {
+            var key = serializeKeyByQuery(db, collection, {
+              username: username
+            });
+            console.log('del: ' + key);
+            yield thunkify(client.del.bind(client))(key);
+          })();
+        }
+      }
     } catch (e) {
       this.result = {
         code: 500,
@@ -171,6 +277,36 @@ module.exports = function(app) {
       this.result = {
         code: 200,
         result: data
+      };
+
+      // 判断是否需要清空 redis 缓存
+      try {
+        var decoded = jwt.verify(token || '', 'private key for carrier');
+        isTokenValid = !!decoded;
+      } catch (e) {}
+      if (this.session) {
+        username = this.session.username;
+      } else if (isTokenValid) {
+        username = decoded.username;
+      }
+      if (!client) {
+        client = redis.createClient(app.config.redis.port, app.config.redis.host);
+      }
+      if (this.method != 'GET') {
+        var data =
+          yield queryByQuery(db, 'update_cache', {
+            db: db,
+            collection: collection
+          });
+        if (data) {
+          co(function*() {
+            var key = serializeKeyByQuery(db, collection, {
+              username: username
+            });
+            console.log('del: ' + key);
+            yield thunkify(client.del.bind(client))(key);
+          })();
+        }
       }
     } catch (e) {
       this.result = {
