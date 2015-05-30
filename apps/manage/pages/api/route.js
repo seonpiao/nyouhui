@@ -7,6 +7,7 @@ var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
 var redis = require("redis");
 var co = require('co');
+var extend = require('node.extend');
 
 module.exports = function(app) {
 
@@ -177,7 +178,20 @@ module.exports = function(app) {
     var id = this.request.params.id;
     try {
       var newData = this.request.body;
-      delete newData._id;
+      var originData =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      originData = originData[db][collection];
+      if (!originData) {
+        originData = {};
+      }
+      extend(originData, newData);
+      delete originData._id;
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -186,7 +200,7 @@ module.exports = function(app) {
           collection: collection,
           id: id
         }, {
-          json: newData,
+          json: originData,
           method: this.method
         });
       //修改schema，要调整索引
@@ -242,18 +256,15 @@ module.exports = function(app) {
             collection: collection
           });
         if (data) {
-          console.log(data)
           co(function*() {
             var key = serializeKeyByQuery(db, 'users', {
               username: username
             });
-            console.log('del: ' + key);
             yield thunkify(client.del.bind(client))(key);
             var key = serializeKeyByQuery(db, 'privilege', {
               db: db,
               collection: 'users'
             });
-            console.log('del: ' + key);
             yield thunkify(client.del.bind(client))(key);
           })();
         }
