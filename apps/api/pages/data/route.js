@@ -54,7 +54,6 @@ module.exports = function(app) {
     var key = serializeKeyByQuery(db, collection, query);
     var reply =
       yield thunkify(client.hget.bind(client))(key, field);
-    console.log('>>>' + reply)
     if (!reply) {
       var data =
         yield queryByQuery(db, collection, query);
@@ -112,7 +111,6 @@ module.exports = function(app) {
         yield getHashCacheByQuery(app.config.users.db, app.config.users.collection, {
           uid: uid
         }, 'group');
-      console.log('userGroup: ' + userGroup);
     }
 
     // 判断权限
@@ -125,13 +123,11 @@ module.exports = function(app) {
 
       userGroup = (userGroup || '').split(',');
       permissibleGroup = (permissibleGroup || '').split(',');
-      console.log(userGroup, permissibleGroup);
       privilege = userGroup.some(function(m) {
         return permissibleGroup.some(function(n) {
           return m == n;
         });
       });
-      console.log('privilege: ' + privilege);
     }
     return privilege;
   }
