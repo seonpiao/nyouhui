@@ -32,10 +32,21 @@ define(["libs/client/views/base"], function(Base) {
             var queueid = data.queueid;
             var task = data.task;
             var $tip = $('[data-task-queueid="' + queueid + '"]');
+            $tip.removeClass('alert-info');
             $tip.addClass('alert-success');
             setTimeout(function() {
               self.close($tip);
-            }, 1000)
+            }, 2000)
+          });
+          socket.on('task error', function(data) {
+            var queueid = data.queueid;
+            var task = data.task;
+            var $tip = $('[data-task-queueid="' + queueid + '"]');
+            $tip.removeClass('alert-info');
+            $tip.addClass('alert-error');
+            setTimeout(function() {
+              self.close($tip);
+            }, 2000)
           });
         }
       });

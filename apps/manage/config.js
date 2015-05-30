@@ -13,8 +13,6 @@ module.exports = function(app) {
   var config = {
     port: '9002',
     socket: {
-      host: 'backend.dev.wanleyun.com',
-      // host: 'localhost',
       port: 3001
     },
     restful: {

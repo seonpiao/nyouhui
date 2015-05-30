@@ -29,31 +29,42 @@ var dequeue = function() {
   var taskQueue = global.taskQueue[this.session.username];
   var runningTask = global.runningTask[this.session.username];
   var queueid = Object.keys(taskQueue).shift();
-  var queueItem = taskQueue[queueid];
-  delete taskQueue[queueid];
-  var task = queueItem.task;
-  runningTask[task.id] = queueItem;
-  console.log(task.flow)
-  task.flow.on('end', function() {
-    global.io.emit('task end', {
+  if (queueid) {
+    var queueItem = taskQueue[queueid];
+    delete taskQueue[queueid];
+    var task = queueItem.task;
+    runningTask[task.id] = queueItem;
+    task.flow.on('end', function() {
+      global.io.emit('task end', {
+        queueid: queueid,
+        task: {
+          name: task.name
+        }
+      });
+      delete runningTask[task.id];
+      delete taskQueue[queueid];
+    });
+    task.flow.on('error', function() {
+      global.io.emit('task error', {
+        queueid: queueid,
+        task: {
+          name: task.name
+        }
+      });
+      delete runningTask[task.id];
+      delete taskQueue[queueid];
+    });
+    task.flow.begin(task.beginData);
+    task.steps.forEach(function(step) {
+      task.flow.go(step.id);
+    });
+    global.io.emit('task start', {
       queueid: queueid,
       task: {
         name: task.name
       }
     });
-    delete runningTask[task.id];
-    delete taskQueue[queueid];
-  });
-  task.flow.begin(task.beginData);
-  task.steps.forEach(function(step) {
-    task.flow.go(step.id);
-  });
-  global.io.emit('task start', {
-    queueid: queueid,
-    task: {
-      name: task.name
-    }
-  });
+  }
 };
 
 module.exports = function(app) {
