@@ -13,20 +13,18 @@ define(["libs/client/views/base"], function(Base) {
         width: 300,
         zIndex: 100
       });
+      this.model.getRunnings(function(tasks) {
+        _.forEach(tasks, function(task) {
+          var $tip = self._buildTip(task);
+          self._queue.push($tip);
+          self.show();
+        });
+      });
       this.module('socket', function(module) {
         if (module) {
           var socket = module.socket();
           socket.on('task start', function(data) {
-            var queueid = data.queueid;
-            var task = data.task;
-            var $tip = self.$el.clone(true);
-            $tip.removeAttr('data-module');
-            $tip.attr('data-task-queueid', queueid);
-            $tip.removeClass('hide');
-            $tip.find('p').html(task.name + ' start.');
-            $tip.find('button').on('click', function() {
-              self.close($tip);
-            });
+            var $tip = self._buildTip(data);
             self._queue.push($tip);
             self.show();
           });
@@ -41,6 +39,20 @@ define(["libs/client/views/base"], function(Base) {
           });
         }
       });
+    },
+    _buildTip: function(data) {
+      var self = this;
+      var queueid = data.queueid;
+      var task = data.task;
+      var $tip = self.$el.clone(true);
+      $tip.removeAttr('data-module');
+      $tip.attr('data-task-queueid', queueid);
+      $tip.removeClass('hide');
+      $tip.find('p').html(task.name);
+      $tip.find('button').on('click', function() {
+        self.close($tip);
+      });
+      return $tip;
     },
     show: function() {
       var self = this;

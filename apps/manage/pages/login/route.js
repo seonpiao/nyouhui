@@ -12,7 +12,8 @@ module.exports = function(app) {
         host: app.config.restful.host,
         port: app.config.restful.port,
         db: app.config.admins.db,
-        collection: app.config.admins.collection
+        collection: app.config.admins.collection,
+        one: true
       }, {
         qs: {
           query: JSON.stringify({
@@ -22,8 +23,8 @@ module.exports = function(app) {
         }
       });
     result = result[app.config.admins.db][app.config.admins.collection];
-    if (result && result.length === 1) {
-      return true;
+    if (result) {
+      return result;
     } else {
       return false;
     }
@@ -44,73 +45,6 @@ module.exports = function(app) {
     } else {
       this.redirect('/login');
     }
-  });
-
-  app.route('/login/getAccessToken').post(function*(next) {
-    var username = this.request.body.username;
-    var password = this.request.body.password;
-    this.json = true;
-    var result =
-      yield auth(username, password);
-    if (result) {
-      var token = jwt.sign({
-        username: username
-      }, 'private key for carrier');
-      this.result = {
-        code: 200,
-        result: {
-          token: token
-        }
-      }
-    } else {
-      this.result = {
-        code: 401
-      };
-    }
-  });
-
-  var captchas = {};
-
-  var captchasCache = function(token, num) {
-    var keys = Object.keys(captchas);
-    if (keys.length > 100000) {
-      delete captchas[keys.shift()];
-    }
-    captchas[token] = num;
-  };
-
-  var verifyCaptcha = function(token, num) {
-    return num == captchas[token];
-  };
-
-  app.route('/login/getCaptchaToken').get(function*(next) {
-    var num = parseInt(Math.random() * 9000 + 1000).toString();
-    var token = tokenGenerator(16);
-    captchasCache(token, num);
-    this.json = true;
-    this.result = {
-      code: 200,
-      result: {
-        token: token
-      }
-    }
-  });
-
-  app.route('/login/captcha/:token').get(function*(next) {
-    this.raw = true;
-    var token = this.request.params.token;
-    var num = captchas[token];
-    if (isNaN(num)) {
-      num = '9999';
-    }
-    var p = new captchapng(80, 30, num);
-    p.color(0, 0, 0, 0); // First color: background (red, green, blue, alpha)
-    p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
-
-    var img = p.getBase64();
-    var imgbase64 = new Buffer(img, 'base64');
-    this.set('Content-Type', 'image/png');
-    this.result = imgbase64;
   });
 
   app.route('/logout').get(function*(next) {

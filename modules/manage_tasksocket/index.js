@@ -1,8 +1,9 @@
-define([ "modules/manage_tasksocket/view" ], function(View) {
+define(["modules/manage_tasksocket/view", "modules/manage_tasksocket/model"], function(View, Model) {
   return {
     init: function(el) {
       var view = new View({
-        el: el
+        el: el,
+        model: new Model
       });
     }
   };

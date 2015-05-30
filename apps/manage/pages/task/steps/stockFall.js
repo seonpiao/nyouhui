@@ -59,18 +59,20 @@ module.exports = {
     }, function(err) {
       console.log(fellstocks)
       co(function*() {
-        yield Mongo.request({
-          host: data.restful.host,
-          port: data.restful.port,
-          db: data.db,
-          collection: 'fellstocks'
-        }, {
-          method: 'post',
-          json: {
-            date: moment().format('YYYY-MM-DD'),
-            stocks: fellstocks
-          }
-        });
+        try {
+          yield Mongo.request({
+            host: data.restful.host,
+            port: data.restful.port,
+            db: data.db,
+            collection: 'fellstocks'
+          }, {
+            method: 'post',
+            json: {
+              date: moment().format('YYYY-MM-DD'),
+              stocks: fellstocks
+            }
+          });
+        } catch (e) {}
         done(err)
       })()
     });

@@ -11,8 +11,8 @@ var moment = require('moment');
 var tokenGenerator = require('random-token');
 
 var enqueue = function(task) {
-  var taskQueue = this.session.taskQueue;
-  var runningTask = this.session.runningTask;
+  var taskQueue = global.taskQueue[this.session.username];
+  var runningTask = global.runningTask[this.session.username];
   var queueid = tokenGenerator(16);
   if (!runningTask[task.id]) {
     taskQueue[queueid] = ({
@@ -26,12 +26,13 @@ var enqueue = function(task) {
 };
 
 var dequeue = function() {
-  var taskQueue = this.session.taskQueue;
-  var runningTask = this.session.runningTask;
+  var taskQueue = global.taskQueue[this.session.username];
+  var runningTask = global.runningTask[this.session.username];
   var queueid = Object.keys(taskQueue).shift();
   var queueItem = taskQueue[queueid];
   var task = queueItem.task;
   runningTask[task.id] = queueItem;
+  console.log(task.flow)
   task.flow.on('end', function() {
     global.io.emit('task end', {
       queueid: queueid,
@@ -79,6 +80,25 @@ module.exports = function(app) {
       logger.error(e.stack);
     }
   });
+  app.route('/task/runnings').get(function*() {
+    var taskQueue = global.taskQueue[this.session.username];
+    var runningTask = global.runningTask[this.session.username];
+    runningTask = Object.keys(runningTask).map(function(taskid) {
+      var queueid = runningTask[taskid].queueid;
+      var task = runningTask[taskid].task;
+      return {
+        queueid: queueid,
+        task: {
+          name: task.name
+        }
+      };
+    });
+    this.json = true;
+    this.result = {
+      code: 200,
+      result: runningTask
+    }
+  });
   app.route('/task/run/:id').get(function*(next) {
     this.json = true;
     var start = Date.now();
@@ -118,23 +138,20 @@ module.exports = function(app) {
         } catch (e) {}
         beginData.restful = app.config.restful;
         try {
-          var self = this;
-          yield thunkify(function(done) {
-            steps.forEach(function(step) {
-              flow.addStep(step.id, step);
-            });
-            flow.on('end', function() {
-              done();
-            });
-            enqueue.call(self, {
-              id: taskid,
-              name: data.name,
-              flow: flow,
-              steps: steps,
-              beginData: beginData
-            });
-            dequeue.call(self);
-          })();
+
+          steps.forEach(function(step) {
+            flow.addStep(step.id, step);
+          });
+          flow.ididid = 111;
+          enqueue.call(this, {
+            id: taskid,
+            name: data.name,
+            flow: flow,
+            steps: steps,
+            beginData: beginData
+          });
+          dequeue.call(this);
+
           this.result = {
             code: 200
           };
