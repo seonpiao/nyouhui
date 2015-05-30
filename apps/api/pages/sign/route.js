@@ -264,7 +264,7 @@ module.exports = function(app) {
           code: 0
         }
       } else {
-        this.result = app.Errors.UNKNOWN;
+        this.result = app.Errors.SIGN_PHONE_NOT_EXIST;
       }
     } else {
       this.result = app.Errors.SIGN_INVALID_CAPTCHA;

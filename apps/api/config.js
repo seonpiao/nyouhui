@@ -42,6 +42,10 @@ module.exports = function(app) {
       code: 2004,
       message: '手机号重复'
     },
+    'SIGN_PHONE_NOT_EXIST': {
+      code: 2005,
+      message: '手机号不存在'
+    },
     //user
     'USER_INCORRECT_PASSWORD': {
       code: 3000,
