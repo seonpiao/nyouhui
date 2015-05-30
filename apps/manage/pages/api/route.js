@@ -241,12 +241,13 @@ module.exports = function(app) {
 
       // 判断是否需要清空 redis 缓存
       try {
-        var decoded = jwt.verify(token || '', 'private key for carrier');
+        var decoded = jwt.verify(token || '', app.jwt_secret);
       } catch (e) {}
-      if (this.session) {
-        username = this.session.username;
+      var uid;
+      if (this.session && this.session.uid) {
+        uid = this.session.uid;
       } else {
-        username = decoded.username;
+        uid = decoded.uid;
       }
 
       if (this.method.toUpperCase() != 'GET') {
@@ -258,7 +259,7 @@ module.exports = function(app) {
         if (data) {
           co(function*() {
             var key = serializeKeyByQuery(db, 'users', {
-              username: username
+              uid: uid
             });
             yield thunkify(client.del.bind(client))(key);
             var key = serializeKeyByQuery(db, 'privilege', {
@@ -298,13 +299,14 @@ module.exports = function(app) {
 
       // 判断是否需要清空 redis 缓存
       try {
-        var decoded = jwt.verify(token || '', 'private key for carrier');
+        var decoded = jwt.verify(token || '', app.jwt_secret);
         isTokenValid = !!decoded;
       } catch (e) {}
-      if (this.session) {
-        username = this.session.username;
+      var uid;
+      if (this.session && this.session.uid) {
+        uid = this.session.uid;
       } else if (isTokenValid) {
-        username = decoded.username;
+        uid = decoded.uid;
       }
       if (!client) {
         client = redis.createClient(app.config.redis.port, app.config.redis.host);
@@ -318,9 +320,8 @@ module.exports = function(app) {
         if (data) {
           co(function*() {
             var key = serializeKeyByQuery(db, collection, {
-              username: username
+              uid: uid
             });
-            console.log('del: ' + key);
             yield thunkify(client.del.bind(client))(key);
           })();
         }
