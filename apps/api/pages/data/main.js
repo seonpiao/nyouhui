@@ -1,1 +1,1 @@
-require([ "apps/api/pages/index/modules" ], function() {});
+require(["apps/api/pages/data/modules"], function() {});
