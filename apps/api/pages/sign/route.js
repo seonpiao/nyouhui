@@ -272,7 +272,9 @@ module.exports = function(app) {
   });
 
   route.nested('/destroyAccessToken').get(function*(next) {
-    this.session = null;
-    this.redirect('/login');
+    this.json = true;
+    this.result = {
+      code: 0
+    };
   });
 }
