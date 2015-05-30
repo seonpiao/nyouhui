@@ -97,6 +97,7 @@ module.exports = function(app) {
           uid: uid,
           source: source,
           nickname: uid,
+          group: ['normal'], // 默认用户组
           reg_ip: this.ip,
           create_time: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
         })
