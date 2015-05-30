@@ -96,21 +96,21 @@ module.exports = function(app) {
 
   var auth = function*(token, db, collection, action) {
     var isTokenValid = false;
-    var username, userGroup, privilege = false;
+    var uid, userGroup, privilege = false;
     try {
       var decoded = jwt.verify(token || '', app.jwt_secret);
       isTokenValid = !!decoded;
     } catch (e) {}
-    if (this.session && this.session.username) {
-      username = this.session.username;
+    if (this.session && this.session.uid) {
+      uid = this.session.uid;
     } else if (isTokenValid) {
-      username = decoded.username;
+      uid = decoded.uid;
     }
-    if (username) {
+    if (uid) {
       // 根据 db 和 query 进行查询该用户所在用户组
       userGroup =
         yield getHashCacheByQuery(app.config.users.db, app.config.users.collection, {
-          username: username
+          uid: uid
         }, 'group');
       console.log('userGroup: ' + userGroup);
     }
