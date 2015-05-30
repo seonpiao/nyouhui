@@ -239,37 +239,24 @@ module.exports = function(app) {
         result: data
       }
 
-      // 判断是否需要清空 redis 缓存
-      try {
-        var decoded = jwt.verify(token || '', app.jwt_secret);
-      } catch (e) {}
-      var uid;
-      if (this.session && this.session.uid) {
-        uid = this.session.uid;
-      } else {
-        uid = decoded.uid;
+      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'privilege', {
+            db: db,
+            collection: 'users'
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
+      }
+      if (db === app.config.users.db && collection === app.config.users.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'users', {
+            uid: uid
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
       }
 
-      if (this.method.toUpperCase() != 'GET') {
-        var data =
-          yield queryByQuery(db, 'update_cache', {
-            db: db,
-            collection: collection
-          });
-        if (data) {
-          co(function*() {
-            var key = serializeKeyByQuery(db, 'users', {
-              uid: uid
-            });
-            yield thunkify(client.del.bind(client))(key);
-            var key = serializeKeyByQuery(db, 'privilege', {
-              db: db,
-              collection: 'users'
-            });
-            yield thunkify(client.del.bind(client))(key);
-          })();
-        }
-      }
     } catch (e) {
       this.result = {
         code: 500,
@@ -298,33 +285,22 @@ module.exports = function(app) {
       };
 
       // 判断是否需要清空 redis 缓存
-      try {
-        var decoded = jwt.verify(token || '', app.jwt_secret);
-        isTokenValid = !!decoded;
-      } catch (e) {}
-      var uid;
-      if (this.session && this.session.uid) {
-        uid = this.session.uid;
-      } else if (isTokenValid) {
-        uid = decoded.uid;
-      }
-      if (!client) {
-        client = redis.createClient(app.config.redis.port, app.config.redis.host);
-      }
-      if (this.method != 'GET') {
-        var data =
-          yield queryByQuery(db, 'update_cache', {
+      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'privilege', {
             db: db,
-            collection: collection
+            collection: 'users'
           });
-        if (data) {
-          co(function*() {
-            var key = serializeKeyByQuery(db, collection, {
-              uid: uid
-            });
-            yield thunkify(client.del.bind(client))(key);
-          })();
-        }
+          yield thunkify(client.del.bind(client))(key);
+        })();
+      }
+      if (db === app.config.users.db && collection === app.config.users.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'users', {
+            uid: uid
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
       }
     } catch (e) {
       this.result = {
