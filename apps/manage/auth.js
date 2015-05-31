@@ -6,7 +6,7 @@ var auth = function*(next) {
   try {
     isTokenValid = jwt.verify(token || '', 'private key for carrier');
   } catch (e) {}
-  if (this.session.username || isTokenValid || this.path.match(/^\/login|bootstrap|css|fonts|img|js|plugins/)) {
+  if (this.session.username || isTokenValid || this.path.match(/^\/install|login|bootstrap|css|fonts|img|js|plugins/)) {
     yield next;
   } else {
     if (this.path.match(/^\/api/)) {
