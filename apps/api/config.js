@@ -4,8 +4,8 @@ var redisStore = require('koa-redis');
 
 module.exports = function(app) {
 
-  app.keys = ['nyouhui', 'cookie'];
-  app.jwt_secret = 'jwt_secret_carrier';
+  app.keys = ['test'];
+  app.jwt_secret = 'jwt_secret_test';
 
   app.Errors = {
     //通用错误
@@ -57,28 +57,26 @@ module.exports = function(app) {
     }
   };
 
-  return {
+  var config = {
     port: '9003',
     restful: {
       host: 'localhost',
-      // host: 'nyouhui.com',
-      port: 3000,
-      defaultDb: 'nyouhui'
+      port: 3000
     },
     redis: {
       host: 'localhost',
       port: 6379
     },
     privilege: {
-      db: 'nyouhui',
+      db: 'firstre',
       collection: 'privilege'
     },
-    users: {
-      db: 'nyouhui',
-      collection: 'users'
+    user: {
+      db: 'firstre',
+      collection: 'user'
     },
     uid: {
-      db: 'nyouhui',
+      db: 'firstre',
       collection: 'uid'
     },
     middlewares: [session({
@@ -90,4 +88,6 @@ module.exports = function(app) {
       }
     }), cors()]
   }
+
+  return config;
 };

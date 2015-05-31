@@ -10,14 +10,26 @@ module.exports = function(app) {
   }).post(function*(next) {
     this.raw = true;
     var body = this.request.body;
+    var admin =
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.admin_db,
+        collection: body.admin_collection
+      });
+    admin = admin[body.admin_db][body.admin_collection];
+    if (admin && admin.length > 0) {
+      this.result = '已经安装过了，不能重复安装';
+      return;
+    }
     //生成配置文件
     var manageTmpl = fs.readFileSync(path.join(__dirname, 'manage.tmpl')).toString();
     var manageFile = (template.compile(manageTmpl)(body));
-    fs.writeFileSync(path.join(__dirname, '../../config2.js'), manageFile);
+    fs.writeFileSync(path.join(__dirname, '../../config.js'), manageFile);
     if (fs.existsSync(path.join(__dirname, '../../../api/'))) {
       var apiTmpl = fs.readFileSync(path.join(__dirname, 'api.tmpl')).toString();
       var apiFile = (template.compile(apiTmpl)(body));
-      fs.writeFileSync(path.join(__dirname, '../../../api/config2.js'), apiFile);
+      fs.writeFileSync(path.join(__dirname, '../../../api/config.js'), apiFile);
     }
 
     //初始化数据库
