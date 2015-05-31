@@ -48,7 +48,7 @@ fi
 
 num=${#hosts[@]}
 
-gitmergeconfilict=($(grep ">>>>>>>" ./ -r | grep -v deploy.sh | awk -F ':' '{print $1}' | sed  's/\/\{1,\}/\//g'))
+gitmergeconfilict=($(grep ">>>>>>>" ./ -r --exclude-dir=node_modules | grep -v deploy.sh | awk -F ':' '{print $1}' | sed  's/\/\{1,\}/\//g'))
 gitmergeconfilictcount=${#gitmergeconfilict[@]}
 
 if [ $gitmergeconfilictcount -gt 0 ]; then

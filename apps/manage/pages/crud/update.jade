@@ -13,9 +13,11 @@ block append content
   section.content
     form(role="form",data-module="manage_form",data-db=result.db,data-collection=result.collection)
       div
-        - var data = result.data[result.db][result.collection];
+        - var data;
         - var schema = result._data[result.config.schema.db][result.config.schema.collection];
         - var controls = result._data[result.config.control.db][result.config.control.collection];
+        if result.data && result.data[result.db]
+          - data = result.data[result.db][result.collection];
         if data && data._id
           +manage_ctrl_input({
             name:'_id',
@@ -23,55 +25,44 @@ block append content
             value:(data ? data._id + '' : '')
           })
         each field in schema.fields
-          - var extra_componets = controls.filter(function(v){
-          //- - console.log(v.name,field.type)
-          -   return v.name == field.type
-          - })
-          - field.base = extra_componets[0].base || field.type;
-          - var baseCtrl = controls.filter(function(v){
-          -   return v._id == field.base;
-          - })
-          if !baseCtrl || baseCtrl.length === 0
-            - field.base = field.type;
-          else
-            - field.base = baseCtrl[0].name;
-          if field.base === 'tagsinput'
-            -var params = {};
-            -params.label = field.alias;
-            -params.name =field.name,
-            -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
-            - for(var key in extra_componets[0].params){
-            -   params[key] = extra_componets[0].params[key]
+          - var extraControl = controls.filter(function(v){
+          -   return v._id.toString() == field.type
+          - })[0];
+          if extraControl
+            - field.base = extraControl.base || extraControl._id;
+            - var baseCtrl = controls.filter(function(v){
+            -   return v._id == field.base;
+            - })
+            if baseCtrl && baseCtrl.length > 0
+              - field.base = baseCtrl[0].name;
+          -var params = {};
+          // 都改为label，暂时兼容老的alias，以后要删掉alias
+          -params.label = field.label || field.alias;
+          -params.name = field.name;
+          -params.required = field.required;
+          -params.value = data ? data[field.name] : field.defaults
+          if extraControl && extraControl.params
+            - for(var key in extraControl.params){
+            -   params[key] = extraControl.params[key]
             - }
+          if field.base === 'tagsinput'
+            -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
             +manage_ctrl_tagsinput(params)
-          else if field.base === 'orderwizard'
-            -var params = {};
-            -params.label = field.alias;
-            -params.name =field.name;
+          else if field.base === 'wizard'
             -params.data = data;
             //- -params.value = data ? (Array.isArray(data[field.name]) ? data[field.name].join(' ') : data[field.name]) : ''
-            - for(var key in extra_componets[0].params){
-            -   params[key] = extra_componets[0].params[key]
-            - }
-            +manage_ctrl_orderwizard(params)
+            +manage_ctrl_wizard(params)
           else if field.base === 'select'
-            -var params = {};
-            -params.label = field.alias;
-            -params.name =field.name;
-            -params.data = data;
-            -params.value = data ? data[field.name] : field.defaults
-            - for(var key in extra_componets[0].params){
-            -   params[key] = extra_componets[0].params[key]
-            - }
             +manage_ctrl_select(params)
+          else if field.base === 'checkbox'
+            +manage_ctrl_checkbox(params)
+          else if field.base === 'textarea'
+            +manage_ctrl_textarea(params)
+          else if field.base === 'editor'
+            +manage_ctrl_editor(params)
+          else if field.base === 'draggableselector'
+            +manage_ctrl_draggableselector(params)
           else
-            -var params = {};
-            -params.label = field.alias;
-            -params.name =field.name,
-            -params.value = data ? data[field.name] : field.defaults
-            if extra_componets[0].params
-              - for(var key in extra_componets[0].params)
-              -   params[key] = extra_componets[0].params[key]
             +manage_ctrl_input(params)
       +manage_box({
         title:'表定义'
@@ -82,4 +73,4 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
-  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.bf340c1f1f8b93e0.js")
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/crud.min.7996aafcee9cc106.js")

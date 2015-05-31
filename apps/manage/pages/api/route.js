@@ -2,11 +2,89 @@ var request = require('request');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('manage:api');
 var auth = require('../../auth');
-var settings = require('../../../../settings');
 var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
+var redis = require("redis");
+var co = require('co');
+var extend = require('node.extend');
 
 module.exports = function(app) {
+
+  var client = redis.createClient(app.config.redis.port, app.config.redis.host);
+
+  var queryByQuery = function*(db, collection, query) {
+    var data =
+      yield Mongo.request({
+        host: app.config.restful.host,
+        port: app.config.restful.port,
+        db: db,
+        collection: collection,
+        one: true
+      }, {
+        qs: {
+          query: JSON.stringify(query)
+        }
+      });
+    data = data[db][collection];
+    return data;
+  }
+
+  var serializeKeyByQuery = function(db, collection, query) {
+    var sortedQuery = {};
+    Object.keys(query).sort().forEach(function(key) {
+      sortedQuery[key] = query[key];
+    });
+    var key = db + '|' + collection + '|' + JSON.stringify(sortedQuery);
+    return key;
+  };
+
+  var serializeKeyById = function(db, collection, id) {
+    return db + '|' + collection + '|' + id;
+  };
+
+  var getHashCacheByQuery = function*(db, collection, query, field) {
+    var key = serializeKeyByQuery(db, collection, query);
+    var reply =
+      yield thunkify(client.hget.bind(client))(key, field);
+    if (!reply) {
+      var data =
+        yield queryByQuery(db, collection, query);
+      if (data) {
+        Object.keys(data).forEach(function(field) {
+          co(function*() {
+            yield thunkify(client.hset.bind(client))(key, field, data[field]);
+          })();
+        });
+        if (data[field]) {
+          reply =
+            yield thunkify(client.hget.bind(client))(key, field);
+        }
+      }
+    }
+    return reply;
+  };
+
+  var getHashCacheById = function*(db, collection, id, field) {
+    var key = serializeKeyById(db, collection, id);
+    var reply =
+      yield thunkify(client[getCmd].bind(client))(key);
+    if (!reply) {
+      var data =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      if (data) {
+        data = data[db][collection];
+        yield thunkify(client.hset.bind(client))(key, field, data[field]);
+        reply = data[field];
+      }
+    }
+  };
+
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -60,7 +138,10 @@ module.exports = function(app) {
           var body = this.request.body;
           var fields = body.fields;
           var dbconn =
-            yield Mongo.get(body.db);
+            yield Mongo.get({
+              db: body.db,
+              hosts: app.config.db.hosts
+            });
           var collection = dbconn.collection(body.collection);
           for (var i = 0; i < fields.length; i++) {
             var field = fields[i];
@@ -96,7 +177,17 @@ module.exports = function(app) {
     var id = this.request.params.id;
     try {
       var newData = this.request.body;
-      delete newData._id;
+      var originData =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      originData = originData[db][collection];
+      extend(originData, newData);
+      delete originData._id;
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -105,7 +196,7 @@ module.exports = function(app) {
           collection: collection,
           id: id
         }, {
-          json: newData,
+          json: originData,
           method: this.method
         });
       //修改schema，要调整索引
@@ -114,14 +205,17 @@ module.exports = function(app) {
         var fields = body.fields;
         var dropped = [];
         var dbconn =
-          yield Mongo.get(body.db);
-        var collection = dbconn.collection(body.collection);
+          yield Mongo.get({
+            db: body.db,
+            hosts: app.config.db.hosts
+          });
+        var _collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
           var field = fields[i];
           if (field.index !== 'no') {
             var indexes = {};
             indexes[field.name] = 1;
-            yield thunkify(collection.ensureIndex.bind(collection))(indexes, {
+            yield thunkify(_collection.ensureIndex.bind(_collection))(indexes, {
               unique: field.index === 'unique'
             });
           } else {
@@ -130,9 +224,9 @@ module.exports = function(app) {
         }
         for (var i = 0; i < dropped.length; i++) {
           var exist =
-            yield thunkify(collection.indexExists.bind(collection))(dropped[i] + '_1');
+            yield thunkify(_collection.indexExists.bind(_collection))(dropped[i] + '_1');
           if (exist) {
-            yield thunkify(collection.dropIndex.bind(collection))(dropped[i] + '_1');
+            yield thunkify(_collection.dropIndex.bind(_collection))(dropped[i] + '_1');
           }
         }
       }
@@ -140,6 +234,26 @@ module.exports = function(app) {
         code: 200,
         result: data
       }
+
+      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'privilege', {
+            db: db,
+            collection: 'users'
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
+      }
+      if (db === app.config.user.db && collection === app.config.user.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, 'users', {
+            uid: originData.uid
+          });
+          console.log('del:' + key)
+          yield thunkify(client.del.bind(client))(key);
+        })();
+      }
+
     } catch (e) {
       this.result = {
         code: 500,
@@ -152,6 +266,15 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     try {
+      var originData =
+        yield Mongo.request({
+          host: app.config.restful.host,
+          port: app.config.restful.port,
+          db: db,
+          collection: collection,
+          id: id
+        });
+      originData = originData[db][collection];
       var data =
         yield Mongo.request({
           host: app.config.restful.host,
@@ -165,6 +288,25 @@ module.exports = function(app) {
       this.result = {
         code: 200,
         result: data
+      };
+
+      // 判断是否需要清空 redis 缓存
+      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, collection, {
+            db: app.config.user.db,
+            collection: app.config.user.collection
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
+      }
+      if (db === app.config.user.db && collection === app.config.user.collection) {
+        co(function*() {
+          var key = serializeKeyByQuery(db, collection, {
+            uid: originData.uid
+          });
+          yield thunkify(client.del.bind(client))(key);
+        })();
       }
     } catch (e) {
       this.result = {

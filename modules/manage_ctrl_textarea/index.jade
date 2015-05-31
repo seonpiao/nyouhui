@@ -1,0 +1,7 @@
+mixin manage_ctrl_textarea(options)
+  .form-group(data-module="manage_ctrl_textarea",data-form-control="textarea")
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    textarea.form-control(name=options.name, value=(options.value || ''),required=(options.required === 'yes'))

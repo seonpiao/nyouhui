@@ -11,7 +11,7 @@
       label 类型
       select.form-control(type="text",name="field_type")
         each control in controls
-          option(value=control,selected=(field && field.type === control))= control
+          option(value=control._id,selected=((field && field.type === control._id) || (!field && control.name === 'input')))= control.name
     .col-xs-1
       label 索引
       select.form-control(type="text",name="field_index")
@@ -23,6 +23,11 @@
       select.form-control(type="text",name="field_display")
         each title,value in yesorno
           option(value=value,selected=(field && field.display === value))= title
+    .col-xs-1
+      label 必填
+      select.form-control(type="text",name="field_required")
+        each title,value in yesorno
+          option(value=value,selected=(field && field.required === value))= title
     .col-xs-1
       label 默认值
       input.form-control(type="text",name="field_defaults",value=(field ? field.defaults : ''))

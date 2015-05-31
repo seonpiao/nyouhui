@@ -2,7 +2,6 @@ var request = require('request');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('manage:api');
 var auth = require('../../auth');
-var settings = require('../../../../settings');
 var _ = require('underscore');
 var Mongo = require('../../../../libs/server/mongodb');
 
@@ -48,14 +47,6 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
-      });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'select',
-        base: 'select'
-      });
       this.result = {
         code: 200,
         result: {
@@ -97,14 +88,6 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'input',
-        base: 'input'
-      });
-      controls[app.config.control.db][app.config.control.collection].splice(0, 0, {
-        name: 'select',
-        base: 'select'
-      });
       this.result = {
         code: 200,
         result: {

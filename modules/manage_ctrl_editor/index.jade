@@ -1,0 +1,7 @@
+mixin manage_ctrl_editor(options)
+  .form-group(data-module="manage_ctrl_editor",data-form-control="editor")
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    textarea.form-control(style="height:300px;",name=options.name, required=(options.required === 'yes'))!= (options.value || '')

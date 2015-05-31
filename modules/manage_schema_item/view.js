@@ -21,7 +21,8 @@ define(["libs/client/views/base"], function(Base) {
           index: $field.find('[name="field_index"]').val(),
           defaults: $field.find('[name="field_defaults"]').val(),
           display: $field.find('[name="field_display"]').val(),
-          get: $field.find('[name="field_get"]').val()
+          get: $field.find('[name="field_get"]').val(),
+          required: $field.find('[name="field_required"]').val()
         });
       });
       return fields;
@@ -40,9 +41,7 @@ define(["libs/client/views/base"], function(Base) {
         fields = [null];
       }
       if (controls) {
-        controls = _.map(JSON.parse(controls), function(v) {
-          return v.name
-        })
+        controls = JSON.parse(controls);
       } else {
         controls = [null];
       }
@@ -63,9 +62,7 @@ define(["libs/client/views/base"], function(Base) {
       var self = this;
       var controls = this.$('.schema-list').attr('data-controls');
       if (controls) {
-        controls = _.map(JSON.parse(controls), function(v) {
-          return v.name
-        })
+        controls = JSON.parse(controls);
       } else {
         controls = [null];
       }

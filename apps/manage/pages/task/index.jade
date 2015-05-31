@@ -1,0 +1,41 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  link(href='/plugins/datatables/dataTables.bootstrap.css', rel='stylesheet', type='text/css')
+
+block append headjs
+
+block append content
+  // Main content
+  section.content
+    div
+      +manage_table(result.data,{
+        fields:[{
+          name:'name',
+          alias:'计划名',
+          display:'yes'
+        },{
+          name:'task',
+          alias:'任务名',
+          display:'yes'
+        },{
+          name:'interval',
+          alias:'时间间隔',
+          display:'yes'
+        }]
+      })
+      .form-group
+        a.btn.btn-primary(href="/task/create") 新建
+    +manage_box()
+
+block append pluginjs
+  // DATA TABES SCRIPT
+  script(src='/plugins/datatables/jquery.dataTables.js')
+  script(src='/plugins/datatables/dataTables.bootstrap.js')
+
+block append footjs
+  script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/task.min.06acaa853b5b357c.js")

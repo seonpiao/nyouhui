@@ -90,21 +90,27 @@ module.exports = function(grunt) {
           }, {
             name: "apps/www/common"
           }, {
-            name: "apps/api/pages/index/main"
+            name: "apps/api/pages/data/main"
+          }, {
+            name: "apps/api/pages/sign/main"
+          }, {
+            name: "apps/api/pages/user/main"
           }, {
             name: "apps/m/pages/index/main"
           }, {
             name: "apps/manage/pages/api/main"
           }, {
-            name: "apps/manage/pages/cron/main"
-          }, {
             name: "apps/manage/pages/crud/main"
           }, {
             name: "apps/manage/pages/index/main"
           }, {
+            name: "apps/manage/pages/install/main"
+          }, {
             name: "apps/manage/pages/login/main"
           }, {
             name: "apps/manage/pages/schema/main"
+          }, {
+            name: "apps/manage/pages/task/main"
           }, {
             name: "apps/www/pages/index/main"
           } ]

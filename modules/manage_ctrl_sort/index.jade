@@ -1,0 +1,26 @@
+mixin manage_ctrl_sort(options)
+    .form-group.manage_ctrl_sort(data-module="manage_ctrl_sort",data-form-control="sort")
+        ul#sortable
+            - var list = options.value;
+            - list.forEach(function(v){
+                li.ui-state-default(data-id=v._id.toString())
+                    !=v.name     
+            - })
+            -var dataids = options.value.map(function(v){
+            -    return v._id
+            -})
+        textarea.form-control(type="text",name='sort',style='display:none')=dataids
+    script.
+      $(function() {
+        var sort = $('#sortable');
+        sort.sortable(function(data){});
+        sort.sortable({ update: function(event, ui) {
+                var ids = [];
+                sort.find('li').each(function(i,v){
+                    ids.push($(v).attr('data-id'));
+                })
+                $('textarea').val(ids);
+            } 
+        });   
+        sort.disableSelection();
+      });

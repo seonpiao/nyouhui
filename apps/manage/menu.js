@@ -4,7 +4,7 @@ var thunkify = require('thunkify');
 var menu = function(app) {
   return function*(next) {
     yield next;
-    if (!this.json && !this.text) {
+    if (!this.json && !this.text && !this.raw) {
       var menu =
         yield Mongo.request({
           host: app.config.restful.host,

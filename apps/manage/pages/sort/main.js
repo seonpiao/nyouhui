@@ -1,0 +1,1 @@
+require(["apps/manage/pages/sort/modules"], function() {});

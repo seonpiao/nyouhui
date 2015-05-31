@@ -56,9 +56,17 @@ html
       include ../../../modules/manage_box/index
       include ../../../modules/manage_table/index
       include ../../../modules/manage_ctrl_tagsinput/index
+      include ../../../modules/manage_ctrl_wizard/index
       include ../../../modules/manage_ctrl_select/index
-      include ../../../modules/manage_ctrl_orderwizard/index
-      include ../../../modules/manage_ctrl_select/index
+      include ../../../modules/manage_ctrl_checkbox/index
+      include ../../../modules/manage_ctrl_textarea/index
+      include ../../../modules/manage_ctrl_editor/index
+      include ../../../modules/manage_ctrl_draggableselector/index
+      include ../../../modules/manage_ctrl_sort/index
+
+      //socket
+      include ../../../modules/socket/index
+      include ../../../modules/manage_tasksocket/index
       .content-wrapper
         include ../../../modules/manage_breadcrumb/index
         block content
@@ -84,11 +92,14 @@ html
     //tagsinput
     script(src='/plugins/tagsinput/tagsinput.js')
     script(src='/plugins/wizard/wizard.js')
+    script(src='/plugins/autosizeTextarea/autosizeTextarea.js')
+    script(src='/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js')
+    script(src='/plugins/socket.io/socket.io.js')
     block pluginjs
     // AdminLTE App
     script(src='/js/app.min.js', type='text/javascript')
     // AdminLTE for demo purposes
-    script(src='/js/demo.js', type='text/javascript')
-    script(src='http://static.nyouhui.com/dist/template/tpl-ver.50b1e987083d65fd.js')
-    script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/common.min.ff084b9bb432fd3d.js")
+    //- script(src='/js/demo.js', type='text/javascript')
+    script(src='http://static.nyouhui.com/dist/template/tpl-ver.95b44e0cf9cadf75.js')
+    script(type="text/javascript",src="//static.nyouhui.com/dist/js/manage/common.min.fe84f4ff647fa31e.js")
     block footjs

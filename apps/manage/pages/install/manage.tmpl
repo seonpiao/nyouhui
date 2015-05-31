@@ -1,0 +1,89 @@
+var session = require('koa-generic-session');
+var auth = require('./auth');
+var task = require('./task');
+var menu = require('./menu');
+var jsonApi = require('./jsonApi');
+var redisStore = require('koa-redis');
+
+module.exports = function(app) {
+
+  app.keys = ['{{secret_key}}'];
+  app.jwt_secret = 'jwt_secret_{{secret_key}}';
+
+  var config = {
+    port: '9002',
+    socket: {
+      port: {{socket_port}}
+    },
+    restful: {
+      host: '{{mongo_host}}',
+      port: {{mongo_port}}
+    },
+    redis: {
+      host: '{{redis_host}}',
+      port: {{redis_port}}
+    },
+    schema: {
+      db: '{{schema_db}}',
+      collection: '{{schema_collection}}'
+    },
+    admin: {
+      db: '{{admin_db}}',
+      collection: '{{admin_collection}}'
+    },
+    privilege: {
+      db: '{{privilege_db}}',
+      collection: '{{privilege_collection}}'
+    },
+    user: {
+      db: '{{user_db}}',
+      collection: '{{user_collection}}'
+    },
+    uid: {
+      db: '{{uid_db}}',
+      collection: '{{uid_collection}}'
+    },
+    menu: {
+      db: '{{menu_db}}',
+      collection: '{{menu_collection}}'
+    },
+    step: {
+      db: '{{step_db}}',
+      collection: '{{step_collection}}'
+    },
+    task: {
+      db: '{{task_db}}',
+      collection: '{{task_collection}}'
+    },
+    tasklog: {
+      db: '{{tasklog_db}}',
+      collection: '{{tasklog_collection}}'
+    },
+    control: {
+      db: '{{control_db}}',
+      collection: '{{control_collection}}'
+    },
+    db: {
+      hosts: '{{mongo_replset}}'
+    },
+    middlewares: [session({
+      store: redisStore(),
+      cookie: {
+        domain: global.DOMAIN,
+        path: '/',
+        maxage: 1000 * 60 * 60 * 24 * 30
+      }
+    }), auth, jsonApi, menu(app), function*(next) {
+      this.global.socket = app.config.socket
+      yield next;
+    }, task(app)]
+  }
+
+  var server = require('http').createServer(app.callback());
+  var io = require('socket.io')(server);
+  global.io = io;
+  server.listen(config.socket.port);
+  console.log('socket listen: ' + config.socket.port);
+
+  return config;
+};

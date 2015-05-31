@@ -1,0 +1,7 @@
+mixin manage_ctrl_checkbox(options)
+  .form-group(data-module="manage_ctrl_checkbox",data-form-control="checkbox",data-db=options.db,data-collection=options.collection,data-value=options.value,data-name=options.name)
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    div.checkbox-panel Loading...

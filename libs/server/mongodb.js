@@ -1,11 +1,11 @@
 var MongoClient = require('mongodb').MongoClient;
 var format = require('util').format;
-var settings = require('../../settings');
 var thunkify = require('thunkify');
 var assert = require('assert');
 var request = require('request');
 var querystring = require('querystring');
 var _ = require('underscore');
+var logger = require('log4js').getLogger('mongo');
 
 var dbs = {};
 
@@ -30,15 +30,17 @@ var appendID = function(url, id) {
   }
 }
 
-Mongo.get = function*(dbname) {
+Mongo.get = function*(options) {
+  var dbname = options.db;
+  var hosts = options.hosts;
   if (dbs[dbname]) {
     return dbs[dbname];
   }
-  var constr = format('mongodb://%s/%s', settings.mongodb.host.join(','), dbname);
+  var constr = format('mongodb://%s/%s', hosts.join(','), dbname);
   var db =
     yield thunkify(MongoClient.connect.bind(MongoClient))(constr, {
       db: {
-        w: settings.mongodb.host.length,
+        w: hosts.length,
         readPreference: 'secondary'
       }
     });
@@ -49,6 +51,7 @@ Mongo.get = function*(dbname) {
 
 Mongo.request = function*(dbOptions, requestOptions) {
   requestOptions = requestOptions || {};
+  requestOptions.method = requestOptions.method || 'get';
   var requestUrl;
   if (dbOptions.path) {
     requestUrl = 'http://' + dbOptions.host + ':' + dbOptions.port + '/' + dbOptions.path;
@@ -65,7 +68,15 @@ Mongo.request = function*(dbOptions, requestOptions) {
   if (_.isObject(result[1])) {
     result = result[1];
   } else {
-    result = JSON.parse(result[1]);
+    try {
+      result = JSON.parse(result[1]);
+    } catch (e) {
+      logger.error(result[1]);
+      logger.error(e.stack);
+    }
+  }
+  if (requestOptions.method !== 'get' && !result.ok) {
+    throw new Error('operation failed');
   }
   //如果传了id，就只返回一条
   if (dbOptions.id) {

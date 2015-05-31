@@ -1,0 +1,14 @@
+mixin manage_ctrl_draggableselector(options)
+  .form-group(data-module="manage_ctrl_draggableselector",data-form-control="draggableselector",data-db=options.db,data-collection=options.collection,data-url=options.url)
+    if options.label
+      div
+        label(style="clear:both;")= options.label
+        if options.required === 'yes'
+          span.text-red *
+    .col-xs-6
+      label 已选
+      ul.list-unstyled.using-task(data-name=options.name,data-value=options.value,style="min-height:100px;padding:10px;border:1px solid rgba(0, 166, 90, 0.4);border-radius:3px;")
+    .col-xs-6
+      label 备选
+      ul.list-unstyled.all-task(style="min-height:100px;padding:10px;border:1px solid rgba(243, 156, 18, 0.4);border-radius:3px;")
+    div.clearfix

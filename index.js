@@ -56,7 +56,7 @@ var port = argv[3];
 if (port) {
   port = port.split(',');
 }
-var domain = argv[4];
+var domain = process.env.DOMAIN;
 global.DOMAIN = domain || 'nyouhui.com';
 
 var defaultRoute = function(app) {
