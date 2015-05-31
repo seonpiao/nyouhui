@@ -140,7 +140,7 @@ module.exports = function(app) {
           var dbconn =
             yield Mongo.get({
               db: body.db,
-              hosts: app.config.db.hosts
+              hosts: app.config.db.hosts.split(',')
             });
           var collection = dbconn.collection(body.collection);
           for (var i = 0; i < fields.length; i++) {
@@ -207,7 +207,7 @@ module.exports = function(app) {
         var dbconn =
           yield Mongo.get({
             db: body.db,
-            hosts: app.config.db.hosts
+            hosts: app.config.db.hosts.split(',')
           });
         var _collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
