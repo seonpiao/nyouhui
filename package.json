@@ -2,6 +2,7 @@
   "name": "carrier",
   "version": "0.0.1",
   "dependencies": {
+    "art-template": "^3.0.3",
     "async": "^0.7.0",
     "captchapng": "0.0.1",
     "co": "3.1.0",

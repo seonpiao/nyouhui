@@ -1,0 +1,122 @@
+doctype html
+html
+  head
+    link(href='', rel='shortcut icon')
+    block 安装
+    meta(content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', name='viewport')
+    // jQueryUI
+    link(href='/css/jqueryui.min.css', rel='stylesheet', type='text/css')
+    // Bootstrap 3.3.2
+    link(href='/bootstrap/css/bootstrap.min.css', rel='stylesheet', type='text/css')
+    // Font Awesome Icons
+    link(href='/css/fontawesome.min.css', rel='stylesheet', type='text/css')
+    // Ionicons 2.0.0
+    link(href='/css/ionicons.min.css', rel='stylesheet', type='text/css')
+    // Theme style
+    link(href='/css/AdminLTE.min.css', rel='stylesheet', type='text/css')
+    //
+      AdminLTE Skins. Choose a skin from the css/skins
+      folder instead of downloading all of them to reduce the load.
+    link(href='/css/skins/_all-skins.min.css', rel='stylesheet', type='text/css')
+    // iCheck
+    link(href='/plugins/iCheck/flat/blue.css', rel='stylesheet', type='text/css')
+    // Morris chart
+    link(href='/plugins/morris/morris.css', rel='stylesheet', type='text/css')
+    // jvectormap
+    link(href='/plugins/jvectormap/jquery-jvectormap-1.2.2.css', rel='stylesheet', type='text/css')
+    // Date Picker
+    link(href='/plugins/datepicker/datepicker3.css', rel='stylesheet', type='text/css')
+    // Daterange picker
+    link(href='/plugins/daterangepicker/daterangepicker-bs3.css', rel='stylesheet', type='text/css')
+    // bootstrap wysihtml5 - text editor
+    link(href='/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css', rel='stylesheet', type='text/css')
+    // tagsinput
+    link(href='/plugins/tagsinput/tagsinput.css', rel='stylesheet', type='text/css')
+    link(href='/plugins/wizard/wizard.css', rel='stylesheet', type='text/css')
+    // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
+    // WARNING: Respond.js doesn't work if you view the page via file://
+    //if lt IE 9
+      script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+      script(src='https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js')
+    // jQuery 2.1.3
+    script(src='/plugins/jQuery/jQuery-2.1.3.min.js')
+  body(style="margin:10px 50px")
+    form(role="form",data-module="manage_form",action="/install",method="POST")
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title Secret Key
+        .box-body
+          .form-group
+            label key
+            span.text-red *
+            input.form-control(name='secret_key', required=true)
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title Socket
+        .box-body
+          .form-group
+            label port
+            span.text-red *
+            input.form-control(type="number", name='socket_port', required=true)
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title Mongo Rest
+        .box-body
+          .form-group
+            label host
+            span.text-red *
+            input.form-control(name='mongo_host', required=true)
+          .form-group
+            label port
+            span.text-red *
+            input.form-control(type="number", name='mongo_port', required=true)
+          .form-group
+            label replset
+            span.text-red *
+            input.form-control(name='mongo_replset', required=true)
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title Redis
+        .box-body
+          .form-group
+            label host
+            span.text-red *
+            input.form-control(name='redis_host', required=true)
+          .form-group
+            label port
+            span.text-red *
+            input.form-control(type="number", name='redis_port', required=true)
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title 数据库们
+          label(style="margin-left:30px")
+            input.x-samedb(type="checkbox",checked=true)
+            | 使用同样地数据库
+        .box-body
+          - var dbs = ['schema','admin','privilege','user','uid','menu','step','task','tasklog','control'];
+          each item in dbs
+            .form-group
+              label= item + ' db'
+              span.text-red *
+              input.form-control.x-db(name=item + '_db', required=true)
+            .form-group
+              label= item + ' collection'
+              span.text-red *
+              input.form-control(name=item + '_collection', value=item, required=true)
+
+      button(type="submit",class="btn btn-primary")= '确定'
+      script.
+        $(function(){
+          $('.x-db').on('input',function(e){
+            var isSamedb = $('.x-samedb')[0].checked;
+            if(isSamedb){
+              var $target = $(e.target);
+              $('.x-db').val($target.val());
+            }
+          });
+        });

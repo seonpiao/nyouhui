@@ -244,7 +244,7 @@ module.exports = function(app) {
           yield thunkify(client.del.bind(client))(key);
         })();
       }
-      if (db === app.config.users.db && collection === app.config.users.collection) {
+      if (db === app.config.user.db && collection === app.config.user.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'users', {
             uid: originData.uid
@@ -294,13 +294,13 @@ module.exports = function(app) {
       if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
-            db: app.config.users.db,
-            collection: app.config.users.collection
+            db: app.config.user.db,
+            collection: app.config.user.collection
           });
           yield thunkify(client.del.bind(client))(key);
         })();
       }
-      if (db === app.config.users.db && collection === app.config.users.collection) {
+      if (db === app.config.user.db && collection === app.config.user.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
             uid: originData.uid

@@ -7,64 +7,63 @@ var redisStore = require('koa-redis');
 
 module.exports = function(app) {
 
-  app.keys = ['test'];
-  app.jwt_secret = 'jwt_secret_test';
+  app.keys = ['nyouhui', 'cookie'];
+  app.jwt_secret = 'jwt_secret_carrier';
 
   var config = {
     port: '9002',
     socket: {
-      port: 3002
+      port: 3001
     },
     restful: {
+      // host: 'nyouhui.com',
       host: 'localhost',
-      port: 3000
+      port: 3000,
+      defaultDb: 'nyouhui'
     },
     redis: {
       host: 'localhost',
       port: 6379
     },
     schema: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'schema'
     },
-    admin: {
-      db: 'firstre',
-      collection: 'admin'
+    admins: {
+      db: 'nyouhui',
+      collection: 'admins'
     },
     privilege: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'privilege'
     },
-    user: {
-      db: 'firstre',
-      collection: 'user'
-    },
-    uid: {
-      db: 'firstre',
-      collection: 'uid'
+    users: {
+      db: 'nyouhui',
+      collection: 'users'
     },
     menu: {
-      db: 'firstre',
-      collection: 'menu'
+      db: 'nyouhui',
+      collection: 'manage_menu'
     },
     step: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'step'
     },
     task: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'task'
     },
     tasklog: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'tasklog'
     },
     control: {
-      db: 'firstre',
-      collection: 'control'
+      db: 'nyouhui',
+      collection: 'controls'
     },
     db: {
-      hosts: 'localhost'
+      // hosts: ['nyouhui.com']
+      hosts: ['localhost']
     },
     middlewares: [session({
       store: redisStore(),

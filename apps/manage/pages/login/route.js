@@ -11,8 +11,8 @@ module.exports = function(app) {
       yield Mongo.request({
         host: app.config.restful.host,
         port: app.config.restful.port,
-        db: app.config.admins.db,
-        collection: app.config.admins.collection,
+        db: app.config.admin.db,
+        collection: app.config.admin.collection,
         one: true
       }, {
         qs: {
@@ -22,7 +22,7 @@ module.exports = function(app) {
           })
         }
       });
-    result = result[app.config.admins.db][app.config.admins.collection];
+    result = result[app.config.admin.db][app.config.admin.collection];
     if (result) {
       return result;
     } else {

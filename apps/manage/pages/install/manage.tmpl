@@ -7,64 +7,64 @@ var redisStore = require('koa-redis');
 
 module.exports = function(app) {
 
-  app.keys = ['test'];
-  app.jwt_secret = 'jwt_secret_test';
+  app.keys = ['{{secret_key}}'];
+  app.jwt_secret = 'jwt_secret_{{secret_key}}';
 
   var config = {
     port: '9002',
     socket: {
-      port: 3002
+      port: {{socket_port}}
     },
     restful: {
-      host: 'localhost',
-      port: 3000
+      host: '{{mongo_host}}',
+      port: {{mongo_port}}
     },
     redis: {
-      host: 'localhost',
-      port: 6379
+      host: '{{redis_host}}',
+      port: {{redis_port}}
     },
     schema: {
-      db: 'firstre',
-      collection: 'schema'
+      db: '{{schema_db}}',
+      collection: '{{schema_collection}}'
     },
     admin: {
-      db: 'firstre',
-      collection: 'admin'
+      db: '{{admin_db}}',
+      collection: '{{admin_collection}}'
     },
     privilege: {
-      db: 'firstre',
-      collection: 'privilege'
+      db: '{{privilege_db}}',
+      collection: '{{privilege_collection}}'
     },
     user: {
-      db: 'firstre',
-      collection: 'user'
+      db: '{{user_db}}',
+      collection: '{{user_collection}}'
     },
     uid: {
-      db: 'firstre',
-      collection: 'uid'
+      db: '{{uid_db}}',
+      collection: '{{uid_collection}}'
     },
     menu: {
-      db: 'firstre',
-      collection: 'menu'
+      db: '{{menu_db}}',
+      collection: '{{menu_collection}}'
     },
     step: {
-      db: 'firstre',
-      collection: 'step'
+      db: '{{step_db}}',
+      collection: '{{step_collection}}'
     },
     task: {
-      db: 'firstre',
-      collection: 'task'
+      db: '{{task_db}}',
+      collection: '{{task_collection}}'
     },
     tasklog: {
-      db: 'firstre',
-      collection: 'tasklog'
+      db: '{{tasklog_db}}',
+      collection: '{{tasklog_collection}}'
     },
     control: {
-      db: 'firstre',
-      collection: 'control'
+      db: '{{control_db}}',
+      collection: '{{control_collection}}'
     },
     db: {
-      hosts: 'localhost'
+      hosts: '{{mongo_replset}}'
     },
     middlewares: [session({
       store: redisStore(),
