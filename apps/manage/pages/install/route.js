@@ -4,22 +4,34 @@ var path = require('path');
 var Mongo = require('../../../../libs/server/mongodb');
 var thunkify = require('thunkify');
 
+var dbs = ['schema', 'admin', 'privilege', 'user', 'uid', 'menu', 'step', 'task', 'tasklog', 'control'];
+
 module.exports = function(app) {
   app.route('/install').get(function*(next) {
-    this.result = {};
+    this.result = {
+      dbs: dbs
+    };
   }).post(function*(next) {
     this.raw = true;
     var body = this.request.body;
-    var admin =
-      yield Mongo.request({
-        host: body.mongo_host,
-        port: body.mongo_port,
-        db: body.admin_db,
-        collection: body.admin_collection
-      });
-    admin = admin[body.admin_db][body.admin_collection];
-    if (admin && admin.length > 0) {
-      this.result = '已经安装过了，不能重复安装';
+    var installed = [];
+    for (var i = 0; i < dbs.length; i++) {
+      var db = dbs[i];
+      var result =
+        yield Mongo.request({
+          host: body.mongo_host,
+          port: body.mongo_port,
+          db: body[db + '_db'],
+          collection: body[db + '_collection']
+        });
+      result = result[body[db + '_db']][body[db + '_collection']];
+      if (result && result.length > 0) {
+        installed.push(db);
+      }
+    }
+    if (installed.length > 0) {
+      this.result = '以下数据库中已有数据，安装失败：';
+      this.result += installed.join(',');
       return;
     }
     //生成配置文件

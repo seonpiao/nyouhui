@@ -98,7 +98,6 @@ html
             input.x-samedb(type="checkbox",checked=true)
             | 使用同样地数据库
         .box-body
-          - var dbs = ['schema','admin','privilege','user','uid','menu','step','task','tasklog','control'];
           each item in dbs
             .form-group
               label= item + ' db'
