@@ -24,43 +24,43 @@ module.exports = function(app) {
       port: 6379
     },
     schema: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'schema'
     },
     admin: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'admin'
     },
     privilege: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'privilege'
     },
     user: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'user'
     },
     uid: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'uid'
     },
     menu: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'menu'
     },
     step: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'step'
     },
     task: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'task'
     },
     tasklog: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'tasklog'
     },
     control: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'control'
     },
     db: {

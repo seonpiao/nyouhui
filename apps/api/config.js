@@ -68,15 +68,15 @@ module.exports = function(app) {
       port: 6379
     },
     privilege: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'privilege'
     },
     user: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'user'
     },
     uid: {
-      db: 'firstre',
+      db: 'nyouhui',
       collection: 'uid'
     },
     middlewares: [session({
