@@ -2,7 +2,6 @@ var request = require('request');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('manage:api');
 var auth = require('../../auth');
-var settings = require('../../../../settings');
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');

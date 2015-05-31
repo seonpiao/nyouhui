@@ -1,6 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
 var format = require('util').format;
-var settings = require('../../settings');
 var thunkify = require('thunkify');
 var assert = require('assert');
 var request = require('request');
