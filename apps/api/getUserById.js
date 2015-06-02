@@ -6,8 +6,8 @@ var getUserById = function(app) {
       yield Mongo.request({
         host: app.config.restful.host,
         port: app.config.restful.port,
-        db: app.config.users.db,
-        collection: app.config.users.collection,
+        db: app.config.user.db,
+        collection: app.config.user.collection,
         one: true
       }, {
         qs: {
@@ -16,7 +16,7 @@ var getUserById = function(app) {
           })
         }
       });
-    result = result[app.config.users.db][app.config.users.collection];
+    result = result[app.config.user.db][app.config.user.collection];
     return result;
   }
 }

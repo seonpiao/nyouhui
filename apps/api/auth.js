@@ -22,14 +22,14 @@ var auth = function(app) {
       yield Mongo.request({
         host: app.config.restful.host,
         port: app.config.restful.port,
-        db: app.config.users.db,
-        collection: app.config.users.collection
+        db: app.config.user.db,
+        collection: app.config.user.collection
       }, {
         qs: {
           query: JSON.stringify(query)
         }
       });
-    result = result[app.config.users.db][app.config.users.collection];
+    result = result[app.config.user.db][app.config.user.collection];
     if (result && result.length === 1) {
       return result[0];
     } else {

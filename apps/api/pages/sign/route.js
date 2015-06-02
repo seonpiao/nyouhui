@@ -8,6 +8,7 @@ var padnum = require('padnum');
 var moment = require('moment');
 var logger = require('log4js').getLogger('api/user');
 var extend = require('node.extend');
+var captcha = require('../../util/captcha');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -18,28 +19,6 @@ var sha1 = function(str) {
 module.exports = function(app) {
 
   var auth = require('../../auth')(app);
-
-  var captchas = {};
-
-  var captchasCache = function(token, num) {
-    var keys = Object.keys(captchas);
-    if (keys.length > 100000) {
-      delete captchas[keys.shift()];
-    }
-    captchas[token] = num;
-  };
-
-  var verifyCaptcha = function(token, num) {
-    if (num == captchas[token]) {
-      delete captchas[token];
-      return true;
-    }
-    return false;
-  };
-
-  var sendCaptchaBySms = function*() {
-
-  };
 
   var addUser = function*(userData, source) {
     source = source || 1;
@@ -89,8 +68,8 @@ module.exports = function(app) {
       yield Mongo.request({
         host: app.config.restful.host,
         port: app.config.restful.port,
-        db: app.config.users.db,
-        collection: app.config.users.collection
+        db: app.config.user.db,
+        collection: app.config.user.collection
       }, {
         method: 'post',
         json: extend(userData, {
@@ -126,10 +105,7 @@ module.exports = function(app) {
   route.nested('/captcha/:token').get(function*(next) {
     this.raw = true;
     var token = this.request.params.token;
-    var num = captchas[token];
-    if (isNaN(num)) {
-      num = '9999';
-    }
+    var num = captcha.getCachedCaptcha(token);
     var p = new captchapng(80, 30, num);
     p.color(0, 0, 0, 0); // First color: background (red, green, blue, alpha)
     p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
@@ -141,9 +117,8 @@ module.exports = function(app) {
   });
 
   route.nested('/getCaptchaToken').get(function*(next) {
-    var num = padnum(parseInt(Math.random() * 10000).toString(), 4);
     var token = tokenGenerator(16);
-    captchasCache(token, num);
+    captcha.getCaptcha(token);
     this.json = true;
     this.result = {
       code: 0,
@@ -155,11 +130,10 @@ module.exports = function(app) {
 
   route.nested('/getPhoneCaptcha').get(function*(next) {
     this.json = true;
-    var num = padnum(parseInt(Math.random() * 10000).toString(), 4);
     var phone = this.request.query.phone;
     if (phone) {
-      captchasCache(phone, num);
-      yield sendCaptchaBySms.call(this, num);
+      var num =
+        yield captcha.sendCaptchaBySms(phone);
       this.result = {
         code: 0,
         result: {
@@ -174,10 +148,10 @@ module.exports = function(app) {
   route.nested('/regPhone').post(function*(next) {
     this.json = true;
     var phone = this.request.body.phone;
-    var captcha = this.request.body.captcha;
+    var captchaCode = this.request.body.captcha;
     var password = this.request.body.password;
     var source = 1; //1为本站，其他为外站
-    var isCaptchaValid = verifyCaptcha(phone, captcha);
+    var isCaptchaValid = captcha.verifyCaptcha(phone, captchaCode);
     if (isCaptchaValid) {
       password = sha1(password);
       try {
@@ -229,15 +203,15 @@ module.exports = function(app) {
     var phone = this.request.body.phone;
     var password = this.request.body.password;
     password = sha1(password);
-    var captcha = this.request.body.captcha;
-    var isCaptchaValid = verifyCaptcha(phone, captcha);
+    var captchaCode = this.request.body.captcha;
+    var isCaptchaValid = captcha.verifyCaptcha(phone, captchaCode);
     if (isCaptchaValid) {
       var user =
         yield Mongo.request({
           host: app.config.restful.host,
           port: app.config.restful.port,
-          db: app.config.users.db,
-          collection: app.config.users.collection,
+          db: app.config.user.db,
+          collection: app.config.user.collection,
           one: true
         }, {
           qs: {
@@ -246,7 +220,7 @@ module.exports = function(app) {
             })
           }
         });
-      user = user[app.config.users.db][app.config.users.collection];
+      user = user[app.config.user.db][app.config.user.collection];
       if (user) {
         var id = user._id;
         user.password = password;
@@ -254,8 +228,8 @@ module.exports = function(app) {
         yield Mongo.request({
           host: app.config.restful.host,
           port: app.config.restful.port,
-          db: app.config.users.db,
-          collection: app.config.users.collection,
+          db: app.config.user.db,
+          collection: app.config.user.collection,
           id: id
         }, {
           method: 'put',
