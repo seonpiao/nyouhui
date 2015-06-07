@@ -11,9 +11,9 @@ define(["libs/client/views/base"], function(Base) {
     },
     value: function() {
       var won = this.$won.val() * 1;
-      var rate = parseFloat(yuan) / parseFloat(won);
       var stock = this.$stock.val() * 1;
       var yuan = this.$yuan.html() * 1;
+      var rate = yuan / stock / (won);
       return [won, yuan, rate, stock];
     },
     name: function() {
