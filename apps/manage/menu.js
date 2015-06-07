@@ -7,8 +7,8 @@ var menu = function(app) {
     if (!this.json && !this.text && !this.raw) {
       var menu =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.menu.db,
           collection: app.config.menu.collection
         });

@@ -7,10 +7,12 @@ define(["libs/client/views/base"], function(Base) {
     },
     init: function() {
       var $el = this.$el;
-      if ($el.attr('data-db')) {
+      if ($el.attr('data-db') && $el.attr('data-collection')) {
         this.model.db = $el.attr('data-db');
+        this.model.collection = $el.attr('data-collection');
+      } else if ($el.attr('data-url')) {
+        this.model.customUrl = $el.attr('data-url');
       }
-      this.model.collection = $el.attr('data-collection');
       this.listenTo(this.model, 'sync', this.success.bind(this));
       this.listenTo(this.model, 'error', this.error.bind(this));
       this.$submit = this.$('[type=submit]');

@@ -45,6 +45,19 @@ html
 
       div(class="box box-primary")
         .box-header
+          h3.box-title 基本配置
+        .box-body
+          .form-group
+            label 项目名
+            span.text-red *
+            input.form-control(name='name', required=true)
+          .form-group
+            label 端口号
+            span.text-red *
+            input.form-control(name='port', required=true)
+
+      div(class="box box-primary")
+        .box-header
           h3.box-title Secret Key
         .box-body
           .form-group
@@ -77,6 +90,10 @@ html
             label replset
             span.text-red *
             input.form-control(name='mongo_replset', required=true)
+          .form-group
+            label default db
+            span.text-red *
+            input.form-control(name='mongo_db', required=true)
 
       div(class="box box-primary")
         .box-header

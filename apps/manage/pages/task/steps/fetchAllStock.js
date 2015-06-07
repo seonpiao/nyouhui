@@ -3,7 +3,7 @@ var Gather = require('pagegather');
 
 module.exports = {
   input: [],
-  output: ['allstocks'],
+  output: ['allStocks'],
   go: function(data, done) {
     var stocks = [];
     var gather = new Gather({
@@ -25,7 +25,7 @@ module.exports = {
       });
       stocks = stocks.concat(szstocks);
       done(null, {
-        allstocks: stocks
+        allStocks: stocks
       });
     });
   }

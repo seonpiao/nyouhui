@@ -59,9 +59,10 @@ module.exports = function(app) {
 
   var config = {
     port: '9003',
-    restful: {
+    mongo: {
       host: '{{mongo_host}}',
-      port: {{mongo_port}}
+      port: {{mongo_port}},
+      defaultDB:'{{mongo_db}}'
     },
     redis: {
       host: '{{redis_host}}',

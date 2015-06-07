@@ -9,6 +9,7 @@ var body = require('koa-body');
 var resetctx = require('./libs/server/resetctx');
 var response = require('./libs/server/response');
 var staticServe = require('koa-static');
+var co = require('co');
 
 var APP_PATH = path.join(__dirname, 'apps');
 
@@ -47,14 +48,17 @@ function init(app, options) {
   }));
 }
 
-
+var apps = [],
+  port;
 var argv = process.argv;
 
-var apps = argv[2].split(',');
+if (argv.length > 2) {
+  apps = argv[2].split(',');
 
-var port = argv[3];
+  port = argv[3];
 if (port) {
   port = port.split(',');
+  }
 }
 var domain = process.env.DOMAIN;
 global.DOMAIN = domain || 'nyouhui.com';
@@ -119,37 +123,49 @@ var sanitize = function(s) {
   return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-apps.forEach(function(appName, i) {
-  var app = koa();
-  var appPath = path.join(APP_PATH, appName)
-  var appConfig = require(path.join(appPath, 'config.js'));
-  if (_.isFunction(appConfig)) {
-    appConfig = appConfig(app);
-  }
-  var pagePath = path.join(appPath, 'pages');
-  var pageNames = fs.readdirSync(pagePath);
-  init(app, {
-    appPath: appPath,
-    appConfig: appConfig
-  });
-  pageNames.forEach(function(pageName) {
-    var routePath = path.join(pagePath, pageName, 'route.js');
-    if (fs.existsSync(routePath)) {
-      var route = require(routePath);
-      route(app, pageName, appConfig);
-    } else {
-      app.route('/' + pageName).all(function*(next) {
-        this.result = {};
-        this.global.girlid = 0;
-        this.global.page = pageName;
-        this.template = pageName + '/index';
-      });
+function isGeneratorFunction(obj) {
+  return obj && obj.constructor && 'GeneratorFunction' == obj.constructor.name;
+}
+
+co(function*() {
+  for (var i = 0; i < apps.length; i++) {
+    var appName = apps[i];
+    var app = koa();
+    var appPath = path.join(APP_PATH, appName)
+    var appConfig = require(path.join(appPath, 'config.js'));
+    if (isGeneratorFunction(appConfig)) {
+      appConfig =
+        yield appConfig(app);
+    } else if (_.isFunction(appConfig)) {
+      appConfig = appConfig(app);
     }
-  });
-  var appPort = appConfig.port;
-  if (port && port[i]) {
-    appPort = port[i];
+    var pagePath = path.join(appPath, 'pages');
+    var pageNames = fs.readdirSync(pagePath);
+    init(app, {
+      appPath: appPath,
+      appConfig: appConfig
+    });
+    pageNames.forEach(function(pageName) {
+      var routePath = path.join(pagePath, pageName, 'route.js');
+      if (fs.existsSync(routePath)) {
+        var route = require(routePath);
+        route(app, pageName, appConfig);
+      } else {
+        app.route('/' + pageName).all(function*(next) {
+          this.result = {};
+          this.global.girlid = 0;
+          this.global.page = pageName;
+          this.template = pageName + '/index';
+        });
+      }
+    });
+    var appPort = appConfig.port;
+    if (port && port[i]) {
+      appPort = port[i];
+    }
+    logger.info('App[' + appName + '] listening: ' + appPort);
+    app.listen(appPort);
   }
-  logger.info('App[' + appName + '] listening: ' + appPort);
-  app.listen(appPort);
+})(function() {
+  // process.exit(0);
 });

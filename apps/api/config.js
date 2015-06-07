@@ -4,8 +4,8 @@ var redisStore = require('koa-redis');
 
 module.exports = function(app) {
 
-  app.keys = ['test'];
-  app.jwt_secret = 'jwt_secret_test';
+  app.keys = ['firstre'];
+  app.jwt_secret = 'jwt_secret_firstre';
 
   app.Errors = {
     //通用错误
@@ -59,24 +59,25 @@ module.exports = function(app) {
 
   var config = {
     port: '9003',
-    restful: {
+    mongo: {
       host: 'localhost',
-      port: 3000
+      port: 3000,
+      defaultDB: 'stock'
     },
     redis: {
       host: 'localhost',
       port: 6379
     },
     privilege: {
-      db: 'nyouhui',
+      db: 'stock',
       collection: 'privilege'
     },
     user: {
-      db: 'nyouhui',
+      db: 'stock',
       collection: 'user'
     },
     uid: {
-      db: 'nyouhui',
+      db: 'stock',
       collection: 'uid'
     },
     middlewares: [session({

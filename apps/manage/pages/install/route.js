@@ -3,6 +3,13 @@ var fs = require('fs');
 var path = require('path');
 var Mongo = require('../../../../libs/server/mongodb');
 var thunkify = require('thunkify');
+var crypto = require('crypto');
+
+var sha1 = function(str) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update(str);
+  return shasum.digest('hex')
+}
 
 var dbs = ['schema', 'admin', 'privilege', 'user', 'uid', 'menu', 'step', 'task', 'tasklog', 'control'];
 
@@ -15,6 +22,22 @@ module.exports = function(app) {
     this.raw = true;
     var body = this.request.body;
     var installed = [];
+    // var configs =
+    //   yield Mongo.request({
+    //     host: body.mongo_host,
+    //     port: body.mongo_port,
+    //     db: 'carrier_db',
+    //     collection: 'carrier_config'
+    //   }, {
+    //     qs: {
+    //       name: body.name
+    //     }
+    //   });
+    // configs = configs['carrier_db']['carrier_config'];
+    // if (configs && configs.length > 0) {
+    //   this.result = '配置[' + body.name + ']已存在';
+    //   return;
+    // }
     for (var i = 0; i < dbs.length; i++) {
       var db = dbs[i];
       var result =
@@ -34,6 +57,8 @@ module.exports = function(app) {
       this.result += installed.join(',');
       return;
     }
+
+
     //生成配置文件
     var manageTmpl = fs.readFileSync(path.join(__dirname, 'manage.tmpl')).toString();
     var manageFile = (template.compile(manageTmpl)(body));
@@ -43,6 +68,25 @@ module.exports = function(app) {
       var apiFile = (template.compile(apiTmpl)(body));
       fs.writeFileSync(path.join(__dirname, '../../../api/config.js'), apiFile);
     }
+
+    var config = {};
+
+    Object.keys(body).forEach(function(key) {
+      if (key.indexOf('_') !== -1) {
+        var arr = key.split('_');
+        if (!config[arr[0]]) {
+          config[arr[0]] = {};
+        }
+        config[arr[0]][arr[1]] = body[key];
+      } else {
+        config[key] = body[key];
+      }
+    });
+    //加载配置
+    app.config = config;
+
+    app.keys = [config.secret.key];
+    app.jwt_secret = 'jwt_secret_' + config.secret.key;
 
     //初始化数据库
     try {
@@ -335,7 +379,7 @@ module.exports = function(app) {
         method: 'post',
         json: {
           username: 'root',
-          password: 'admin'
+          password: sha1('admin')
         }
       });
       //--索引
@@ -372,10 +416,10 @@ module.exports = function(app) {
             required: 'yes'
           }, {
             name: 'password',
-            alias: '基础控件',
+            alias: '密码',
             type: password._id.toString(),
             index: 'no',
-            defaults: '',
+            defaults: '123456',
             display: 'yes',
             required: 'node'
           }]

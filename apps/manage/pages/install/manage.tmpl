@@ -11,11 +11,12 @@ module.exports = function(app) {
   app.jwt_secret = 'jwt_secret_{{secret_key}}';
 
   var config = {
-    port: '9002',
+    name: '{{name}}',
+    port: '{{port}}',
     socket: {
       port: {{socket_port}}
     },
-    restful: {
+    mongo: {
       host: '{{mongo_host}}',
       port: {{mongo_port}}
     },

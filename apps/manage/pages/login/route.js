@@ -3,14 +3,22 @@ var thunkify = require('thunkify');
 var jwt = require('jsonwebtoken');
 var captchapng = require('captchapng');
 var tokenGenerator = require('random-token');
+var crypto = require('crypto');
+
+var sha1 = function(str) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update(str);
+  return shasum.digest('hex')
+}
 
 module.exports = function(app) {
 
   var auth = function*(username, password) {
+    password = sha1(password);
     var result =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.admin.db,
         collection: app.config.admin.collection,
         one: true
@@ -40,6 +48,7 @@ module.exports = function(app) {
     var result =
       yield auth(username, password);
     if (result) {
+      this.session.uid = result._id.toString();
       this.session.username = username;
       this.redirect(this.session.redirectUrl || '/schema');
     } else {

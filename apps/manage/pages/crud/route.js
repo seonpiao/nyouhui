@@ -18,8 +18,8 @@ module.exports = function(app) {
       //从controls表里面，获取字段的附件数据
       var fieldExtData =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.control.db,
           collection: app.config.control.collection,
           id: field.type
@@ -40,8 +40,8 @@ module.exports = function(app) {
             field.collection = fieldParams.collection;
             var fieldData =
               yield Mongo.request({
-                host: app.config.restful.host,
-                port: app.config.restful.port,
+                host: app.config.mongo.host,
+                port: app.config.mongo.port,
                 db: fieldParams.db,
                 collection: fieldParams.collection
               });
@@ -60,8 +60,8 @@ module.exports = function(app) {
       //要显示的列表数据
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection
         }, {
@@ -71,8 +71,8 @@ module.exports = function(app) {
       var _data = {};
       var schema =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
           one: true
@@ -137,8 +137,8 @@ module.exports = function(app) {
       //table data
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
           one: true
@@ -155,8 +155,8 @@ module.exports = function(app) {
       var _data = {};
       var schema =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
           one: true
@@ -178,8 +178,8 @@ module.exports = function(app) {
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.control.db,
           collection: app.config.control.collection
         });
@@ -225,8 +225,8 @@ module.exports = function(app) {
       //table data
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -235,8 +235,8 @@ module.exports = function(app) {
       var _data = {};
       var schema =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
           one: true
@@ -258,8 +258,8 @@ module.exports = function(app) {
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.control.db,
           collection: app.config.control.collection
         });

@@ -24,11 +24,16 @@ define(function() {
       return Backbone.Model.prototype.destroy.apply(this, arguments);
     },
     url: function() {
-      if (this.method === 'create') {
-        return this.prefix + '/' + this.db + '/' + this.collection;
+      var url = '';
+      if (this.customUrl) {
+        url = this.customUrl;
       } else {
-        return this.prefix + '/' + this.db + '/' + this.collection + '/' + (this.id ? this.id : '');
+        url = this.prefix + '/' + this.db + '/' + this.collection;
       }
+      if (this.method !== 'create') {
+        url = url + '/' + (this.id ? this.id : '');
+      }
+      return url;
     },
     parse: function(resp) {
       if (resp.code === 200) {

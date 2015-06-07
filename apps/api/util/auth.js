@@ -1,4 +1,4 @@
-var Mongo = require('../../libs/server/mongodb');
+var Mongo = require('../../../libs/server/mongodb');
 var crypto = require('crypto');
 
 var sha1 = function(str) {
@@ -20,8 +20,8 @@ var auth = function(app) {
     }
     var result =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.user.db,
         collection: app.config.user.collection
       }, {

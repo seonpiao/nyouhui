@@ -12,8 +12,8 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection
         }, {
@@ -42,8 +42,8 @@ module.exports = function(app) {
     try {
       var controls =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.control.db,
           collection: app.config.control.collection
         });
@@ -73,8 +73,8 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -83,8 +83,8 @@ module.exports = function(app) {
         });
       var controls =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.control.db,
           collection: app.config.control.collection
         });

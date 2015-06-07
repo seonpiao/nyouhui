@@ -44,7 +44,8 @@ var dequeue = function() {
       delete runningTask[task.id];
       delete taskQueue[queueid];
     });
-    task.flow.on('error', function() {
+    task.flow.on('error', function(e) {
+      logger.error(e.data);
       global.io.emit('task error', {
         queueid: queueid,
         task: {
@@ -117,8 +118,8 @@ module.exports = function(app) {
     var taskid = this.request.params.id;
     var data =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.task.db,
         collection: app.config.task.collection,
         id: taskid
@@ -132,8 +133,8 @@ module.exports = function(app) {
         var id = ids[i];
         var originStep =
           yield Mongo.request({
-            host: app.config.restful.host,
-            port: app.config.restful.port,
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
             db: app.config.step.db,
             collection: app.config.step.collection,
             id: id
@@ -141,6 +142,11 @@ module.exports = function(app) {
         originStep = originStep[app.config.step.db][app.config.step.collection];
         var step = require(path.join(__dirname, 'steps', originStep.stepid + '.js'));
         step.id = originStep.stepid;
+        try {
+          step.params = JSON.parse(originStep.params);
+        } catch (e) {
+          step.params = {};
+        }
         steps.push(step);
       }
       if (steps.length > 0) {
@@ -148,7 +154,7 @@ module.exports = function(app) {
         try {
           beginData = JSON.parse(data.data);
         } catch (e) {}
-        beginData.restful = app.config.restful;
+        beginData.mongo = app.config.mongo;
         try {
 
           steps.forEach(function(step) {
@@ -183,8 +189,8 @@ module.exports = function(app) {
     }
     var end = Date.now();
     yield Mongo.request({
-      host: app.config.restful.host,
-      port: app.config.restful.port,
+      host: app.config.mongo.host,
+      port: app.config.mongo.port,
       db: app.config.tasklog.db,
       collection: app.config.tasklog.collection
     }, {

@@ -90,9 +90,13 @@ module.exports = function(grunt) {
           }, {
             name: "apps/www/common"
           }, {
+            name: "apps/api/pages/.DS_Store/main"
+          }, {
             name: "apps/api/pages/data/main"
           }, {
             name: "apps/api/pages/sign/main"
+          }, {
+            name: "apps/api/pages/sos/main"
           }, {
             name: "apps/api/pages/user/main"
           }, {
@@ -111,6 +115,8 @@ module.exports = function(grunt) {
             name: "apps/manage/pages/schema/main"
           }, {
             name: "apps/manage/pages/task/main"
+          }, {
+            name: "apps/manage/pages/user/main"
           }, {
             name: "apps/www/pages/index/main"
           } ]

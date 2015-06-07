@@ -12,7 +12,6 @@ block append headjs
 block append content
   // Main content
   section.content
-    include ../../../../modules/manage_table/index
     div
       - var data = result.data[result.db][result.collection];
       +manage_table(data,{

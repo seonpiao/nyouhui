@@ -12,8 +12,8 @@ module.exports = function(app) {
 
   var queryById = function*(db, collection, id) {
     return yield Mongo.request({
-      host: app.config.restful.host,
-      port: app.config.restful.port,
+      host: app.config.mongo.host,
+      port: app.config.mongo.port,
       db: db,
       collection: collection,
       id: id
@@ -23,8 +23,8 @@ module.exports = function(app) {
   var queryByQuery = function*(db, collection, query) {
     var data =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: db,
         collection: collection,
         one: true
@@ -79,8 +79,8 @@ module.exports = function(app) {
     if (!reply) {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -146,8 +146,8 @@ module.exports = function(app) {
       try {
         var data =
           yield Mongo.request({
-            host: app.config.restful.host,
-            port: app.config.restful.port,
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
             db: db,
             collection: collection,
             id: id

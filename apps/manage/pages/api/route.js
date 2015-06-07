@@ -7,6 +7,13 @@ var Mongo = require('../../../../libs/server/mongodb');
 var redis = require("redis");
 var co = require('co');
 var extend = require('node.extend');
+var crypto = require('crypto');
+
+var sha1 = function(str) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update(str);
+  return shasum.digest('hex')
+}
 
 module.exports = function(app) {
 
@@ -15,8 +22,8 @@ module.exports = function(app) {
   var queryByQuery = function*(db, collection, query) {
     var data =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: db,
         collection: collection,
         one: true
@@ -71,8 +78,8 @@ module.exports = function(app) {
     if (!reply) {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -92,8 +99,8 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -118,29 +125,30 @@ module.exports = function(app) {
   }).post(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
-    var id = this.request.params.id;
+    var body = this.request.body;
     try {
+      //用户表要加密密码
+      if (body.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+        body.password = sha1(body.password);
+      }
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
-          collection: collection,
-          id: id
+          collection: collection
         }, {
-          json: this.request.body,
-          method: this.method,
-          headers: this.headers
+          json: body,
+          method: this.method
         });
       if (data[db][collection]['ok']) {
         //新增schema，要调整索引
         if (db === app.config.schema.db && collection === app.config.schema.collection) {
-          var body = this.request.body;
           var fields = body.fields;
           var dbconn =
             yield Mongo.get({
               db: body.db,
-              hosts: app.config.db.hosts.split(',')
+              hosts: app.config.mongo.replset.split(',')
             });
           var collection = dbconn.collection(body.collection);
           for (var i = 0; i < fields.length; i++) {
@@ -179,8 +187,8 @@ module.exports = function(app) {
       var newData = this.request.body;
       var originData =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -188,10 +196,14 @@ module.exports = function(app) {
       originData = originData[db][collection];
       extend(originData, newData);
       delete originData._id;
+      //用户表要加密密码
+      if (originData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+        originData.password = sha1(originData.password);
+      }
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -207,7 +219,7 @@ module.exports = function(app) {
         var dbconn =
           yield Mongo.get({
             db: body.db,
-            hosts: app.config.db.hosts.split(',')
+            hosts: app.config.mongo.replset.split(',')
           });
         var _collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
@@ -268,8 +280,8 @@ module.exports = function(app) {
     try {
       var originData =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -277,8 +289,8 @@ module.exports = function(app) {
       originData = originData[db][collection];
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -321,8 +333,8 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           path: '/dbs'
         });
       this.result = {

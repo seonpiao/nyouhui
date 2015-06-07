@@ -1,7 +1,10 @@
 var jwt = require('jsonwebtoken');
+var redis = require("redis");
+var thunkify = require('thunkify');
 
 var checkLogin = function(app) {
-  return function() {
+  var client = redis.createClient(app.config.redis.port, app.config.redis.host);
+  return function*() {
     var token = this.request.query.token || this.request.body.token;
     var isTokenValid = false,
       decoded = {};
@@ -10,7 +13,11 @@ var checkLogin = function(app) {
       isTokenValid = !!decoded;
     } catch (e) {}
     if (isTokenValid || this.path.match(/^\/login|bootstrap|css|fonts|img|js|plugins/)) {
-      return decoded.uid;
+      var reply =
+        yield thunkify(client.get.bind(client))('app_session_' + decoded.uid);
+      if (reply) {
+        return decoded.uid;
+      }
     }
     this.result = app.Errors.NOT_LOGIN;
     return false;

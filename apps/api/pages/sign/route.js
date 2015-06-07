@@ -9,6 +9,7 @@ var moment = require('moment');
 var logger = require('log4js').getLogger('api/user');
 var extend = require('node.extend');
 var captcha = require('../../util/captcha');
+var redis = require("redis");
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -18,14 +19,16 @@ var sha1 = function(str) {
 
 module.exports = function(app) {
 
-  var auth = require('../../auth')(app);
+  var auth = require('../../util/auth')(app);
+  var checkLogin = require('../../util/checkLogin')(app);
+  var client = redis.createClient(app.config.redis.port, app.config.redis.host);
 
   var addUser = function*(userData, source) {
     source = source || 1;
     var result =
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.uid.db,
         collection: app.config.uid.collection,
         one: true
@@ -37,8 +40,8 @@ module.exports = function(app) {
     result = result[app.config.uid.db][app.config.uid.collection];
     if (!result) {
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.uid.db,
         collection: app.config.uid.collection
       }, {
@@ -50,8 +53,8 @@ module.exports = function(app) {
       });
       result =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.uid.db,
           collection: app.config.uid.collection,
           one: true
@@ -66,8 +69,8 @@ module.exports = function(app) {
     uid = source + padnum(uid, 11);
     try {
       yield Mongo.request({
-        host: app.config.restful.host,
-        port: app.config.restful.port,
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
         db: app.config.user.db,
         collection: app.config.user.collection
       }, {
@@ -88,8 +91,8 @@ module.exports = function(app) {
     var objectId = result._id + '';
     delete result._id
     yield Mongo.request({
-      host: app.config.restful.host,
-      port: app.config.restful.port,
+      host: app.config.mongo.host,
+      port: app.config.mongo.port,
       db: app.config.uid.db,
       collection: app.config.uid.collection,
       id: objectId
@@ -186,6 +189,9 @@ module.exports = function(app) {
       var token = jwt.sign({
         uid: result.uid
       }, app.jwt_secret);
+      yield thunkify(client.set.bind(client))('app_session_' + result.uid, Date.now());
+      //设置一个月的有效期
+      yield thunkify(client.expire.bind(client))('app_session_' + result.uid, 60 * 60 * 24 * 30);
       this.result = {
         code: 0,
         result: {
@@ -208,8 +214,8 @@ module.exports = function(app) {
     if (isCaptchaValid) {
       var user =
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.user.db,
           collection: app.config.user.collection,
           one: true
@@ -226,8 +232,8 @@ module.exports = function(app) {
         user.password = password;
         delete user._id;
         yield Mongo.request({
-          host: app.config.restful.host,
-          port: app.config.restful.port,
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
           db: app.config.user.db,
           collection: app.config.user.collection,
           id: id
@@ -248,6 +254,11 @@ module.exports = function(app) {
 
   route.nested('/destroyAccessToken').get(function*(next) {
     this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (uid) {
+      yield thunkify(client.del.bind(client))('app_session_' + uid);
+    }
     this.result = {
       code: 0
     };

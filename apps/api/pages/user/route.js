@@ -14,28 +14,10 @@ var sha1 = function(str) {
 
 module.exports = function(app) {
 
-  var auth = require('../../auth')(app);
-  var checkLogin = require('../../checkLogin')(app);
-  var getUserById = require('../../getUserById')(app);
-
-  var saveUser = function*(userData) {
-    var id = userData._id;
-    var method = 'post';
-    if (userData._id) {
-      delete userData._id;
-      method = 'put';
-    }
-    yield Mongo.request({
-      host: app.config.restful.host,
-      port: app.config.restful.port,
-      db: app.config.user.db,
-      collection: app.config.user.collection,
-      id: id
-    }, {
-      method: method,
-      json: userData
-    });
-  };
+  var auth = require('../../util/auth')(app);
+  var checkLogin = require('../../util/checkLogin')(app);
+  var getUserById = require('../../util/getUserById')(app);
+  var saveUser = require('../../util/saveUser')(app);
 
   var modifyPassword = function*(user, password) {
     password = sha1(password);
@@ -47,7 +29,8 @@ module.exports = function(app) {
 
   route.nested('/getUserInfo').get(function*(next) {
     this.json = true;
-    var uid = checkLogin.call(this);
+    var uid =
+      yield checkLogin.call(this);
     if (!uid) return;
     var token = this.request.body.token;
     var user =
@@ -66,7 +49,8 @@ module.exports = function(app) {
 
   route.nested('/modifyPassword').post(function*(next) {
     this.json = true;
-    var uid = checkLogin.call(this);
+    var uid =
+    yield checkLogin.call(this);
     if (!uid) return;
     var password = this.request.body.password;
     var newPassword = this.request.body.new_password;
@@ -85,7 +69,8 @@ module.exports = function(app) {
 
   route.nested('/bindPhone').post(function*(next) {
     this.json = true;
-    var uid = checkLogin.call(this);
+    var uid =
+      yield checkLogin.call(this);
     if (!uid) return;
     var phone = this.request.body.phone;
     var captchaCode = this.request.body.captcha;
@@ -109,7 +94,8 @@ module.exports = function(app) {
 
   route.nested('/reportPosition').post(function*() {
     this.json = true;
-    var uid = checkLogin.call(this);
+    var uid =
+      yield checkLogin.call(this);
     if (!uid) return;
     var x = parseFloat(this.request.body.x);
     var y = parseFloat(this.request.body.y);
