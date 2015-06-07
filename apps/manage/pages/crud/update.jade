@@ -62,6 +62,10 @@ block append content
             +manage_ctrl_editor(params)
           else if field.base === 'draggableselector'
             +manage_ctrl_draggableselector(params)
+          else if field.base === 'won2yuan'
+            -params.rate = data ? data.rate : '';
+            -params.yuan = data ? data.yuan : '';
+            +manage_ctrl_won2yuan(params)
           else
             +manage_ctrl_input(params)
       +manage_box({

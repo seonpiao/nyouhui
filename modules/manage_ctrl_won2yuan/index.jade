@@ -1,0 +1,12 @@
+mixin manage_ctrl_won2yuan(options)
+  .form-group(data-module="manage_ctrl_won2yuan",data-form-control="won2yuan")
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    div.clearfix
+      .col-xs-6(style="padding:0;")
+        input.form-control(type="number", name=options.name, value=(options.value || ''),required=(options.required === 'yes'))
+      .col-xs-6(style="padding:0;")
+        if options.yuan
+          span(data-rate=options.rate)= options.yuan

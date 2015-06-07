@@ -94,6 +94,8 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/data/main"
           }, {
+            name: "apps/api/pages/finance/main"
+          }, {
             name: "apps/api/pages/sign/main"
           }, {
             name: "apps/api/pages/sos/main"
