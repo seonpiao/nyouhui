@@ -4,21 +4,28 @@ define(["libs/client/views/base"], function(Base) {
     events: {
       'input input': 'exchange'
     },
+    init: function() {
+      this.$won = this.$('input[name="won"]');
+      this.$yuan = this.$('.yuan');
+      this.$stock = this.$('input[name="stock"]');
+    },
     value: function() {
-      return this.$('input').val()
+      var won = this.$won.val() * 1;
+      var rate = parseFloat(yuan) / parseFloat(won);
+      var stock = this.$stock.val() * 1;
+      var yuan = this.$yuan.html() * 1;
+      return [won, yuan, rate, stock];
     },
     name: function() {
-      return this.$('input').attr('name');
+      return ['won', 'yuan', 'rate', 'stock'];
     },
     exchange: function(e) {
-      var $target = $(e.target);
-      var url = 'http://api.nyouhui.com/finance/won2yuan?won=1200';
+      var self = this;
+      var url = 'http://api.nyouhui.com/finance/won2yuan?won=' + this.$won.val();
       $.ajax({
         url: url,
-        dataType: 'jsonp',
-        jsonpCallback: 'cb',
         success: function(data) {
-          alert(data.status)
+          self.$('.yuan').html(data.data[0].number2 * self.$stock.val());
         }
       });
     }
