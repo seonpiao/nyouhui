@@ -13,6 +13,23 @@ var co = require('co');
 
 var APP_PATH = path.join(__dirname, 'apps');
 
+var randomPort = function() {
+  var port = Math.ceil(10000 + Math.random() * 10000);
+  return port;
+};
+
+var listenPort = function(app, port) {
+  if (!port) {
+    port = randomPort();
+  }
+  try {
+    app.listen(port);
+    logger.info('App[' + app.name + '] listening: ' + port);
+  } catch (e) {
+    listenPort(app);
+  }
+};
+
 function init(app, options) {
   var appPath = options.appPath;
   var appConfig = options.appConfig;
@@ -56,8 +73,8 @@ if (argv.length > 2) {
   apps = argv[2].split(',');
 
   port = argv[3];
-if (port) {
-  port = port.split(',');
+  if (port) {
+    port = port.split(',');
   }
 }
 var domain = process.env.DOMAIN;
@@ -129,8 +146,10 @@ function isGeneratorFunction(obj) {
 
 co(function*() {
   for (var i = 0; i < apps.length; i++) {
+
     var appName = apps[i];
     var app = koa();
+    app.name = appName;
     var appPath = path.join(APP_PATH, appName)
     var appConfig = require(path.join(appPath, 'config.js'));
     if (isGeneratorFunction(appConfig)) {
@@ -139,6 +158,9 @@ co(function*() {
     } else if (_.isFunction(appConfig)) {
       appConfig = appConfig(app);
     }
+    if (!appConfig) {
+      appConfig = {}
+    }
     var pagePath = path.join(appPath, 'pages');
     var pageNames = fs.readdirSync(pagePath);
     init(app, {
@@ -146,26 +168,31 @@ co(function*() {
       appConfig: appConfig
     });
     pageNames.forEach(function(pageName) {
-      var routePath = path.join(pagePath, pageName, 'route.js');
-      if (fs.existsSync(routePath)) {
-        var route = require(routePath);
-        route(app, pageName, appConfig);
-      } else {
-        app.route('/' + pageName).all(function*(next) {
-          this.result = {};
-          this.global.girlid = 0;
-          this.global.page = pageName;
-          this.template = pageName + '/index';
-        });
-      }
+      try {
+        var routePath = path.join(pagePath, pageName, 'route.js');
+        if (fs.existsSync(routePath)) {
+          var route = require(routePath);
+          route(app, pageName, appConfig);
+        } else {
+          app.route('/' + pageName).all(function*(next) {
+            this.result = {};
+            this.global.girlid = 0;
+            this.global.page = pageName;
+            this.template = pageName + '/index';
+          });
+        }
+      } catch (e) {}
     });
+
     var appPort = appConfig.port;
     if (port && port[i]) {
       appPort = port[i];
     }
-    logger.info('App[' + appName + '] listening: ' + appPort);
-    app.listen(appPort);
+    listenPort(app, appPort);
   }
-})(function() {
+})(function(err) {
+  if (err) {
+    logger.error(err);
+  }
   // process.exit(0);
 });

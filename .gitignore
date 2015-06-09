@@ -3,3 +3,4 @@ dist
 temp
 .DS_Store
 dump.rdb
+apps/manage/config.js
