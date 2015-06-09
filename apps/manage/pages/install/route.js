@@ -116,6 +116,20 @@ module.exports = function(app) {
           desc: ''
         }
       });
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.control_db,
+        collection: body.control_collection
+      }, {
+        method: 'post',
+        json: {
+          name: 'none',
+          base: '',
+          params: '',
+          desc: ''
+        }
+      });
       var input =
         yield Mongo.request({
           host: body.mongo_host,
