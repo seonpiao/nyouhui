@@ -18,6 +18,7 @@ define(["libs/client/views/base"], function(Base) {
       this.$batch = this.$('select');
       this.$weight = this.$('input[name="weight"]');
       this.$postage = this.$('.postage');
+      this.$postageYuan = this.$('.postage-yuan');
       this.type = this.$el.attr('data-type');
 
 
@@ -57,14 +58,15 @@ define(["libs/client/views/base"], function(Base) {
         var weight = this.$weight.val() * 1;
         var postage = this.$postage.html() * 1;
         var totalYuan = this.$totalYuan.html() * 1;
-        return [won, rate, stock, unitWon, unitYuan, totalYuan, discount, batch, weight, postage];
+        var postageYuan = this.$postageYuan.html() * 1;
+        return [won, rate, stock, unitWon, unitYuan, totalYuan, discount, batch, weight, postage, postageYuan];
       }
     },
     name: function() {
       if (this.type === 'simple') {
         return [this._name, 'yuan', 'rate'];
       }
-      return [this._name, 'rate', 'stock', 'unit_won', 'unit_yuan', 'total_yuan', 'discount', 'batch', 'weight', 'postage'];
+      return [this._name, 'rate', 'stock', 'unit_won', 'unit_yuan', 'total_yuan', 'discount', 'batch', 'weight', 'postage', 'postage_yuan'];
     },
     _getRate: function(callback) {
       var rate = this.$rate.html() * 1;
@@ -97,7 +99,8 @@ define(["libs/client/views/base"], function(Base) {
           var totalPrice = $selectedBatch.attr('data-price');
           var unitWeightPrice = totalPrice / (totalWeight * 1000);
           self.$postage.html((unitWeightPrice * self.$weight.val()).toFixed(2));
-          self.$totalYuan.html(self.$unitYuan.html() * self.$stock.val() + self.$postage.html() * 1);
+          self.$totalYuan.html((self.$unitYuan.html() * 1 + self.$postage.html() * 1) * self.$stock.val());
+          self.$postageYuan.html(self.$unitYuan.html() * 1 + self.$postage.html() * 1);
         }
       });
     }

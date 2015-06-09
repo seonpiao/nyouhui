@@ -55,6 +55,10 @@ mixin manage_ctrl_won2yuan(options)
         span.postage= (options.postage || 0)
         | 元
       div.clearfix
+        | 加运费单价（人民币）：
+        span.postage-yuan= (options.postageYuan || 0)
+        | 元
+      div.clearfix
         | 折后总价（人民币）：
         span.total-yuan= (options.totalYuan || 0)
         | 元
