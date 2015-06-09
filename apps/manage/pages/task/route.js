@@ -9,10 +9,12 @@ var Flow = require('flow-js');
 var co = require('co');
 var moment = require('moment');
 var tokenGenerator = require('random-token');
+var extend = require('node.extend');
 
 var enqueue = function(task) {
-  var taskQueue = global.taskQueue[this.session.username];
-  var runningTask = global.runningTask[this.session.username];
+  var username = task.username;
+  var taskQueue = global.taskQueue[username];
+  var runningTask = global.runningTask[username];
   var queueid = tokenGenerator(16);
   if (!runningTask[task.id]) {
     taskQueue[queueid] = ({
@@ -25,9 +27,9 @@ var enqueue = function(task) {
   return queueid;
 };
 
-var dequeue = function() {
-  var taskQueue = global.taskQueue[this.session.username];
-  var runningTask = global.runningTask[this.session.username];
+var dequeue = function(username) {
+  var taskQueue = global.taskQueue[username];
+  var runningTask = global.runningTask[username];
   var queueid = Object.keys(taskQueue).shift();
   if (queueid) {
     var queueItem = taskQueue[queueid];
@@ -69,6 +71,89 @@ var dequeue = function() {
 };
 
 module.exports = function(app) {
+
+  global.manage.runTask = function*(options) {
+    var taskid = options.taskid,
+      beginData = options.beginData || {},
+      username = options.username;
+    var start = Date.now();
+    var data =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.task.db,
+        collection: app.config.task.collection,
+        id: taskid
+      });
+    data = (data[app.config.task.db][app.config.task.collection]);
+    if (data) {
+      var ids = data.steps;
+      var flow = new Flow();
+      var steps = [];
+      for (var i = 0; i < ids.length; i++) {
+        var id = ids[i];
+        var originStep =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: app.config.step.db,
+            collection: app.config.step.collection,
+            id: id
+          });
+        originStep = originStep[app.config.step.db][app.config.step.collection];
+        var step = require(path.join(__dirname, 'steps', originStep.stepid + '.js'));
+        step.id = originStep.stepid;
+        try {
+          step.params = JSON.parse(originStep.params);
+        } catch (e) {
+          step.params = {};
+        }
+        steps.push(step);
+      }
+      if (steps.length > 0) {
+        try {
+          extend(beginData, JSON.parse(data.data));
+        } catch (e) {}
+        beginData.mongo = app.config.mongo;
+        try {
+          steps.forEach(function(step) {
+            flow.addStep(step.id, step);
+          });
+          enqueue.call(this, {
+            username: username,
+            id: taskid,
+            name: data.name,
+            flow: flow,
+            steps: steps,
+            beginData: beginData
+          });
+          dequeue.call(this, username);
+        } catch (e) {
+          logger.error(e.stack);
+          throw {
+            code: 500
+          };
+        }
+      }
+    }
+    var end = Date.now();
+    yield Mongo.request({
+      host: app.config.mongo.host,
+      port: app.config.mongo.port,
+      db: app.config.tasklog.db,
+      collection: app.config.tasklog.collection
+    }, {
+      method: 'post',
+      json: true,
+      body: {
+        start: moment(start).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
+        end: moment(end).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
+        taskid: taskid,
+        result: JSON.stringify(this.result)
+      }
+    })
+  };
+
   app.route('/task/steps').get(function*(next) {
     this.json = true;
     var taskNames = fs.readdirSync(path.join(__dirname, 'steps'));
@@ -114,72 +199,17 @@ module.exports = function(app) {
   });
   app.route('/task/run/:id').get(function*(next) {
     this.json = true;
-    var start = Date.now();
     var taskid = this.request.params.id;
-    var data =
-      yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.task.db,
-        collection: app.config.task.collection,
-        id: taskid
+    try {
+      yield global.manage.runTask({
+        taskid: taskid,
+        username: this.session.username
       });
-    data = (data[app.config.task.db][app.config.task.collection]);
-    if (data) {
-      var ids = data.steps;
-      var flow = new Flow();
-      var steps = [];
-      for (var i = 0; i < ids.length; i++) {
-        var id = ids[i];
-        var originStep =
-          yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
-            db: app.config.step.db,
-            collection: app.config.step.collection,
-            id: id
-          });
-        originStep = originStep[app.config.step.db][app.config.step.collection];
-        var step = require(path.join(__dirname, 'steps', originStep.stepid + '.js'));
-        step.id = originStep.stepid;
-        try {
-          step.params = JSON.parse(originStep.params);
-        } catch (e) {
-          step.params = {};
-        }
-        steps.push(step);
-      }
-      if (steps.length > 0) {
-        var beginData = {};
-        try {
-          beginData = JSON.parse(data.data);
-        } catch (e) {}
-        beginData.mongo = app.config.mongo;
-        try {
-
-          steps.forEach(function(step) {
-            flow.addStep(step.id, step);
-          });
-          flow.ididid = 111;
-          enqueue.call(this, {
-            id: taskid,
-            name: data.name,
-            flow: flow,
-            steps: steps,
-            beginData: beginData
-          });
-          dequeue.call(this);
-
-          this.result = {
-            code: 200
-          };
-        } catch (e) {
-          this.result = {
-            code: 500
-          };
-          logger.error(e.stack);
-        }
-      }
+      this.result = {
+        code: 200
+      };
+    } catch (e) {
+      this.result = e;
     }
     if (!this.result) {
       this.result = {
@@ -187,21 +217,5 @@ module.exports = function(app) {
         message: 'no step'
       };
     }
-    var end = Date.now();
-    yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.tasklog.db,
-      collection: app.config.tasklog.collection
-    }, {
-      method: 'post',
-      json: true,
-      body: {
-        start: moment(start).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
-        end: moment(end).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
-        taskid: taskid,
-        result: JSON.stringify(this.result)
-      }
-    })
   });
 }

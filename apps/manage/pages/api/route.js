@@ -166,6 +166,22 @@ module.exports = function(app) {
           code: 200,
           result: data
         }
+        var events =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: app.config.event.db,
+            collection: app.config.event.collection
+          }, {
+            qs: {
+              query: JSON.stringify({
+                name: db + ':' + collection + ':afterinsert'
+              })
+            }
+          });
+        if (events && events.length > 0) {
+
+        }
       } else {
         this.result = {
           code: 500,
