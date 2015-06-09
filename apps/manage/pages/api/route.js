@@ -131,6 +131,66 @@ module.exports = function(app) {
       if (body.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
         body.password = sha1(body.password);
       }
+      if (db === 'cl' && collection === 'sells') {
+        var goodsName = body.name;
+        var count = body.count;
+        var goods =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: 'cl',
+            collection: 'goods'
+          }, {
+            qs: {
+              query: JSON.stringify({
+                name: goodsName
+              })
+            }
+          });
+        goods = goods['cl']['goods'];
+        if (goods && goods.length > 0) {
+          var changedItems = [];
+          for (var i = 0; i < goods.length; i++) {
+            var item = goods[i];
+            if (count > 0) {
+              if (item.stock >= count) {
+                item.stock -= count;
+                count = 0;
+                changedItems.push(item);
+                break;
+              } else {
+                count -= item.stock;
+                item.stock = 0;
+                changedItems.push(item);
+              }
+            }
+          }
+          if (count > 0) {
+            this.result = {
+              code: 500,
+              message: '库存不足'
+            }
+            return;
+          } else {
+            for (var i = 0; i < changedItems.length; i++) {
+              var item = changedItems[i];
+              item.total_yuan = item.stock * item.unit_yuan;
+              var goodsId = item._id + '';
+              delete item._id;
+              yield Mongo.request({
+                host: app.config.mongo.host,
+                port: app.config.mongo.port,
+                db: 'cl',
+                collection: 'goods',
+                id: goodsId
+              }, {
+                method: 'put',
+                json: item
+              });
+            }
+          }
+        }
+      }
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -166,22 +226,6 @@ module.exports = function(app) {
           code: 200,
           result: data
         }
-        var events =
-          yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
-            db: app.config.event.db,
-            collection: app.config.event.collection
-          }, {
-            qs: {
-              query: JSON.stringify({
-                name: db + ':' + collection + ':afterinsert'
-              })
-            }
-          });
-        if (events && events.length > 0) {
-
-        }
       } else {
         this.result = {
           code: 500,
@@ -210,6 +254,71 @@ module.exports = function(app) {
           id: id
         });
       originData = originData[db][collection];
+      if (db === 'cl' && collection === 'sells') {
+        if (originData.name !== newData.name) {
+          this.result = {
+            code: 500,
+            message: '不能修改商品名'
+          }
+          return;
+        }
+        var goodsName = originData.name;
+        var count = newData.count - originData.count;
+        var goods =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: 'cl',
+            collection: 'goods'
+          }, {
+            qs: {
+              query: JSON.stringify({
+                name: goodsName
+              })
+            }
+          });
+        goods = goods['cl']['goods'];
+        if (goods && goods.length > 0) {
+          var changedItems = [];
+          for (var i = 0; i < goods.length; i++) {
+            var item = goods[i];
+            if (item.stock >= count) {
+              item.stock -= count;
+              count = 0;
+              changedItems.push(item);
+              break;
+            } else {
+              count -= item.stock;
+              item.stock = 0;
+              changedItems.push(item);
+            }
+          }
+          if (count > 0) {
+            this.result = {
+              code: 500,
+              message: '库存不足'
+            }
+            return;
+          } else {
+            for (var i = 0; i < changedItems.length; i++) {
+              var item = changedItems[i];
+              item.total_yuan = item.stock * item.unit_yuan;
+              var goodsId = item._id + '';
+              delete item._id;
+              yield Mongo.request({
+                host: app.config.mongo.host,
+                port: app.config.mongo.port,
+                db: 'cl',
+                collection: 'goods',
+                id: goodsId
+              }, {
+                method: 'put',
+                json: item
+              });
+            }
+          }
+        }
+      }
       extend(originData, newData);
       delete originData._id;
       //用户表要加密密码
@@ -303,6 +412,44 @@ module.exports = function(app) {
           id: id
         });
       originData = originData[db][collection];
+      if (db === 'cl' && collection === 'sells') {
+        var goodsName = originData.name;
+        var count = originData.count;
+        var goods =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: 'cl',
+            collection: 'goods'
+          }, {
+            qs: {
+              query: JSON.stringify({
+                name: goodsName
+              })
+            }
+          });
+        goods = goods['cl']['goods'];
+        if (goods && goods.length > 0) {
+          for (var i = 0; i < goods.length; i++) {
+            var item = goods[i];
+            item.stock = item.stock * 1 + count * 1;
+            item.total_yuan = item.stock * item.unit_yuan;
+            var goodsId = item._id + '';
+            delete item._id;
+            yield Mongo.request({
+              host: app.config.mongo.host,
+              port: app.config.mongo.port,
+              db: 'cl',
+              collection: 'goods',
+              id: goodsId
+            }, {
+              method: 'put',
+              json: item
+            });
+            break;
+          }
+        }
+      }
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
