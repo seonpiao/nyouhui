@@ -89,18 +89,18 @@ define(["libs/client/views/base"], function(Base) {
       this._getRate(function(rate) {
         self.$rate.html(rate);
         if (self.type === 'simple') {
-          self.$yuan.html(self.$won.val() * rate);
+          self.$yuan.html((self.$won.val() * rate).toFixed(2));
           self.$yuan.attr('data-rate', rate);
         } else {
-          self.$unitWon.html(self.$won.val() * self.$discount.val() / 10);
-          self.$unitYuan.html(self.$won.val() * rate);
+          self.$unitWon.html((self.$won.val() * self.$discount.val() / 10).toFixed(2));
+          self.$unitYuan.html((self.$won.val() * rate).toFixed(2));
           var $selectedBatch = self.$batch.find(':selected');
           var totalWeight = $selectedBatch.attr('data-weight');
           var totalPrice = $selectedBatch.attr('data-price');
           var unitWeightPrice = totalPrice / (totalWeight * 1000);
           self.$postage.html((unitWeightPrice * self.$weight.val()).toFixed(2));
-          self.$totalYuan.html((self.$unitYuan.html() * 1 + self.$postage.html() * 1) * self.$stock.val());
-          self.$postageYuan.html(self.$unitYuan.html() * 1 + self.$postage.html() * 1);
+          self.$totalYuan.html(((self.$unitYuan.html() * 1 + self.$postage.html() * 1) * self.$stock.val()).toFixed(2));
+          self.$postageYuan.html((self.$unitYuan.html() * 1 + self.$postage.html() * 1).toFixed(2));
         }
       });
     }
