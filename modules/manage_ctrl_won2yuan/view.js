@@ -11,6 +11,7 @@ define(["libs/client/views/base"], function(Base) {
       this.$unitWon = this.$('.unit-won');
       this.$unitYuan = this.$('.unit-yuan');
       this.$totalYuan = this.$('.total-yuan');
+      this.$rate = this.$('.rate');
     },
     value: function() {
       var won = this.$won.val() * 1;
@@ -34,6 +35,8 @@ define(["libs/client/views/base"], function(Base) {
         success: function(data) {
           self.$unitYuan.html(data.data[0].number2);
           self.$totalYuan.html(self.$unitYuan.html() * self.$stock.val());
+          var rate = (data.data[0].number2 / data.data[0].number1).toFixed(4);
+          self.$rate.html(rate);
         }
       });
     }

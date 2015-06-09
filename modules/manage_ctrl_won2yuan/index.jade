@@ -18,6 +18,9 @@ mixin manage_ctrl_won2yuan(options)
           | 库存 
           input.form-control(style="display:inline-block;width:120px;", type="number", name="stock", value=(options.stock || '0'),required=(options.required === 'yes'))
     div.clearfix
+      | 当前汇率：
+      span.rate= (options.rate || 0)
+    div.clearfix
       | 折后单价（韩元）：
       span.unit-won= (options.unitWon || 0)
       | 元
