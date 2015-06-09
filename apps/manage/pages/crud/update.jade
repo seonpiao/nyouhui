@@ -61,6 +61,8 @@ block append content
               +manage_ctrl_textarea(params)
             else if field.base === 'editor'
               +manage_ctrl_editor(params)
+            else if field.base === 'autocomplete'
+              +manage_ctrl_autocomplete(params)
             else if field.base === 'draggableselector'
               +manage_ctrl_draggableselector(params)
             else if field.base === 'won2yuan'
