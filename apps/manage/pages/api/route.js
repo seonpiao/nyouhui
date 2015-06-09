@@ -8,6 +8,7 @@ var redis = require("redis");
 var co = require('co');
 var extend = require('node.extend');
 var crypto = require('crypto');
+var moment = require('moment');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -191,6 +192,9 @@ module.exports = function(app) {
           }
         }
       }
+      var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+      body.create_time = timeStr;
+      body.modify_time = timeStr;
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -325,6 +329,7 @@ module.exports = function(app) {
       if (originData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
         originData.password = sha1(originData.password);
       }
+      originData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
