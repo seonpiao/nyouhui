@@ -52,12 +52,6 @@ module.exports = function(app) {
         installed.push(db);
       }
     }
-    if (installed.length > 0) {
-      this.result = '以下数据库中已有数据，安装失败：';
-      this.result += installed.join(',');
-      return;
-    }
-
 
     //生成配置文件
     var manageTmpl = fs.readFileSync(path.join(__dirname, 'manage.tmpl')).toString();
@@ -69,24 +63,11 @@ module.exports = function(app) {
       fs.writeFileSync(path.join(__dirname, '../../../api/config.js'), apiFile);
     }
 
-    var config = {};
-
-    Object.keys(body).forEach(function(key) {
-      if (key.indexOf('_') !== -1) {
-        var arr = key.split('_');
-        if (!config[arr[0]]) {
-          config[arr[0]] = {};
-        }
-        config[arr[0]][arr[1]] = body[key];
-      } else {
-        config[key] = body[key];
-      }
-    });
-    //加载配置
-    app.config = config;
-
-    app.keys = [config.secret.key];
-    app.jwt_secret = 'jwt_secret_' + config.secret.key;
+    if (installed.length > 0) {
+      this.result = '安装完成。但因为以下数据库中已有数据，因此仅更新了配置文件：';
+      this.result += installed.join(',');
+      return;
+    }
 
     //初始化数据库
     try {
