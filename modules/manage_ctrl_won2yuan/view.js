@@ -47,7 +47,7 @@ define(["libs/client/views/base"], function(Base) {
       var won = this.$won.val() * 1;
       if (this.type === 'simple') {
         var yuan = this.$yuan.html() * 1;
-        return [won, yuan, this.$yuan.attr('data-rate')];
+        return [won.toFixed(2), yuan.toFixed(2), this.$yuan.attr('data-rate')];
       } else {
         var stock = this.$stock.val() * 1;
         var unitWon = this.$unitWon.html() * 1;
@@ -59,7 +59,7 @@ define(["libs/client/views/base"], function(Base) {
         var postage = this.$postage.html() * 1;
         var totalYuan = this.$totalYuan.html() * 1;
         var postageYuan = this.$postageYuan.html() * 1;
-        return [won, rate, stock, unitWon, unitYuan, totalYuan, discount, batch, weight, postage, postageYuan];
+        return [won.toFixed(2), rate.toFixed(4), stock, unitWon.toFixed(2), unitYuan.toFixed(2), totalYuan.toFixed(2), discount, batch, weight, postage.toFixed(2), postageYuan.toFixed(2)];
       }
     },
     name: function() {
