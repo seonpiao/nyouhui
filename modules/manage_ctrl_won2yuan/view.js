@@ -51,12 +51,12 @@ define(["libs/client/views/base"], function(Base) {
         var stock = this.$stock.val() * 1;
         var unitWon = this.$unitWon.html() * 1;
         var unitYuan = this.$unitYuan.html() * 1;
-        var totalYuan = this.$totalYuan.html() * 1;
         var rate = (unitYuan / unitWon).toFixed(4);
         var discount = this.$discount.val() * 1;
         var batch = this.$batch.val();
         var weight = this.$weight.val() * 1;
         var postage = this.$postage.html() * 1;
+        var totalYuan = this.$totalYuan.html() * 1;
         return [won, rate, stock, unitWon, unitYuan, totalYuan, discount, batch, weight, postage];
       }
     },
@@ -92,12 +92,12 @@ define(["libs/client/views/base"], function(Base) {
         } else {
           self.$unitWon.html(self.$won.val() * self.$discount.val() / 10);
           self.$unitYuan.html(self.$won.val() * rate);
-          self.$totalYuan.html(self.$unitYuan.html() * self.$stock.val());
           var $selectedBatch = self.$batch.find(':selected');
           var totalWeight = $selectedBatch.attr('data-weight');
           var totalPrice = $selectedBatch.attr('data-price');
           var unitWeightPrice = totalPrice / (totalWeight * 1000);
           self.$postage.html((unitWeightPrice * self.$weight.val()).toFixed(2));
+          self.$totalYuan.html(self.$unitYuan.html() * self.$stock.val() + self.$postage.html() * 1);
         }
       });
     }
