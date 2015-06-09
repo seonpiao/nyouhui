@@ -52,7 +52,7 @@ define(["libs/client/views/base"], function(Base) {
         var stock = this.$stock.val() * 1;
         var unitWon = this.$unitWon.html() * 1;
         var unitYuan = this.$unitYuan.html() * 1;
-        var rate = (unitYuan / unitWon).toFixed(4);
+        var rate = (unitYuan / unitWon) * 1;
         var discount = this.$discount.val() * 1;
         var batch = this.$batch.val();
         var weight = this.$weight.val() * 1;
