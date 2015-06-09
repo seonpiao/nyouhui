@@ -159,14 +159,14 @@ co(function*() {
       } else if (_.isFunction(appConfig)) {
         appConfig = appConfig(app);
       }
-      init(app, {
-        appPath: appPath,
-        appConfig: appConfig
-      });
     } catch (e) {}
     if (!appConfig) {
       appConfig = {}
     }
+    init(app, {
+      appPath: appPath,
+      appConfig: appConfig
+    });
     var pagePath = path.join(appPath, 'pages');
     var pageNames = fs.readdirSync(pagePath);
     pageNames.forEach(function(pageName) {
