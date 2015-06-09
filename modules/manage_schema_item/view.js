@@ -29,6 +29,7 @@ define(["libs/client/views/base"], function(Base) {
     },
     init: function() {
       this.initView();
+      this.$('.schema-list').sortable();
       this.on('afterrender', this.check.bind(this));
     },
     initView: function() {

@@ -146,27 +146,29 @@ function isGeneratorFunction(obj) {
 
 co(function*() {
   for (var i = 0; i < apps.length; i++) {
-
     var appName = apps[i];
     var app = koa();
     app.name = appName;
     var appPath = path.join(APP_PATH, appName)
-    var appConfig = require(path.join(appPath, 'config.js'));
-    if (isGeneratorFunction(appConfig)) {
-      appConfig =
-        yield appConfig(app);
-    } else if (_.isFunction(appConfig)) {
-      appConfig = appConfig(app);
-    }
+    var appConfig = null;
+    try {
+      appConfig = require(path.join(appPath, 'config.js'));
+      if (isGeneratorFunction(appConfig)) {
+        appConfig =
+          yield appConfig(app);
+      } else if (_.isFunction(appConfig)) {
+        appConfig = appConfig(app);
+      }
+      init(app, {
+        appPath: appPath,
+        appConfig: appConfig
+      });
+    } catch (e) {}
     if (!appConfig) {
       appConfig = {}
     }
     var pagePath = path.join(appPath, 'pages');
     var pageNames = fs.readdirSync(pagePath);
-    init(app, {
-      appPath: appPath,
-      appConfig: appConfig
-    });
     pageNames.forEach(function(pageName) {
       try {
         var routePath = path.join(pagePath, pageName, 'route.js');

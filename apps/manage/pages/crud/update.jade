@@ -64,8 +64,12 @@ block append content
             else if field.base === 'draggableselector'
               +manage_ctrl_draggableselector(params)
             else if field.base === 'won2yuan'
+              -params.unitWon = data ? data.unit_won : '';
+              -params.unitYuan = data ? data.unit_yuan : '';
+              -params.totalYuan = data ? data.total_yuan : '';
               -params.rate = data ? data.rate : '';
               -params.yuan = data ? data.yuan : '';
+              -params.discount = data ? data.discount : '';
               -params.stock = data ? data.stock : '';
               +manage_ctrl_won2yuan(params)
             else

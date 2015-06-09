@@ -18,7 +18,9 @@ module.exports = function(app) {
     },
     mongo: {
       host: '{{mongo_host}}',
-      port: {{mongo_port}}
+      port: {{mongo_port}},
+      replset: '{{mongo_replset}}',
+      defaultDB: '{{mongo_db}}'
     },
     redis: {
       host: '{{redis_host}}',

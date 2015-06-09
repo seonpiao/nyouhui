@@ -7,13 +7,25 @@ mixin manage_ctrl_won2yuan(options)
     div.clearfix
       .col-xs-3(style="padding:0;")
         label
-          | 韩元 
-          input.form-control(style="display:inline-block;width:80%;", type="number", name=options.name, value=(options.value || ''),required=(options.required === 'yes'))
+          | 原价（韩元） 
+          input.form-control(style="display:inline-block;width:120px;", type="text", name=options.name, value=(options.value || ''),required=(options.required === 'yes'))
+      .col-xs-3(style="padding:0;")
+        label
+          | 折扣
+          input.form-control(style="display:inline-block;width:120px;", type="text", name="discount", value=(options.discount || 10),required=(options.required === 'yes'))
       .col-xs-3(style="padding:0;padding-left:20px;")
         label
           | 库存 
-          input.form-control(style="display:inline-block;width:80%;", type="number", name="stock", value=(options.stock || '0'),required=(options.required === 'yes'))
-      .col-xs-3(style="padding:0;line-height: 32px;padding-left:20px;")
-        | 总计
-        span.yuan(data-rate=options.rate)= (options.yuan || 0)
-        | 人民币
+          input.form-control(style="display:inline-block;width:120px;", type="number", name="stock", value=(options.stock || '0'),required=(options.required === 'yes'))
+    div.clearfix
+      | 折后单价（韩元）：
+      span.unit-won= (options.unitWon || 0)
+      | 元
+    div.clearfix
+      | 折后单价（人民币）：
+      span.unit-yuan= (options.unitYuan || 0)
+      | 元
+    div.clearfix
+      | 折后总价（人民币）：
+      span.total-yuan= (options.totalYuan || 0)
+      | 元
