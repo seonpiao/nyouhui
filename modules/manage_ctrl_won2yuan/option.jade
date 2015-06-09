@@ -1,0 +1,2 @@
+each item in list
+  option(value=(item.id || item._id),data-weight=item.weight,data-price=item.yuan * 1 + item.postage_china * 1,selected=((item.id || item._id) === value))= (item.name || item.id || item._id)
