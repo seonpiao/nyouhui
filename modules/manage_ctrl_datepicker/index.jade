@@ -1,0 +1,10 @@
+mixin manage_ctrl_datepicker(options)
+  .form-group(data-module="manage_ctrl_datepicker",data-form-control="datepicker")
+    if options.label
+      label= options.label
+    if options.required === 'yes'
+      span.text-red *
+    .input-group.date
+      input.form-control(name=options.name, value=(options.value || ''),required=(options.required === 'yes'))
+      span.input-group-addon
+        i.glyphicon.glyphicon-th

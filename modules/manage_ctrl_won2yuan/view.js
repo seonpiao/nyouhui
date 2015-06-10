@@ -73,7 +73,10 @@ define(["libs/client/views/base"], function(Base) {
       if (rate > 0) {
         callback(rate);
       } else {
-        var won = this.$unitWon.html() || this.$won.val();
+        var won = this.$unitWon.html();
+        if (won <= 0) {
+          won = this.$won.val()
+        }
         var url = 'http://api.nyouhui.com/finance/won2yuan?won=' + won;
         $.ajax({
           url: url,
