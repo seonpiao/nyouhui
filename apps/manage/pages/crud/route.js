@@ -8,6 +8,7 @@ var path = require('path');
 var Mongo = require('../../../../libs/server/mongodb');
 var extend = require('node.extend');
 var co = require('co');
+var jade = require('jade');
 
 module.exports = function(app) {
 
@@ -67,6 +68,7 @@ module.exports = function(app) {
         }, {
           qs: this.request.query
         });
+      var list = data[db][collection];
       //列表的字段定义数据
       var _data = {};
       var schema =
@@ -92,6 +94,18 @@ module.exports = function(app) {
         yield getFieldExtData(fields);
       extDatas.forEach(function(extData) {
         extend(true, _data, extData);
+      });
+      //检查有哪些自定义的模板
+      var templates = {};
+      fields.forEach(function(field) {
+        if (field.template) {
+          templates[field.name] = field.template;
+        }
+      });
+      Object.keys(templates).forEach(function(fieldName) {
+        list.forEach(function(row) {
+          row[fieldName] = jade.render(templates[fieldName], row);
+        });
       });
       extend(true, _data, schema);
       this.result = {

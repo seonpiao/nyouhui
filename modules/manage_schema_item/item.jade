@@ -31,3 +31,10 @@ li.form-group
     .col-xs-1
       label 默认值
       input.form-control(type="text",name="field_defaults",value=(field ? field.defaults : ''))
+    .col-xs-2
+      label 自定义模板？
+      div(style="line-height:30px;padding-left:30px;")
+        input.cbx-template(type="checkbox",name="field_customtmpl",value=(field.customtmpl == '1' ? '1' : '0'), checked=(field.customtmpl == '1'))
+    .col-xs-12(style=(field.customtmpl == '1' ? '' : "display:none"))
+      label 模板
+      textarea(name="field_template",rows="10").form-control= (field ? field.template : '')

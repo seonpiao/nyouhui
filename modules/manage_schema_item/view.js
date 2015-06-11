@@ -4,7 +4,8 @@ define(["libs/client/views/base"], function(Base) {
     template: 'item',
     events: {
       'click .add-item': 'add',
-      'click .del-item': 'del'
+      'click .del-item': 'del',
+      'click .cbx-template': 'toggleTemplate'
     },
     name: function() {
       return 'fields';
@@ -14,6 +15,7 @@ define(["libs/client/views/base"], function(Base) {
       var fields = [];
       $fields.each(function(i, field) {
         var $field = $(field);
+        var customtmpl = $field.find('[name="field_customtmpl"]').val();
         fields.push({
           name: $field.find('[name="field_name"]').val(),
           alias: $field.find('[name="field_alias"]').val(),
@@ -22,7 +24,9 @@ define(["libs/client/views/base"], function(Base) {
           defaults: $field.find('[name="field_defaults"]').val(),
           display: $field.find('[name="field_display"]').val(),
           get: $field.find('[name="field_get"]').val(),
-          required: $field.find('[name="field_required"]').val()
+          required: $field.find('[name="field_required"]').val(),
+          customtmpl: customtmpl,
+          template: (customtmpl === '1' ? $field.find('[name="field_template"]').val() : '')
         });
       });
       return fields;
@@ -56,6 +60,16 @@ define(["libs/client/views/base"], function(Base) {
             self.$('.schema-list').append(html);
           });
         });
+      }
+    },
+    toggleTemplate: function(e) {
+      var $target = $(e.target);
+      if ($target[0].checked) {
+        $target[0].value = '1';
+        $target.parent().parent().next().show();
+      } else {
+        $target[0].value = '0';
+        $target.parent().parent().next().hide();
       }
     },
     add: function(e) {
