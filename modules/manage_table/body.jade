@@ -1,0 +1,28 @@
+- var list = result.data[result.db][result.collection];
+each item in list
+  tr
+    each field in options.fields
+      if field.display === 'yes'
+        - var value = item[field.name];
+        if field.db && field.collection
+          if typeof value === 'string'
+            each foreignItem in result._data[field.db][field.collection]
+              if (foreignItem.id || foreignItem._id) === value
+                - value = foreignItem.name
+          else if Array.isArray(value)
+            - value = value.map(function(oneOfValue){
+            -   var foreignData = result._data[field.db][field.collection]
+            -   for(var i = 0; i < foreignData.length; i++){
+            -     var foreignItem = foreignData[i];
+            -     if((foreignItem.id || foreignItem._id) === oneOfValue) return foreignItem.name;
+            -   }
+            - });
+        td!= value
+    td
+      if !options.readonly
+        a(href= path.replace(/^\/dt/,'/crud').replace(/\/$/,'') + '/update/' + (item.id || item._id)) 编辑
+        | 
+        a.del-row(data-id=(item.id || item._id), href="javascript:;") 删除
+      if options.showExec
+        | 
+        a.exec-row(data-id=(item.id || item._id), href="javascript:;") 执行

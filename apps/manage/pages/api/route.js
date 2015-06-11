@@ -97,6 +97,17 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var id = this.request.params.id;
+    var query = this.request.query;
+    var pagesize = query.pagesize || 10;
+    var page = 1;
+    if (query.page >= 1) {
+      page = parseInt(query.page, 10);
+    }
+    var skip = pagesize * (page - 1);
+    query.limit = pagesize;
+    query.skip = skip;
+    delete query.page;
+    delete query.pagesize;
     try {
       var data =
         yield Mongo.request({
@@ -106,14 +117,31 @@ module.exports = function(app) {
           collection: collection,
           id: id
         }, {
-          qs: this.request.query
+          qs: query
         });
+      var dbconn =
+        yield Mongo.get({
+          db: db,
+          hosts: app.config.mongo.replset.split(',')
+        });
+      var coll = dbconn.collection(collection);
+      var filter = {};
+      try {
+        filter = JSON.parse(query.query);
+      } catch (e) {}
+      var count =
+        yield thunkify(coll.count.bind(coll))(filter);
       this.result = {
         code: 200,
         result: {
           db: db,
           collection: collection,
-          data: data
+          data: data,
+          page: {
+            total: count,
+            pagesize: pagesize,
+            page: page
+          }
         }
       }
     } catch (e) {
