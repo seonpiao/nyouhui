@@ -22,7 +22,7 @@ module.exports = function(app) {
       this.result = {
         code: 200,
         result: {
-          data: data || [],
+          data: data,
           db: db,
           collection: collection
         }

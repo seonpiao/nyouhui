@@ -97,26 +97,28 @@ module.exports = function(app) {
         }
       });
     var schemaData = schema[app.config.schema.db][app.config.schema.collection];
-    var fields = schemaData.fields;
-    //下面是要获取有外联的字段的附加数据
-    //获取到关联的外表数据
-    var extDatas =
-      yield getFieldExtData(fields);
-    extDatas.forEach(function(extData) {
-      extend(true, _data, extData);
-    });
-    //检查有哪些自定义的模板
-    var templates = {};
-    fields.forEach(function(field) {
-      if (field.template) {
-        templates[field.name] = field.template;
-      }
-    });
-    Object.keys(templates).forEach(function(fieldName) {
-      list.forEach(function(row) {
-        row[fieldName] = jade.render(templates[fieldName], row);
+    if (schemaData) {
+      var fields = schemaData.fields;
+      //下面是要获取有外联的字段的附加数据
+      //获取到关联的外表数据
+      var extDatas =
+        yield getFieldExtData(fields);
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
       });
-    });
+      //检查有哪些自定义的模板
+      var templates = {};
+      fields.forEach(function(field) {
+        if (field.template) {
+          templates[field.name] = field.template;
+        }
+      });
+      Object.keys(templates).forEach(function(fieldName) {
+        list.forEach(function(row) {
+          row[fieldName] = jade.render(templates[fieldName], row);
+        });
+      });
+    }
     extend(true, _data, schema);
     var dbconn =
       yield Mongo.get({

@@ -1,9 +1,9 @@
-mixin manage_table(options)
+mixin manage_table(list, options)
   - options = options || {};
   if !__global.__manage_table_id
     - __global.__manage_table_id = 1;
   - var tableid = 'table_' + __global.__manage_table_id++
-  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=result.db,data-collection=result.collection,data-options=JSON.stringify(options))
+  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=result.db,data-collection=result.collection,data-options=JSON.stringify(options),data-ajax=(list ? '0' : '1'))
     thead
       tr
         each field in options.fields
@@ -11,7 +11,8 @@ mixin manage_table(options)
             th= field.alias
         th
     tbody
-      //- include body
+      if list
+        include body
     //- tfoot
     //-   tr
     //-     each field in options.fields

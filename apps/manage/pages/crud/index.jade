@@ -19,7 +19,7 @@ block append content
       - try{params = JSON.parse(schema.params)}catch(e){}
       - var options = {fields:schema.fields}
       - for(var key in params){options[key] = params[key]}
-      +manage_table(options)
+      +manage_table(null,options)
       if !params.readonly
         .form-group
           a.btn.btn-primary(href="/crud/" + result.db + "/" + result.collection + "/create") 新建
