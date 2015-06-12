@@ -1,2 +1,2 @@
-var mongodbRest = require('mongodb-rest/server.js');
+var mongodbRest = require('mongodb-rest-tmp/server.js');
 mongodbRest.startServer();

@@ -9,8 +9,10 @@ var logger = require('log4js').getLogger('mongo');
 
 var dbs = {};
 
-var Mongo = function() {
-
+var Mongo = function(hosts, db, collection) {
+  this.db = db;
+  this.collection;
+  this.hosts = hosts;
 };
 
 var appendID = function(url, id) {

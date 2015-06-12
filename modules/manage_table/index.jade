@@ -8,7 +8,7 @@ mixin manage_table(list, options)
       tr
         each field in options.fields
           if field.display === 'yes'
-            th= field.alias
+            th(data-field=field.name)= field.alias
         th
     tbody
       if list

@@ -23,8 +23,6 @@ define(["libs/client/views/base"], function(Base) {
           "bServerSide": true,
           "sAjaxSource": "/dt/" + db + '/' + collection,
           "fnServerParams": function(aoData) {
-            if (self._initPage) return;
-            self._initPage = true;
             var page = location.search.match(/page=(\d+)/);
             if (page) {
               page = page[1] * 1;
@@ -38,8 +36,18 @@ define(["libs/client/views/base"], function(Base) {
               } else if (item.name === 'iDisplayLength') {
                 oDisplayLength = item;
               }
+              if (item.name === 'sColumns') {
+                item.value = _.map(_.filter(self.$('th'), function(el) {
+                  return !!$(el).attr('data-field');
+                }), function(el) {
+                  return $(el).attr('data-field');
+                }).join(',');
+              }
             });
-            oDisplayStart.value = (page - 1) * oDisplayLength.value;
+            if (!self._initPage) {
+              oDisplayStart.value = (page - 1) * oDisplayLength.value;
+              self._initPage = true;
+            }
           },
           "fnAjaxUpdateDraw": function(oSettings, json) {
             var options = JSON.parse(self.$el.attr('data-options'));

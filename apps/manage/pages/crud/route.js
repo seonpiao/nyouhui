@@ -12,6 +12,10 @@ var jade = require('jade');
 
 module.exports = function(app) {
 
+  var sanitize = function(s) {
+    return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  }
+
   var getFieldExtData = function*(fields) {
     var extDatas = [];
     for (var i = 0; i < fields.length; i++) {
@@ -177,11 +181,31 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var query = this.request.query;
-    if (!query.page && query.iDisplayStart && query.iDisplayLength) {
+    if (query.iDisplayStart && query.iDisplayLength) {
       query.pagesize = query.iDisplayLength;
       query.page = Math.ceil((query.iDisplayStart * 1 + 1) / (query.iDisplayLength * 1));
       delete query.iDisplayStart;
       delete query.iDisplayLength;
+    }
+    var columns = query.sColumns.split(',');
+    if (query.sSearch) {
+      var filter = columns.map(function(col, index) {
+        var obj = {};
+        obj[col] = {
+          $regex: sanitize(query.sSearch)
+        };
+        return obj;
+      });
+      filter = {
+        $or: filter
+      }
+      query.query = JSON.stringify(filter);
+    }
+    var sortCol = columns[query.iSortCol_0 || -1];
+    if (sortCol) {
+      var sort = {};
+      sort[sortCol] = query.sSortDir_0 === 'asc' ? 1 : -1;
+      query.sort = JSON.stringify(sort);
     }
     var result =
       yield getCollectionData.call(this);
