@@ -183,7 +183,7 @@ co(function*() {
           });
         }
       } catch (e) {
-        logger.error(e.stack);
+        // logger.error(e.stack);
       }
     });
 
