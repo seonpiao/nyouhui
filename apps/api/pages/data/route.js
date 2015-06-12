@@ -175,5 +175,44 @@ module.exports = function(app) {
         message: 'Not Allowed'
       }
     }
+  }).post(function*(next) {
+    var db = this.request.params.db;
+    var collection = this.request.params.collection;
+    var body = this.request.body;
+    var token = body.token || this.request.query.token;
+    var hasPermission =
+      yield auth.call(this, token, db, collection, 'write');
+    try {
+      var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+      body.create_time = timeStr;
+      body.modify_time = timeStr;
+      var data =
+        yield Mongo.request({
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
+          db: db,
+          collection: collection
+        }, {
+          json: body,
+          method: this.method
+        });
+      if (data[db][collection]['ok']) {
+        this.result = {
+          code: 200,
+          result: data
+        }
+      } else {
+        this.result = {
+          code: 500,
+          message: '数据重复'
+        }
+      }
+    } catch (e) {
+      this.result = {
+        code: 500,
+        message: e.message
+      }
+      logger.error(e.stack);
+    }
   });
 }

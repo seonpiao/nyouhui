@@ -232,6 +232,64 @@ module.exports = function(app) {
           }
         });
       controlSelect = controlSelect[body.control_db][body.control_collection];
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.control_db,
+        collection: body.control_collection
+      }, {
+        method: 'post',
+        json: {
+          name: 'draggableselector',
+          base: '',
+          params: '',
+          desc: ''
+        }
+      });
+      var controlDraggableselector =
+        yield Mongo.request({
+          host: body.mongo_host,
+          port: body.mongo_port,
+          db: body.control_db,
+          collection: body.control_collection,
+          one: true
+        }, {
+          qs: {
+            query: JSON.stringify({
+              name: 'draggableselector'
+            })
+          }
+        });
+      controlDraggableselector = controlDraggableselector[body.control_db][body.control_collection];
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.control_db,
+        collection: body.control_collection
+      }, {
+        method: 'post',
+        json: {
+          name: 'usergroup_draggableselector',
+          base: '',
+          params: '',
+          desc: ''
+        }
+      });
+      var controlUsergroupDraggableselector =
+        yield Mongo.request({
+          host: body.mongo_host,
+          port: body.mongo_port,
+          db: body.control_db,
+          collection: body.control_collection,
+          one: true
+        }, {
+          qs: {
+            query: JSON.stringify({
+              name: 'usergroup_draggableselector'
+            })
+          }
+        });
+      controlUsergroupDraggableselector = controlUsergroupDraggableselector[body.control_db][body.control_collection];
       //--索引
       var dbconn =
         yield Mongo.get({
@@ -421,6 +479,82 @@ module.exports = function(app) {
         }
       });
       //======管理员======
+
+      //======权限管理======
+      //--菜单
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.menu_db,
+        collection: body.menu_collection
+      }, {
+        method: 'post',
+        json: {
+          name: '权限管理',
+          path: '系统设置',
+          url: '/crud/' + body.privilege_db + '/' + body.privilege_collection
+        }
+      });
+      //--初始数据
+      //--索引
+      var dbconn =
+        yield Mongo.get({
+          db: body.privilege_db,
+          hosts: body.mongo_replset.split(',')
+        });
+      var collection = dbconn.collection(body.privilege_collection);
+      yield thunkify(collection.ensureIndex.bind(collection))({
+        db: 1,
+        collection: 1
+      });
+      //--schema定义
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.schema_db,
+        collection: body.schema_collection
+      }, {
+        method: 'post',
+        json: {
+          db: body.privilege_db,
+          collection: body.privilege_collection,
+          params: '',
+          fields: [{
+            name: 'db',
+            alias: 'db',
+            type: input._id.toString(),
+            index: 'no',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }, {
+            name: 'collection',
+            alias: 'collection',
+            type: input._id.toString(),
+            index: 'no',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }, {
+            name: 'read',
+            alias: '读取',
+            type: controlUsergroupDraggableselector._id.toString(),
+            index: 'no',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }, {
+            name: 'write',
+            alias: '写入',
+            type: controlUsergroupDraggableselector._id.toString(),
+            index: 'no',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }]
+        }
+      });
+      //======权限管理======
 
     } catch (e) {
       console.log(e.stack);
