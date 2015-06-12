@@ -409,14 +409,15 @@ module.exports = function(app) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'privilege', {
             db: db,
-            collection: 'users'
+            collection: originData.collection
           });
+          console.log('del:' + key)
           yield thunkify(client.del.bind(client))(key);
         })();
       }
       if (db === app.config.user.db && collection === app.config.user.collection) {
         co(function*() {
-          var key = serializeKeyByQuery(db, 'users', {
+          var key = serializeKeyByQuery(db, 'user', {
             uid: originData.uid
           });
           console.log('del:' + key)

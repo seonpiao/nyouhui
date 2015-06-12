@@ -36,7 +36,7 @@ define(function() {
       return url;
     },
     parse: function(resp) {
-      if (resp.code === 200) {
+      if (resp.code === 200 || resp.code === 0) {
         return resp.result;
       }
       this.error = resp;

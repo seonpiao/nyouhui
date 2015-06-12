@@ -42,6 +42,10 @@ module.exports = function(grunt) {
       jade: {
         files: ["**/*.jade"],
         tasks: ["jade"]
+      },
+      images: {
+        files: ["apps/**/static/images/*.*"],
+        tasks: ["copy:images"]
       }
     },
     jade: {
@@ -84,6 +88,8 @@ module.exports = function(grunt) {
           modules: [{
             name: "apps/api/common"
           }, {
+            name: "apps/beima/common"
+          }, {
             name: "apps/m/common"
           }, {
             name: "apps/manage/common"
@@ -99,6 +105,8 @@ module.exports = function(grunt) {
             name: "apps/api/pages/sos/main"
           }, {
             name: "apps/api/pages/user/main"
+          }, {
+            name: "apps/beima/pages/m_signup/main"
           }, {
             name: "apps/m/pages/index/main"
           }, {
@@ -142,6 +150,16 @@ module.exports = function(grunt) {
         filter: "isFile",
         rename: function(dest, filepath) {
           return path.join(dest, filepath.replace("apps/", "").replace("pages/", "").replace("/main", ""));
+        }
+      },
+      images: {
+        expand: true,
+        cwd: "apps",
+        src: ["**/static/images/*.*", "!node_modules/**/*.*"],
+        dest: "dist/images",
+        filter: "isFile",
+        rename: function(dest, filepath) {
+          return path.join(dest, filepath.replace("images/", ""));
         }
       }
     },
@@ -216,6 +234,18 @@ module.exports = function(grunt) {
         }
       }
     },
+    shell: {
+      devbr: {
+        command: function(brname) {
+          return [
+            'git checkout master',
+            'git pull',
+            'git branch ' + brname,
+            'git checkout ' + brname
+          ].join('&&');
+        }
+      }
+    },
     newapp: {
       options: {
         dest: ""
@@ -256,6 +286,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-stylus");
   grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-contrib-copy");
+  grunt.loadNpmTasks("grunt-shell");
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("private-grunt-jade-runtime");
   grunt.loadNpmTasks("grunt-filerev");

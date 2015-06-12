@@ -11,7 +11,7 @@ var sha1 = function(str) {
   return shasum.digest('hex')
 }
 
-var dbs = ['schema', 'admin', 'privilege', 'user', 'uid', 'menu', 'step', 'task', 'tasklog', 'control'];
+var dbs = ['schema', 'admin', 'privilege', 'user', 'usergroup', 'uid', 'menu', 'step', 'task', 'tasklog', 'control'];
 
 module.exports = function(app) {
   app.route('/install').get(function*(next) {
@@ -270,8 +270,8 @@ module.exports = function(app) {
         method: 'post',
         json: {
           name: 'usergroup_draggableselector',
-          base: '',
-          params: '',
+          base: 'draggableselector',
+          params: '{"db":"' + body.usergroup_db + '","collection":"' + body.usergroup_collection + '"}',
           desc: ''
         }
       });
@@ -479,6 +479,79 @@ module.exports = function(app) {
         }
       });
       //======管理员======
+
+      //======用户组======
+      //--菜单
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.menu_db,
+        collection: body.menu_collection
+      }, {
+        method: 'post',
+        json: {
+          name: '用户组管理',
+          path: '系统设置',
+          url: '/crud/' + body.usergroup_db + '/' + body.usergroup_collection
+        }
+      });
+      //--初始数据
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.usergroup_db,
+        collection: body.usergroup_collection
+      }, {
+        method: 'post',
+        json: {
+          id: 'all',
+          name: '所有用户'
+        }
+      });
+      //--索引
+      var dbconn =
+        yield Mongo.get({
+          db: body.usergroup_db,
+          hosts: body.mongo_replset.split(',')
+        });
+      var collection = dbconn.collection(body.usergroup_collection);
+      yield thunkify(collection.ensureIndex.bind(collection))({
+        name: 1
+      }, {
+        unique: true
+      });
+      //--schema定义
+      yield Mongo.request({
+        host: body.mongo_host,
+        port: body.mongo_port,
+        db: body.schema_db,
+        collection: body.schema_collection
+      }, {
+        method: 'post',
+        json: {
+          db: body.usergroup_db,
+          collection: body.usergroup_collection,
+          params: '',
+          fields: [{
+            name: 'id',
+            alias: 'id',
+            type: input._id.toString(),
+            index: 'yes',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }, {
+            name: 'name',
+            alias: '名称',
+            type: input._id.toString(),
+            index: 'no',
+            defaults: '',
+            display: 'yes',
+            required: 'yes'
+          }]
+        }
+      });
+      //======用户组======
 
       //======权限管理======
       //--菜单

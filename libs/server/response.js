@@ -55,6 +55,7 @@ module.exports = function*(view) {
   } else {
     _.extend(this.locals, defaultLocals);
     this.status = 200;
+    console.log(this.locals)
     yield this.render(this.page + '/' + this.view);
   }
 }

@@ -50,7 +50,8 @@
     "grunt-carrier-helper": "*",
     "grunt-filerev": "",
     "grunt-string-replace": "",
-    "load-grunt-tasks": "~0.3.0"
+    "load-grunt-tasks": "~0.3.0",
+    "grunt-shell": "*"
   },
   "description": "wanleyun.com",
   "main": "index.js",

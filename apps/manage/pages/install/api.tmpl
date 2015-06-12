@@ -18,8 +18,12 @@ module.exports = function(app) {
       message: '缺少参数'
     },
     'NOT_LOGIN': {
-      code: 1001,
+      code: 1002,
       message: '未登录'
+    },
+    'NOT_ALLOWED': {
+      code: 1003,
+      message: '没有权限'
     },
     //sign
     'SIGN_INVALID_CAPTCHA': {
@@ -54,6 +58,15 @@ module.exports = function(app) {
     'USER_NOT_EXIST': {
       code: 3000,
       message: '用户不存在'
+    },
+    //data
+    'DATA_INSERT_ERROR': {
+      code: 4000,
+      message: '插入数据库失败'
+    },
+    'DATA_READ_ERROR': {
+      code: 4001,
+      message: '读取数据库失败'
     }
   };
 
@@ -75,6 +88,10 @@ module.exports = function(app) {
     user: {
       db: '{{user_db}}',
       collection: '{{user_collection}}'
+    },
+    usergroup: {
+      db: '{{usergroup_db}}',
+      collection: '{{usergroup_collection}}'
     },
     uid: {
       db: '{{uid_db}}',

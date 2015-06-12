@@ -5,6 +5,7 @@ var Mongo = require('../../../../libs/server/mongodb');
 var redis = require("redis");
 var co = require('co');
 var jwt = require('jsonwebtoken');
+var moment = require('moment');
 
 module.exports = function(app) {
 
@@ -96,6 +97,15 @@ module.exports = function(app) {
   var auth = function*(token, db, collection, action) {
     var isTokenValid = false;
     var uid, userGroup, privilege = false;
+    var permissibleGroup =
+      yield getHashCacheByQuery(app.config.privilege.db, app.config.privilege.collection, {
+        db: db,
+        collection: collection
+      }, action);
+    permissibleGroup = (permissibleGroup || '').split(',');
+    if (permissibleGroup.indexOf('all') !== -1) {
+      return true;
+    }
     try {
       var decoded = jwt.verify(token || '', app.jwt_secret);
       isTokenValid = !!decoded;
@@ -108,21 +118,14 @@ module.exports = function(app) {
     if (uid) {
       // 根据 db 和 query 进行查询该用户所在用户组
       userGroup =
-        yield getHashCacheByQuery(app.config.users.db, app.config.users.collection, {
+        yield getHashCacheByQuery(app.config.user.db, app.config.user.collection, {
           uid: uid
         }, 'group');
     }
 
     // 判断权限
     if (userGroup) {
-      var permissibleGroup =
-        yield getHashCacheByQuery(app.config.privilege.db, app.config.privilege.collection, {
-          db: db,
-          collection: collection
-        }, action);
-
       userGroup = (userGroup || '').split(',');
-      permissibleGroup = (permissibleGroup || '').split(',');
       privilege = userGroup.some(function(m) {
         return permissibleGroup.some(function(n) {
           return m == n;
@@ -155,7 +158,7 @@ module.exports = function(app) {
             qs: this.request.query
           });
         this.result = {
-          code: 200,
+          code: 0,
           result: {
             db: db,
             collection: collection,
@@ -163,56 +166,48 @@ module.exports = function(app) {
           }
         }
       } catch (e) {
-        this.result = {
-          code: 500,
-          message: e.message
-        }
+        this.result = app.Errors.DATA_READ_ERROR;
         logger.error(e.stack);
       }
     } else {
-      this.result = {
-        code: 403,
-        message: 'Not Allowed'
-      }
+      this.result = app.Errors.NOT_ALLOWED;
     }
   }).post(function*(next) {
+    this.json = true;
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var body = this.request.body;
     var token = body.token || this.request.query.token;
     var hasPermission =
       yield auth.call(this, token, db, collection, 'write');
-    try {
-      var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-      body.create_time = timeStr;
-      body.modify_time = timeStr;
-      var data =
-        yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: db,
-          collection: collection
-        }, {
-          json: body,
-          method: this.method
-        });
-      if (data[db][collection]['ok']) {
-        this.result = {
-          code: 200,
-          result: data
+    if (hasPermission) {
+      try {
+        var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+        body.create_time = timeStr;
+        body.modify_time = timeStr;
+        var data =
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: db,
+            collection: collection
+          }, {
+            json: body,
+            method: this.method
+          });
+        if (data[db][collection]['ok']) {
+          this.result = {
+            code: 0
+          }
+        } else {
+          this.result = app.Errors.DATA_INSERT_ERROR;
         }
-      } else {
-        this.result = {
-          code: 500,
-          message: '数据重复'
-        }
+      } catch (e) {
+        this.result = app.Errors.DATA_INSERT_ERROR;
+        logger.error(e.stack);
       }
-    } catch (e) {
-      this.result = {
-        code: 500,
-        message: e.message
-      }
-      logger.error(e.stack);
+    } else {
+      this.result = app.Errors.NOT_ALLOWED;
     }
   });
 }

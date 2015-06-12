@@ -1,0 +1,26 @@
+form.beima_signup_form(data-module="beima_signup_form")
+  .form-input-item
+    label 姓 名:
+    input(type="text" placeholder="请输入......" required name="name")
+  .form-input-item
+    label 手 机:
+    input(type="text" placeholder="请输入......" required name="phone")
+  .form-input-item
+    label 邮 箱:
+    input(type="text" placeholder="请输入......" required name="email")
+  .qualification
+    label 资质选择:
+    ul
+      - var qualificationList = result[db][collection];
+      if qualificationList && qualificationList.length > 0
+        each qualification,index in qualificationList
+          li
+            label
+              input(type="radio" name="qualification" value=qualification._id.toString() checked=(index === 0))
+              = qualification.name
+      li
+        label
+          input(type="radio" name="qualification" value="other")
+          | 其他
+          input(type="text" name="other_qualification")
+  button(type="submit") 我要报名

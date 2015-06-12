@@ -102,7 +102,6 @@ var defaultRoute = function(app) {
     });
     yield next;
     if (!this.result) {
-      this.global.girlid = 0;
       this.page = '404';
     } else {
       this.result.query = this.request.query;
@@ -118,7 +117,8 @@ var defaultRoute = function(app) {
 var bases = {
   'defaults': {
     www: '1', //替换同级子域
-    m: '1' //替换同级子域
+    m: '1', //替换同级子域
+    'static': '1', //替换同级子域
   }
 };
 
@@ -178,12 +178,13 @@ co(function*() {
         } else {
           app.route('/' + pageName).all(function*(next) {
             this.result = {};
-            this.global.girlid = 0;
             this.global.page = pageName;
             this.template = pageName + '/index';
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        logger.error(e.stack);
+      }
     });
 
     var appPort = appConfig.port;

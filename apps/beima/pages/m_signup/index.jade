@@ -1,0 +1,19 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  link(type="text/css",rel="stylesheet",href="http://" + __global.base.static + "/dist/css/beima/m_signup.1234567890abcdef.css")
+
+block append headjs
+  script(type="text/javascript",src="http://" + __global.base.static + "/dist/js/beima/common.min.1234567890abcdef.js")
+
+block append body
+  include ../../../../modules/beima_signup_logo/index
+  include ../../../../modules/beima_signup_form/index
+  include ../../../../modules/beima_bottom_qrcode/index
+
+block append footjs
+  script(type="text/javascript",src="http://" + __global.base.static + "/dist/js/beima/m_signup.min.1234567890abcdef.js")
