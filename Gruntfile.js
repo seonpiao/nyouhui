@@ -82,6 +82,7 @@ module.exports = function(grunt) {
             "jquery-cookie": "libs/client/jquery-cookie",
             underscore: "libs/client/underscore",
             backbone: "libs/client/backbone",
+            oz: "libs/client/oz",
             jaderuntime: "libs/client/runtime"
           },
           modules: [{
