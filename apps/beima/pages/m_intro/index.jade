@@ -1,0 +1,18 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  link(type="text/css",rel="stylesheet",href="http://" + __global.base.static + "/dist/css/beima/m_intro.1234567890abcdef.css")
+
+block append headjs
+  script(type="text/javascript",src="http://" + __global.base.static + "/dist/js/beima/common.min.1234567890abcdef.js")
+
+block append body
+  include ../../../../modules/beima_intro_cover/index
+  include ../../../../modules/beima_intro_content/index
+
+block append footjs
+  script(type="text/javascript",src="http://" + __global.base.static + "/dist/js/beima/m_intro.min.1234567890abcdef.js")

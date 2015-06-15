@@ -4,4 +4,4 @@ mixin manage_ctrl_textarea(options)
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    textarea.form-control(name=options.name, value=(options.value || ''),required=(options.editable === 'required'))
+    textarea.form-control(name=options.name, required=(options.editable === 'required'))= options.value

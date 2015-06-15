@@ -1,0 +1,19 @@
+- var data = result[db][collection];
+.beima_intro_content
+  .line
+  h1= data.headline
+  .abstract= data.abstract
+  - var blocks = {};
+  - var exp = /(block_title|block_content)(\d+)/
+  each value,key in data
+    - var matched = key.match(exp)
+    if matched
+      - blocks[matched[2]] = blocks[matched[2]] || {}
+      - blocks[matched[2]][matched[1]] = value
+  each block in blocks
+    .block
+      h3= block.block_title
+      .content= block.block_content
+  .mt_50
+    include ../beima_bottom_qrcode/index
+  .line.mt_30
