@@ -24,7 +24,7 @@ define(["libs/client/views/base"], function(Base) {
           defaults: $field.find('[name="field_defaults"]').val(),
           display: $field.find('[name="field_display"]').val(),
           get: $field.find('[name="field_get"]').val(),
-          required: $field.find('[name="field_required"]').val(),
+          editable: $field.find('[name="field_editable"]').val(),
           customtmpl: customtmpl,
           template: (customtmpl === '1' ? $field.find('[name="field_template"]').val() : '')
         });

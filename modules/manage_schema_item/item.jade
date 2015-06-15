@@ -8,7 +8,7 @@ li.form-group
       label 别名
       input.form-control(type="text",name="field_alias",value=(field ? field.alias : ''))
     .col-xs-2
-      label 类型
+      label 控件
       select.form-control(type="text",name="field_type")
         each control in controls
           option(value=control._id,selected=((field && field.type === control._id) || (!field && control.name === 'input')))= control.name
@@ -24,16 +24,17 @@ li.form-group
         each title,value in yesorno
           option(value=value,selected=(field && field.display === value))= title
     .col-xs-1
-      label 必填
-      select.form-control(type="text",name="field_required")
-        each title,value in yesorno
-          option(value=value,selected=(field && field.required === value))= title
+      label 编辑
+      select.form-control(type="text",name="field_editable")
+        - var editable = {'yes':'显示','required':'必填',no:'不显示','readonly':'只读'}
+        each title,value in editable
+          option(value=value,selected=(field && field.editable === value))= title
     .col-xs-1
       label 默认值
       input.form-control(type="text",name="field_defaults",value=(field ? field.defaults : ''))
-    .col-xs-2
-      label 自定义模板？
-      div(style="line-height:30px;padding-left:30px;")
+    .col-xs-1
+      label(style="text-align:center;display:block;") 模板
+      div(style="line-height:30px;text-align:center;")
         input.cbx-template(type="checkbox",name="field_customtmpl",value=((field && field.customtmpl == '1') ? '1' : '0'), checked=((field && field.customtmpl == '1')))
     .col-xs-12(style=((field && field.customtmpl == '1') ? '' : "display:none"))
       label 模板

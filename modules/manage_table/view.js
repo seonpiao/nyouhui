@@ -23,14 +23,16 @@ define(["libs/client/views/base"], function(Base) {
           "bServerSide": true,
           "sAjaxSource": "/dt/" + db + '/' + collection,
           "fnServerParams": function(aoData) {
-            var page = location.search.match(/page=(\d+)/);
-            if (page) {
-              page = page[1] * 1;
-            } else {
-              page = 1;
-            }
+            var sColumns = self.getUrlParam('sColumns');
+            var sSearch = self.getUrlParam('sSearch');
             var oDisplayStart, oDisplayLength;
+            var caredParams = {
+              'sColumns': 'scol',
+              'sSearch': 'skey'
+            };
+            var serverParams = {};
             _.forEach(aoData, function(item) {
+              serverParams[item.name] = item;
               if (item.name === 'iDisplayStart') {
                 oDisplayStart = item;
               } else if (item.name === 'iDisplayLength') {
@@ -45,8 +47,14 @@ define(["libs/client/views/base"], function(Base) {
               }
             });
             if (!self._initPage) {
+              var page = self.getUrlParam('page');
               oDisplayStart.value = (page - 1) * oDisplayLength.value;
+              _.forEach(caredParams, function(value, key) {
+
+              });
               self._initPage = true;
+            } else {
+
             }
           },
           "fnAjaxUpdateDraw": function(oSettings, json) {
@@ -90,21 +98,38 @@ define(["libs/client/views/base"], function(Base) {
                 return pageInfo;
               };
               dt.oApi._fnCallbackFire(oSettings, 'aoDrawCallback', 'pagination', [oSettings]);
-              var url = location.href;
-              var replacedUrl = location.href.replace(/page=\d+/, 'page=' + json.result.page.page);
-              if (!replacedUrl.match(/page=\d+/)) {
-                if (replacedUrl.indexOf('?') === -1) {
-                  replacedUrl = replacedUrl.replace(/(#|$)/, "?page=" + json.result.page.page + "$1");
-                } else {
-                  replacedUrl = replacedUrl.replace(/(#|$)/, "&page=" + json.result.page.page + "$1");
-                }
-              }
-              history.replaceState(null, null, replacedUrl);
+              self.addUrlParam({
+                page: json.result.page.page
+              });
             });
           }
         });
       }
       var dt = this.$el.dataTable(params);
+    },
+    addUrlParam: function(params) {
+      var replacedUrl = location.href;
+      _.forEach(params, function(value, name) {
+        var exp = new RegExp('(\\?|&)' + name + '=[^&]+');
+        if (!replacedUrl.match(exp)) {
+          if (replacedUrl.indexOf('?') === -1) {
+            replacedUrl = replacedUrl.replace(/(#|$)/, "?" + name + "=" + value + "$1");
+          } else {
+            replacedUrl = replacedUrl.replace(/(#|$)/, "&" + name + "=" + value + "$1");
+          }
+        } else {
+          replacedUrl = replacedUrl.replace(exp, '$1' + name + '=' + value);
+        }
+      });
+      history.replaceState(null, null, replacedUrl);
+    },
+    getUrlParam: function(name) {
+      var exp = new RegExp('(?:\\?|&)' + name + '=([^&]+)');
+      var value = location.href.match(exp);
+      if (value) {
+        return value[1];
+      }
+      return '';
     },
     del: function(e) {
       var confirm = window.confirm('确定要删除么？');

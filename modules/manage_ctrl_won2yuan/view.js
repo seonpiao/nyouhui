@@ -96,7 +96,7 @@ define(["libs/client/views/base"], function(Base) {
           self.$yuan.attr('data-rate', rate);
         } else {
           self.$unitWon.html((self.$won.val() * self.$discount.val() / 10).toFixed(2));
-          self.$unitYuan.html((self.$won.val() * rate).toFixed(2));
+          self.$unitYuan.html((self.$unitWon.html() * 1 * rate).toFixed(2));
           var $selectedBatch = self.$batch.find(':selected');
           var totalWeight = $selectedBatch.attr('data-weight');
           var totalPrice = $selectedBatch.attr('data-price');

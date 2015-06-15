@@ -116,20 +116,6 @@ module.exports = function(app) {
           desc: ''
         }
       });
-      yield Mongo.request({
-        host: body.mongo_host,
-        port: body.mongo_port,
-        db: body.control_db,
-        collection: body.control_collection
-      }, {
-        method: 'post',
-        json: {
-          name: 'none',
-          base: '',
-          params: '',
-          desc: ''
-        }
-      });
       var input =
         yield Mongo.request({
           host: body.mongo_host,
@@ -321,7 +307,7 @@ module.exports = function(app) {
             index: 'yes',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'base',
             alias: '基础控件',
@@ -329,7 +315,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'node'
+            editable: 'required'
           }, {
             name: 'params',
             alias: '参数',
@@ -337,7 +323,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'no'
+            editable: 'required'
           }, {
             name: 'desc',
             alias: '备注',
@@ -345,7 +331,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'no'
+            editable: 'required'
           }]
         }
       });
@@ -385,7 +371,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'path',
             alias: '路径',
@@ -393,7 +379,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'url',
             alias: 'url',
@@ -401,7 +387,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }]
         }
       });
@@ -466,7 +452,7 @@ module.exports = function(app) {
             index: 'yes',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'password',
             alias: '密码',
@@ -474,7 +460,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '123456',
             display: 'yes',
-            required: 'node'
+            editable: 'required'
           }]
         }
       });
@@ -539,7 +525,7 @@ module.exports = function(app) {
             index: 'yes',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'name',
             alias: '名称',
@@ -547,7 +533,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }]
         }
       });
@@ -599,7 +585,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'collection',
             alias: 'collection',
@@ -607,7 +593,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'read',
             alias: '读取',
@@ -615,7 +601,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }, {
             name: 'write',
             alias: '写入',
@@ -623,7 +609,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            required: 'yes'
+            editable: 'required'
           }]
         }
       });

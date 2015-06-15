@@ -6,6 +6,6 @@ mixin manage_ctrl_tagsinput(options)
   .form-group(data-module="manage_ctrl_tagsinput",data-form-control="tagsinput",data-db=options.db,data-collection=options.collection)
     if options.label
       label= options.label
-    if options.required === 'yes'
+    if options.editable === 'required'
       strong.text-red *
-    input.form-control(id=tagsinputid,name=options.name,value=(options.value || ''),role="input",required=(options.required === 'yes'))
+    input.form-control(id=tagsinputid,name=options.name,value=(options.value || ''),role="input",required=(options.editable === 'required'))

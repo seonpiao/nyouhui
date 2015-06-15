@@ -2,6 +2,6 @@ mixin manage_ctrl_editor(options)
   .form-group(data-module="manage_ctrl_editor",data-form-control="editor")
     if options.label
       label= options.label
-    if options.required === 'yes'
+    if options.editable === 'required'
       span.text-red *
-    textarea#umeditor.form-control(style="height:300px;",name=options.name, required=(options.required === 'yes'))!= (options.value || '')
+    textarea#umeditor.form-control(style="height:300px;",name=options.name, required=(options.editable === 'required'))!= (options.value || '')

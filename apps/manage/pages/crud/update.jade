@@ -35,12 +35,13 @@ block append content
             - })
             if baseCtrl && baseCtrl.length > 0
               - field.base = baseCtrl[0].name;
-          if field.base !== 'none'
+          - console.log(field.editable)
+          if field.editable !== 'no'
             -var params = {};
             // 都改为label，暂时兼容老的alias，以后要删掉alias
             -params.label = field.label || field.alias;
             -params.name = field.name;
-            -params.required = field.required;
+            -params.editable = field.editable;
             -params.value = data ? data[field.name] : field.defaults
             if extraControl && extraControl.params
               - for(var key in extraControl.params){

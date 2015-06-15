@@ -2,6 +2,6 @@ mixin manage_ctrl_input(options)
   .form-group(data-module="manage_ctrl_input",data-form-control="input")
     if options.label
       label= options.label
-    if options.required === 'yes'
+    if options.editable === 'required'
       span.text-red *
-    input.form-control(type=(options.type || "text"), placeholder=options.placeholder || '', name=options.name, value=(options.type != 'password' ? (options.value || '') : ''),required=(options.required === 'yes'))
+    input.form-control(type=(options.type || "text"), placeholder=options.placeholder || '', name=options.name, value=(options.type != 'password' ? (options.value || '') : ''),required=(options.editable === 'required'))

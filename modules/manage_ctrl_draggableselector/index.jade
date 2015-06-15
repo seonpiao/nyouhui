@@ -3,7 +3,7 @@ mixin manage_ctrl_draggableselector(options)
     if options.label
       div
         label(style="clear:both;")= options.label
-        if options.required === 'yes'
+        if options.editable === 'required'
           span.text-red *
     .col-xs-6
       label 已选
