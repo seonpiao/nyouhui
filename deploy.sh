@@ -8,7 +8,7 @@ server_host="117.121.10.98"
 server_path="/data/www/nyouhui.com/static/dist"
 server_code="/root/code/nyouhui"
 pm2_pname="index"
-upload_dirs=(js css template)
+upload_dirs=(js css template images)
 
 users=(seon)
 

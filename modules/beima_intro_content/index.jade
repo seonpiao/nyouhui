@@ -13,7 +13,7 @@
   each block in blocks
     .block
       h3= block.block_title
-      .content= block.block_content
+      .content!= block.block_content
   .mt_50
     include ../beima_bottom_qrcode/index
   .line.mt_30

@@ -41,7 +41,8 @@ block append content
             -params.label = field.label || field.alias;
             -params.name = field.name;
             -params.editable = field.editable;
-            -params.value = data ? data[field.name] : field.defaults
+            -params.value = (data && data[field.name]) ? data[field.name] : field.defaults
+            -params.hidden = (field.editable === 'hidden')
             if extraControl && extraControl.params
               - for(var key in extraControl.params){
               -   params[key] = extraControl.params[key]
@@ -80,6 +81,8 @@ block append content
               -params.postage = data ? data.postage : '';
               -params.postageYuan = data ? data.postage_yuan : '';
               +manage_ctrl_won2yuan(params)
+            else if field.base === 'continue'
+              +manage_ctrl_continue(params)
             else
               +manage_ctrl_input(params)
       +manage_box({

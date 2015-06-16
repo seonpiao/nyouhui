@@ -26,7 +26,7 @@ li.form-group
     .col-xs-1
       label 编辑
       select.form-control(type="text",name="field_editable")
-        - var editable = {'yes':'显示','required':'必填',no:'不显示','readonly':'只读'}
+        - var editable = {'yes':'可编辑','required':'必填',no:'不可编辑','hidden':'隐藏'}
         each title,value in editable
           option(value=value,selected=(field && field.editable === value))= title
     .col-xs-1

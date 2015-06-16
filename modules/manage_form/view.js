@@ -66,7 +66,11 @@ define(["libs/client/views/base"], function(Base) {
     success: function(model, resp, options) {
       if (resp.code === 200) {
         alert('操作成功');
-        location.href = document.referrer;
+        if (this.$('input[data-form-continue]').length > 0 && this.$('input[data-form-continue]')[0].checked) {
+          location.reload();
+        } else {
+          location.href = document.referrer;
+        }
       } else {
         alert(resp.message || '操作失败');
       }
