@@ -4,7 +4,8 @@ define(["libs/client/views/base"], function(Base) {
     events: {
       'click .btn-cancel': 'cancel',
       'submit': 'submit',
-      'focus input': 'checkSubmit'
+      'focus input': 'checkSubmit',
+      'blur input': 'enableSubmit'
     },
     init: function() {
       var $el = this.$el;
@@ -55,10 +56,17 @@ define(["libs/client/views/base"], function(Base) {
     },
     checkSubmit: function(e) {
       if ($(e.target).attr('nosubmit')) {
+        clearTimeout(this._enableTimer);
         this.$submit.addClass('disabled');
       } else {
         this.$submit.removeClass('disabled');
       }
+    },
+    enableSubmit: function() {
+      var self = this;
+      this._enableTimer = setTimeout(function() {
+        self.$submit.removeClass('disabled');
+      }, 200);
     },
     submit: function(e) {
       console.log(this.$(':focus').attr('nosubmit'))
