@@ -1,21 +1,23 @@
 .btn-toolbar(data-role='editor-toolbar', data-target=id style="margin-bottom:10px;")
-  a.btn.dropdown-toggle(data-toggle='dropdown', title='Font')
-    i.icon-font
-    b.caret
-  ul.dropdown-menu
-  a.btn.dropdown-toggle(data-toggle='dropdown', title='Font Size')
-    i.icon-text-height
-    b.caret
-  ul.dropdown-menu
-    li
-      a(data-edit='fontSize 5')
-        font(size='5') Huge
-    li
-      a(data-edit='fontSize 3')
-        font(size='3') Normal
-    li
-      a(data-edit='fontSize 1')
-        font(size='1') Small
+  .btn-group(style="float:none;")
+    a.btn.dropdown-toggle(data-toggle='dropdown', title='Font')
+      i.icon-font
+      b.caret
+    ul.dropdown-menu
+  .btn-group(style="float:none;")
+    a.btn.dropdown-toggle(data-toggle='dropdown', title='Font Size')
+      i.icon-text-height
+      b.caret
+    ul.dropdown-menu
+      li
+        a(data-edit='fontSize 5')
+          font(size='5') Huge
+      li
+        a(data-edit='fontSize 3')
+          font(size='3') Normal
+      li
+        a(data-edit='fontSize 1')
+          font(size='1') Small
   a.btn(data-edit='bold', title='Bold (Ctrl/Cmd+B)')
     i.icon-bold
   a.btn(data-edit='italic', title='Italic (Ctrl/Cmd+I)')
