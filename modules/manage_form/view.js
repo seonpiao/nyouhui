@@ -3,7 +3,8 @@ define(["libs/client/views/base"], function(Base) {
     moduleName: "manage_form",
     events: {
       'click .btn-cancel': 'cancel',
-      'submit': 'submit'
+      'submit': 'submit',
+      'focus input': 'checkSubmit'
     },
     init: function() {
       var $el = this.$el;
@@ -52,7 +53,15 @@ define(["libs/client/views/base"], function(Base) {
         }
       });
     },
+    checkSubmit: function(e) {
+      if ($(e.target).attr('nosubmit')) {
+        this.$submit.addClass('disabled');
+      } else {
+        this.$submit.removeClass('disabled');
+      }
+    },
     submit: function(e) {
+      console.log(this.$(':focus').attr('nosubmit'))
       e.preventDefault();
       if (!this.$submit.hasClass('disabled')) {
         this.fillModel();

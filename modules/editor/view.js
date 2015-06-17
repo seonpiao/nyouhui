@@ -40,10 +40,6 @@ define(["libs/client/views/base"], function(Base) {
         })
         .change(function() {
           $(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');
-        })
-        .keydown('esc', function() {
-          this.value = '';
-          $(this).change();
         });
 
       this.$('[data-role=magic-overlay]').each(function() {
