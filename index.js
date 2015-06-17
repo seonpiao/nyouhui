@@ -44,7 +44,9 @@ function init(app, options) {
   }));
 
   //parse body
-  app.use(body());
+  app.use(body({
+    jsonLimit: '100mb'
+  }));
 
   //default routing
   defaultRoute(app);
