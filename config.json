@@ -1,0 +1,24 @@
+{
+  "db": "mongodb://localhost:27017",
+  "server": {
+    "port": 3000,
+    "address": "0.0.0.0"
+  },
+  "body": {
+    "limit": "100mb"
+  },
+  "accessControl": {
+    "allowOrigin": "*",
+    "allowMethods": "GET,POST,PUT,DELETE,HEAD,OPTIONS",
+    "allowCredentials": false
+  },
+  "mongoOptions": {
+    "serverOptions": {},
+    "dbOptions": {
+      "w": 1
+    }
+  },
+  "humanReadableOutput": true,
+  "collectionOutputType": "json",
+  "urlPrefix": ""
+}

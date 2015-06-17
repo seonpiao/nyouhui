@@ -2,13 +2,17 @@ define(["libs/client/views/base"], function(Base) {
   var View = Base.extend({
     moduleName: "manage_ctrl_editor",
     init: function() {
-      var um = UM.getEditor(this.$('textarea').attr('id'));
+      // var um = UM.getEditor(this.$('textarea').attr('id'));
+      // this.$('.editor').wysiwyg({
+      //   hotKeys: {},
+      //   toolbarSelector: '[data-target=' + this.$('.editor').attr('id') + ']'
+      // });
     },
     value: function() {
-      return this.$('textarea').val()
+      return this.module('editor').value();
     },
     name: function() {
-      return this.$('textarea').attr('name');
+      return this.module('editor').name();
     }
   });
   return View;

@@ -1,0 +1,9 @@
+mixin manage_ctrl_contentblock(options)
+  .form-group(data-module="manage_ctrl_contentblock",data-form-control="contentblock",data-name=options.name)
+    if options.label
+      label= options.label
+    if options.editable === 'required'
+      span.text-red *
+    ul.blocks(style="list-style:none;padding:0;",data-value=options.value)
+    .form-group
+      button(type="button").btn.btn-default.add-item 增加内容区块

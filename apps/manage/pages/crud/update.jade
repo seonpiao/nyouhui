@@ -6,7 +6,10 @@ block append meta
 
 block append stylesheet
   style.
-    .edui-body-container img{
+    .editable{
+      overflow:auto;
+    }
+    .editable img{
       max-width:100%;
     }
 
@@ -87,6 +90,8 @@ block append content
               +manage_ctrl_won2yuan(params)
             else if field.base === 'continue'
               +manage_ctrl_continue(params)
+            else if field.base === 'contentblock'
+              +manage_ctrl_contentblock(params)
             else
               +manage_ctrl_input(params)
       +manage_box({

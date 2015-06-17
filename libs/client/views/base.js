@@ -85,18 +85,32 @@ define(function() {
         $module = $('[data-module=' + name + ']');
       } else if (typeof instanceName === 'string') {
         $module = $('[data-module-' + name + '=' + instanceName + ']');
+      } else {
+        $module = $('[data-module=' + name + ']');
       }
       if ($module.length > 0) {
         var module = $module.data('view');
         if (module) {
-          callback(module);
+          if (callback) {
+            callback(module);
+          } else {
+            return module;
+          }
         } else {
-          $module.one('viewbind', function() {
-            callback($module.data('view'));
-          });
+          if (callback) {
+            $module.one('viewbind', function() {
+              callback($module.data('view'));
+            });
+          } else {
+            return null;
+          }
         }
       } else {
-        callback(null);
+        if (callback) {
+          callback(null);
+        } else {
+          return null;
+        }
       }
     },
     renderTo: function(selector) {

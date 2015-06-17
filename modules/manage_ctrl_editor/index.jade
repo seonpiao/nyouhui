@@ -7,4 +7,5 @@ mixin manage_ctrl_editor(options)
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    textarea.form-control(id=editorid,style="height:300px;",name=options.name, required=(options.editable === 'required'))!= (options.value || '')
+    include ../editor/index
+    +editor(options)

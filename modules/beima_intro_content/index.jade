@@ -3,17 +3,12 @@
   .line
   h1= data.headline
   .abstract= data.abstract
-  - var blocks = {};
-  - var exp = /(block_title|block_content)(\d+)/
-  each value,key in data
-    - var matched = key.match(exp)
-    if matched
-      - blocks[matched[2]] = blocks[matched[2]] || {}
-      - blocks[matched[2]][matched[1]] = value
+  - var blocks = data.content;
   each block in blocks
+    - try{block = JSON.parse(block)}catch(e){}
     .block
-      h3= block.block_title
-      .content!= block.block_content
+      h3= block.title
+      .content!= block.value
   .mt_50
     include ../beima_bottom_qrcode/index
   .line.mt_30

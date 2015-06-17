@@ -1,0 +1,23 @@
+include ../editor/index
+if block
+  li(style="margin-bottom:20px;")
+    .col-xs-10(style="padding:0;")
+      .block-title
+        input.form-control(type="text", placeholder="区块标题",value=block.title)
+      .block-content(style="padding-top:10px;")
+        +editor({
+          value:block.value
+        })
+    .col-xs-2
+      button(type="button").del-item.btn.btn-default 删除
+    div(style="clear:both;")
+else
+  li(style="margin-bottom:20px;")
+    .col-xs-10(style="padding:0;")
+      .block-title
+        input.form-control(type="text", placeholder="区块标题")
+      .block-content(style="padding-top:10px;")
+        +editor()
+    .col-xs-2
+      button(type="button").del-item.btn.btn-default 删除
+    div(style="clear:both;")
