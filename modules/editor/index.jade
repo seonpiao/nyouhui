@@ -3,6 +3,6 @@ mixin editor(options)
   if !__global.editorid
     - __global.editorid = 0;
   - __global.editorid++;
-  .editor(id="editor_" + (__global.editorid + Date.now()),data-module="editor",data-name=options.name)
-    .btn-toolbar
-    .editable.form-control(style="height:300px;")!= options.value || ''
+  textarea.editor.form-control(style="height:300px;", id="editor_" + (__global.editorid + Date.now()),data-module="editor",data-name=options.name)!= options.value || ''
+    //- .btn-toolbar
+    //- .editable.form-control(style="height:300px;")!= options.value || ''

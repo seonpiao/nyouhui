@@ -4,11 +4,12 @@ define(["libs/client/views/base"], function(Base) {
     moduleName: "editor",
     init: function() {
       id++;
-      this.$toolbar = this.$('.btn-toolbar');
-      this.$editable = this.$('.editable');
-      this.$toolbar.prop('id', 'editor_toolbar_' + id);
-      this.$editable.prop('id', 'editor_editable_' + id);
-      this.initToolbar(id);
+      // this.$toolbar = this.$('.btn-toolbar');
+      // this.$editable = this.$('.editable');
+      // this.$toolbar.prop('id', 'editor_toolbar_' + id);
+      // this.$editable.prop('id', 'editor_editable_' + id);
+      // this.initToolbar(id);
+      UM.getEditor(this.$el[0].id);
     },
     initToolbar: function(id) {
       var self = this;
@@ -49,7 +50,7 @@ define(["libs/client/views/base"], function(Base) {
       });
     },
     value: function() {
-      return this.$('.editable').html();
+      return this.$el.val();
     },
     name: function() {
       return this.$el.attr('data-name');

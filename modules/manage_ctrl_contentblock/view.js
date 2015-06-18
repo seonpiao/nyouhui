@@ -8,7 +8,9 @@ define(["libs/client/views/base"], function(Base) {
     },
     init: function() {
       this.$blocks = this.$('.blocks');
-      // this.$blocks.sortable();
+      this.$blocks.sortable({
+        handle: '.move-item'
+      });
       this.initView();
     },
     initView: function() {
@@ -45,7 +47,7 @@ define(["libs/client/views/base"], function(Base) {
     },
     value: function() {
       var $titles = this.$('.block-title');
-      var $editors = this.$('.editor');
+      var $editors = this.$('[data-module=editor]');
       return _.map($editors, function(editor, i) {
         return JSON.stringify({
           title: $titles[i].firstChild.value,

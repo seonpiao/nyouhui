@@ -9,6 +9,10 @@ var co = require('co');
 var extend = require('node.extend');
 var crypto = require('crypto');
 var moment = require('moment');
+var parse = require('co-busboy');
+var mkdirp = require('mkdirp');
+var path = require('path');
+var fs = require('fs');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -17,7 +21,6 @@ var sha1 = function(str) {
 }
 
 module.exports = function(app) {
-
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
 
   var queryByQuery = function*(db, collection, query) {
@@ -525,6 +528,115 @@ module.exports = function(app) {
       logger.error(e.stack);
     }
   });
+
+  function writeStream(stream, buffer) {
+    return function(done) {
+      stream.write(buffer, done);
+      stream.on('error', done);
+    }
+  }
+
+  function endStream(stream) {
+    return function(done) {
+      stream.end(done);
+    }
+  }
+
+  function* uploadPart(stream, part) {
+    var chunk;
+    var size = 0;
+    while (null !== (chunk = part.read())) {
+      size += chunk.length;
+      yield writeStream(stream, chunk);
+    }
+    yield endStream(stream);
+    return size;
+  }
+
+  function mkdir(dir) {
+    return function(done) {
+      mkdirp(dir, function(err) {
+        if (err) {
+          logger.error(err);
+        }
+        done();
+      })
+    }
+  }
+
+  function calcHash(file) {
+    return function(done) {
+      var hash = crypto.createHash('md5');
+      var stream = fs.createReadStream(file);
+      stream.on('readable', function() {
+        while (null !== (chunk = stream.read())) {
+          hash.update(chunk);
+        }
+      });
+      stream.on('end', function() {
+        done(null, hash.digest('hex'))
+      });
+    }
+  }
+
+  app.route('/api/upload$').post(function*(next) {
+    this.json = true;
+    var dir = this.request.query.dir || '';
+    var keepname = this.request.query.keepname;
+    var from = this.request.query.from;
+    var parts = parse(this, {
+      autoFields: true
+    });
+    var part, size = 0;
+
+    try {
+      while (part =
+        yield parts) {
+        var destDir = path.join(app.config.upload.path, dir);
+        yield mkdir(destDir);
+        var destFile = path.join(destDir, part.filename);
+        var fileStream = fs.createWriteStream(destFile);
+        var hash =
+          yield calcHash(destFile);
+        this.hash = hash;
+        var filename = part.filename;
+        var filepath = path.join(dir, filename);
+        var relPath = path.join(dir, filename);
+        size = yield uploadPart(fileStream, part);
+        if (keepname !== '1') {
+          var newFilename = hash + path.extname(filename);
+          var newFilepath = path.join(destDir, newFilename);
+          relPath = path.join(dir, newFilename);
+          fs.renameSync(destFile, newFilepath);
+        }
+        this.url = 'http://' + this.global.base['static'] + '/' + relPath;
+      }
+      if (from === 'editor') {
+        this.result = {
+          originalName: filename,
+          name: newFilename,
+          url: this.url,
+          size: size,
+          type: path.extname(filename),
+          state: 'SUCCESS'
+        }
+      } else {
+        this.result = {
+          code: 200,
+          result: {
+            url: this.url,
+            hash: this.hash
+          }
+        };
+      }
+    } catch (e) {
+      logger.error(e.stack);
+      this.result = {
+        code: 500,
+        message: e.message
+      }
+    }
+  })
 
   app.route('/api/dbs').get(function*(next) {
     try {

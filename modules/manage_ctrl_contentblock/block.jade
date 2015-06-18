@@ -10,6 +10,7 @@ if block
         })
     .col-xs-2
       button(type="button").del-item.btn.btn-default 删除
+      span(style="cursor:move;margin-left:10px;").move-item 拖我移动
     div(style="clear:both;")
 else
   li(style="margin-bottom:20px;")
@@ -20,4 +21,5 @@ else
         +editor()
     .col-xs-2
       button(type="button").del-item.btn.btn-default 删除
+      span(style="cursor:move;margin-left:10px;").move-item 拖我移动
     div(style="clear:both;")

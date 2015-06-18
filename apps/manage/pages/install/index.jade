@@ -58,7 +58,7 @@ html
           .form-group
             label API端口号
             span.text-red *
-            input.form-control(name='api_port', required=true)
+            input.formrm-control(name='api_port', required=true)
 
       div(class="box box-primary")
         .box-header
@@ -111,6 +111,15 @@ html
             label port
             span.text-red *
             input.form-control(type="number", name='redis_port', required=true)
+
+      div(class="box box-primary")
+        .box-header
+          h3.box-title Upload
+        .box-body
+          .form-group
+            label path
+            span.text-red *
+            input.form-control(name='upload_path', required=true)
 
       div(class="box box-primary")
         .box-header
