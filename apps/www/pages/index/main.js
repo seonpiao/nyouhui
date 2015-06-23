@@ -1,1 +1,0 @@
-require([ "apps/www/pages/index/modules" ], function() {});

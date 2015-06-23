@@ -2,7 +2,7 @@
 //colors
 $grayLight = #ccc
 $grayLighter = #f1f1f1
-$themeColor = darken(rgb(30,164,207),5%)
+$themeColor = #fd862f
 $secondColor = #ff5a00
 $thirdColor = darken(rgb(30,164,207),5%)
 $highlightColor = lighten($thirdColor,70%)
@@ -13,7 +13,7 @@ $bodyBackground = #eee
 $dividingColor = #f9f9f9
 $dividingLineColor = #aaa
 
-$textColor = #fff
+$textColor = #878080
 $infoTextColor = #bbb
 $summaryColor = #8f8f8f
 $rateColor = #F1AE00
@@ -66,7 +66,7 @@ $infoText = #3a87ad
 $infoBackground = #d9edf7
 $infoBorder = darken($infoBackground, 5%)
 
-$bgUrl='http://static.mm.wanleyun.com/orig/images/'
+$bgUrl='http://static.nyouhui.com/'
 
 $itemLevel0=#a2a2a2
 $itemLevel1=#fff
@@ -158,20 +158,21 @@ li
 input[type="submit"]
   border:0
   outline:0
+input
+  outline:0
 i,em
   font-style:nomal
 button
   border:none
+  outline:0
 
 /********* base *********/
 
-*
-  font-family:"微软雅黑"
 html
   color: #595959
   background: #f5f5f5
-  font-size: 12px
-  font-family: "微软雅黑",'microsoft yahei',Arial,sans-serif
+  font-size: 14px
+  font-family: $fontFamily
 img
   border:none
 a

@@ -1,1 +1,0 @@
-require([ "apps/beima/pages/m_intro/modules" ], function() {});

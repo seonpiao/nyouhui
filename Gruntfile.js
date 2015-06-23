@@ -88,7 +88,7 @@ module.exports = function(grunt) {
           modules: [{
             name: "apps/api/common"
           }, {
-            name: "apps/beima/common"
+            name: "apps/m/common"
           }, {
             name: "apps/m/common"
           }, {
@@ -106,7 +106,7 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/user/main"
           }, {
-            name: "apps/beima/pages/m_signup/main"
+            name: "apps/m/pages/m_signup/main"
           }, {
             name: "apps/m/pages/index/main"
           }, {
