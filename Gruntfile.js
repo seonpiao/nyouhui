@@ -90,8 +90,6 @@ module.exports = function(grunt) {
           }, {
             name: "apps/m/common"
           }, {
-            name: "apps/m/common"
-          }, {
             name: "apps/manage/common"
           }, {
             name: "apps/api/pages/data/main"
@@ -106,7 +104,7 @@ module.exports = function(grunt) {
           }, {
             name: "apps/m/pages/m_signup/main"
           }, {
-            name: "apps/m/pages/index/main"
+            name: "apps/m/pages/m_intro/main"
           }, {
             name: "apps/manage/pages/api/main"
           }, {
