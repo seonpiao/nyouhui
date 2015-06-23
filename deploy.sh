@@ -1,20 +1,39 @@
 #!/bin/bash
 
-test=(117.121.10.98)
-production=(117.121.10.98)
-staticurl="http://online.static.nyouhui.com/"
-static_host="static.nyouhui.com"
-server_host="117.121.10.98"
-server_path="/data/www/nyouhui.com/static/dist"
-server_code="/root/code/nyouhui"
-pm2_pname="index"
-upload_dirs=(js css template images)
+GetKey(){    
+  section=$(echo $1 | cut -d '.' -f 1)    
+  key=$(echo $1 | cut -d '.' -f 2)    
+  sed -n "/\[$section\]/,/\[.*\]/{    
+   /^\[.*\]/d
+   /^[ \t]*$/d
+   /^$/d
+   /^#.*$/d
+   s/^[ \t]*$key[ \t]*=[ \t]*\(.*\)[ \t]*/\1/p
+  }" config.ini
+}
+
+test=($(GetKey "server.test"))
+production=($(GetKey "server.production"))
+static_host=$(GetKey "server.static")
+static_check_url="http://online.$static_host/"
+server_path=$(GetKey "path.dist")
+server_code=$(GetKey "server.code")
+pm2_pname=$(GetKey "pm2.index")
+upload_dirs=($(GetKey "path.upload"))
 
 users=(seon)
 
 env=$1
 user=$2
 branch=$3
+
+# aa=($(GetKey "path.upload"))
+# echo ${aa[0]}
+# echo ${aa[1]}
+# echo ${aa[2]}
+# echo ${aa[3]}
+# echo $static_check_url
+# exit 0
 
 if [ "$3" = "" ]; then
   branch=$user
@@ -113,7 +132,7 @@ if [ "$choice" = "y" ]; then
     #删除不带md5值的文件，这些文件不需要提交到服务器上
     find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
     #copy到static server
-    scp -r dist/${upload_dirs[i]}/ root@$server_host:$server_path
+    scp -r dist/${upload_dirs[i]}/ root@$static_host:$server_path
     str="${str} ./dist/${upload_dirs[i]}"
   done
 
