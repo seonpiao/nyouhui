@@ -15,7 +15,8 @@ GetKey(){
 test=($(GetKey "server.test"))
 production=($(GetKey "server.production"))
 static_host=$(GetKey "server.static")
-static_check_url="http://online.$static_host/"
+static_online_host="online.$static_host"
+static_check_url="http://$static_online_host/"
 server_path=$(GetKey "path.dist")
 server_code=$(GetKey "server.code")
 pm2_pname=$(GetKey "pm2.index")
@@ -132,7 +133,7 @@ if [ "$choice" = "y" ]; then
     #删除不带md5值的文件，这些文件不需要提交到服务器上
     find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
     #copy到static server
-    scp -r dist/${upload_dirs[i]}/ root@$static_host:$server_path
+    scp -r dist/${upload_dirs[i]}/ root@$static_online_host:$server_path
     str="${str} ./dist/${upload_dirs[i]}"
   done
 
@@ -143,12 +144,12 @@ if [ "$choice" = "y" ]; then
   files=($(find ${str} -name "*.*"  | grep '\.\w\{16\}\.' | awk -F '^./' '{print $2}' | sed 's/\/\//\//g'))
   filescount=${#files[@]}
   for((i=0;i<filescount;i++));do
-    staticfileurl="${staticurl}${files[i]}"
+    static_file_url="${static_check_url}${files[i]}"
     httpcode=""
     while [ "$httpcode" != "200" ]
     do
-      httpcode=`curl -I -o /dev/null -s -w %{http_code} -H Host:${static_host} ${staticfileurl}`
-      echo "$httpcode - ${staticfileurl}"
+      httpcode=`curl -I -o /dev/null -s -w %{http_code} -H Host:${static_host} ${static_file_url}`
+      echo "$httpcode - ${static_file_url}"
       wait
       if [ "$httpcode" != "200" ]; then
         sleep 10s
