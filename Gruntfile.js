@@ -94,8 +94,6 @@ module.exports = function(grunt) {
           }, {
             name: "apps/manage/common"
           }, {
-            name: "apps/www/common"
-          }, {
             name: "apps/api/pages/data/main"
           }, {
             name: "apps/api/pages/finance/main"
@@ -125,8 +123,6 @@ module.exports = function(grunt) {
             name: "apps/manage/pages/task/main"
           }, {
             name: "apps/manage/pages/user/main"
-          }, {
-            name: "apps/www/pages/index/main"
           }]
         }
       }
