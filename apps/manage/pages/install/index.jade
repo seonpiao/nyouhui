@@ -117,6 +117,10 @@ html
           h3.box-title Upload
         .box-body
           .form-group
+            label host
+            span.text-red *
+            input.form-control(name='upload_host', required=true)
+          .form-group
             label path
             span.text-red *
             input.form-control(name='upload_path', required=true)
