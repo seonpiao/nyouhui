@@ -23,6 +23,8 @@ pm2_pname=$(GetKey "pm2.index")
 upload_dirs=($(GetKey "path.upload"))
 npm_path=$(GetKey "path.npm")
 pm2_path=$(GetKey "path.pm2")
+git_origin=$(GetKey "git.origin")
+git_branch=$(GetKey "git.branch")
 
 users=(seon)
 
@@ -123,7 +125,7 @@ if [ "$choice" = "y" ]; then
   else
     git commit -m online 
   fi
-  git push
+  git push $git_origin $git_branch
   
   #备份dist到temp，后续还需要还原回来
   cp -rf dist/ temp/
