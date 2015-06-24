@@ -21,6 +21,8 @@ server_path=$(GetKey "path.dist")
 server_code=$(GetKey "path.code")
 pm2_pname=$(GetKey "pm2.index")
 upload_dirs=($(GetKey "path.upload"))
+npm_path=$(GetKey "path.npm")
+pm2_path=$(GetKey "path.pm2")
 
 users=(seon)
 
@@ -162,9 +164,9 @@ if [ "$choice" = "y" ]; then
     echo deploy to ${hosts[i]}
     if [ "$env" = "production" ]; then
       echo $server_code
-      ssh root@${hosts[i]} "cd ${server_code} && git pull && /usr/local/node/bin/npm install && /usr/local/node/bin/pm2 reload ${pm2_pname}"
+      ssh root@${hosts[i]} "cd ${server_code} && git pull && $npm_path install && $pm2_path reload ${pm2_pname}"
     else
-      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && /usr/local/node/bin/npm install && /usr/local/bin/pm2 reload $2"
+      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && $npm_path install && $pm2_path reload $2"
     fi
   done
 fi
