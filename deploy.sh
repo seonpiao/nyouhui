@@ -124,10 +124,6 @@ if [ "$choice" = "y" ]; then
   #更新Node服务
   for((i=0;i<num;i++));do
     echo deploy to ${hosts[i]}
-    if [ "$env" = "production" ]; then
-      ssh root@${hosts[i]} "cd ${server_code} && git pull && $npm_path install && $pm2_path reload ${pm2_pname}"
-    else
-      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${git_branch} && git pull && $npm_path install && $pm2_path reload $2"
-    fi
+    ssh root@${hosts[i]} "cd ${server_code} && git pull && $npm_path install && $pm2_path reload ${pm2_pname}"
   done
 fi
