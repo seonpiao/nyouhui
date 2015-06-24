@@ -323,7 +323,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            editable: 'required'
+            editable: 'yes'
           }, {
             name: 'desc',
             alias: '备注',
@@ -331,7 +331,7 @@ module.exports = function(app) {
             index: 'no',
             defaults: '',
             display: 'yes',
-            editable: 'required'
+            editable: 'yes'
           }]
         }
       });
