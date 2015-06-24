@@ -23,7 +23,7 @@ pm2_pname=$(GetKey "pm2.index")
 upload_dirs=($(GetKey "path.upload"))
 npm_path=$(GetKey "path.npm")
 pm2_path=$(GetKey "path.pm2")
-git_origin=$(GetKey "git.origin")
+git_remote=$(GetKey "git.remote")
 git_branch=$(GetKey "git.branch")
 
 users=(seon)
