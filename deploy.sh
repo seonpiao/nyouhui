@@ -135,7 +135,7 @@ if [ "$choice" = "y" ]; then
     #删除不带md5值的文件，这些文件不需要提交到服务器上
     find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
     #copy到static server
-    scp -r dist/${upload_dirs[i]}/ root@$static_online_host:$server_path
+    scp -r dist/${upload_dirs[i]}/* root@$static_online_host:$server_path/${upload_dirs[i]}
     str="${str} ./dist/${upload_dirs[i]}"
   done
 
