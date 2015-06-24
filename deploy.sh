@@ -135,7 +135,9 @@ if [ "$choice" = "y" ]; then
   str=""
   for((i=0;i<dircount;i++));do
     #删除不带md5值的文件，这些文件不需要提交到服务器上
-    find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
+    if [ "${upload_dirs[i]}" != "images" ]; then
+      find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
+    fi
     #copy到static server
     scp -r dist/${upload_dirs[i]}/* root@$static_online_host:$server_path/${upload_dirs[i]}
     str="${str} ./dist/${upload_dirs[i]}"
@@ -165,7 +167,6 @@ if [ "$choice" = "y" ]; then
   for((i=0;i<num;i++));do
     echo deploy to ${hosts[i]}
     if [ "$env" = "production" ]; then
-      echo $server_code
       ssh root@${hosts[i]} "cd ${server_code} && git pull && $npm_path install && $pm2_path reload ${pm2_pname}"
     else
       ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && $npm_path install && $pm2_path reload $2"
