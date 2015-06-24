@@ -125,7 +125,7 @@ if [ "$choice" = "y" ]; then
   else
     git commit -m online 
   fi
-  git push $git_origin $git_branch
+  git push $git_remote $git_branch
   
   #备份dist到temp，后续还需要还原回来
   cp -rf dist/ temp/
