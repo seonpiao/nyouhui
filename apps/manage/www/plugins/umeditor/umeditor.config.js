@@ -137,7 +137,7 @@
 
         //图片上传配置区
         ,
-        imageUrl: "/api/upload?from=editor&dir=dist/editor_upload" //图片上传提交地址
+        imageUrl: "/api/upload?from=editor&dir=editor_upload" //图片上传提交地址
             ,
         imagePath: "" //图片修正地址，引用了fixedImagePath,如有特殊需求，可自行配置
             ,

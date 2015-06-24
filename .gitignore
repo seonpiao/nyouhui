@@ -5,3 +5,4 @@ temp
 dump.rdb
 apps/manage/config.js
 apps/api/config.js
+upload_tmp

@@ -13,6 +13,7 @@ var parse = require('co-busboy');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var fs = require('fs');
+var cp = require('child_process');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -592,24 +593,27 @@ module.exports = function(app) {
     try {
       while (part =
         yield parts) {
-        var destDir = path.join(app.config.upload.path, dir);
-        yield mkdir(destDir);
-        var destFile = path.join(destDir, part.filename);
-        var fileStream = fs.createWriteStream(destFile);
-        var hash =
-          yield calcHash(destFile);
-        this.hash = hash;
+        var tmpDir = path.join(process.cwd(), 'upload_tmp', dir);
+        yield mkdir(tmpDir);
         var filename = part.filename;
-        var filepath = path.join(dir, filename);
-        var relPath = path.join(dir, filename);
+        var extname = path.extname(filename);
+        var tmpFile = path.join(tmpDir, filename);
+        var fileStream = fs.createWriteStream(tmpFile);
         size = yield uploadPart(fileStream, part);
-        if (keepname !== '1') {
-          var newFilename = hash + path.extname(filename);
-          var newFilepath = path.join(destDir, newFilename);
-          relPath = path.join(dir, newFilename);
-          fs.renameSync(destFile, newFilepath);
+        var hash =
+          yield calcHash(tmpFile);
+        var remoteDir = path.join(app.config.upload.path, 'upload', dir);
+        yield thunkify(cp.exec.bind(cp))('ssh root@' + app.config.upload.host + ' "mkdir -p ' + remoteDir + '"')
+        var newFilename = filename;
+        if (keepname === '1') {
+          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
+        } else {
+          newFilename = hash + extname;
+          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
         }
-        this.url = 'http://' + this.global.base['static'] + '/' + relPath;
+        var relPath = path.join(dir, newFilename);
+        this.url = 'http://' + this.global.base['static'] + '/upload/' + relPath;
+        yield thunkify(cp.exec.bind(cp))('rm -rf ' + tmpDir);
       }
       if (from === 'editor') {
         this.result = {
@@ -618,14 +622,15 @@ module.exports = function(app) {
           url: this.url,
           size: size,
           type: path.extname(filename),
-          state: 'SUCCESS'
+          state: 'SUCCESS',
+          hash: hash
         }
       } else {
         this.result = {
           code: 200,
           result: {
             url: this.url,
-            hash: this.hash
+            hash: hash
           }
         };
       }
