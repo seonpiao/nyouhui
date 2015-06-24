@@ -1,5 +1,7 @@
 #!/bin/bash
 
+config=$1
+
 GetKey(){    
   section=$(echo $1 | cut -d '.' -f 1)    
   key=$(echo $1 | cut -d '.' -f 2)    
@@ -9,11 +11,10 @@ GetKey(){
    /^$/d
    /^#.*$/d
    s/^[ \t]*$key[ \t]*=[ \t]*\(.*\)[ \t]*/\1/p
-  }" config.ini
+  }" $config
 }
 
-test=($(GetKey "server.test"))
-production=($(GetKey "server.production"))
+hosts=($(GetKey "server.node"))
 static_host=$(GetKey "server.static")
 static_online_host="online.$static_host"
 static_check_url="http://$static_online_host/"
@@ -25,50 +26,6 @@ npm_path=$(GetKey "path.npm")
 pm2_path=$(GetKey "path.pm2")
 git_remote=$(GetKey "git.remote")
 git_branch=$(GetKey "git.branch")
-
-users=(seon)
-
-env=$1
-user=$2
-branch=$3
-
-# aa=($(GetKey "path.upload"))
-# echo ${aa[0]}
-# echo ${aa[1]}
-# echo ${aa[2]}
-# echo ${aa[3]}
-# echo $static_check_url
-# exit 0
-
-if [ "$3" = "" ]; then
-  branch=$user
-fi
-
-user=($(echo $2 | sed s/\[0-9\]\$//))
-
-if [ "$env" = "production" ]; then
-  hosts=(${production[@]})
-elif [ "$env" = "test" ]; then
-  hosts=(${test[@]})
-  for loop in ${users[@]}
-  do
-    if [[ $loop = $user ]]
-    then
-      userFlag=true
-    fi
-  done
-
-  if [[ $userFlag = true ]]; then
-    echo "${user}:" > /dev/null
-  else
-    echo "请写出你的美名，wujunlian or seon or feng"
-    exit
-  fi
-
-else
-  echo '请指定正确的上线环境，test or production'
-  exit
-fi
 
 num=${#hosts[@]}
 
@@ -125,6 +82,7 @@ if [ "$choice" = "y" ]; then
   else
     git commit -m online 
   fi
+
   git push $git_remote $git_branch
   
   #备份dist到temp，后续还需要还原回来
