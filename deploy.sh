@@ -57,14 +57,14 @@ if [ $gitaheadcount -gt 0 ]; then
 fi
 
 if [ "$env" = "test" ]; then
-  if [ "$(git status |awk 'NR==1 {print $3}')x" != "${branch}x" ]; then
-    echo "Please enter checkout ${branch}"
+  if [ "$(git status |awk 'NR==1 {print $3}')x" != "${git_branch}x" ]; then
+    echo "Please enter checkout ${git_branch}"
     exit
   fi
 fi
 # if [ "$env" = "production" ]; then
 #   choice="n"
-read -p "Deploy branch(${branch}) to ${hosts[*]}: (y/n)" choice
+read -p "Deploy branch(${git_branch}) to ${hosts[*]}: (y/n)" choice
 # fi
 
 if [ "$choice" = "y" ]; then
@@ -127,7 +127,7 @@ if [ "$choice" = "y" ]; then
     if [ "$env" = "production" ]; then
       ssh root@${hosts[i]} "cd ${server_code} && git pull && $npm_path install && $pm2_path reload ${pm2_pname}"
     else
-      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${branch} && git pull && $npm_path install && $pm2_path reload $2"
+      ssh root@${hosts[i]} "cd /root/code/$2 && git fetch && git checkout ${git_branch} && git pull && $npm_path install && $pm2_path reload $2"
     fi
   done
 fi
