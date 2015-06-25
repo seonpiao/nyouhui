@@ -102,9 +102,13 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/user/main"
           }, {
-            name: "apps/m/pages/m_signup/main"
+            name: "apps/api/pages/weixin/main"
+          }, {
+            name: "apps/m/pages/kangbao_show/main"
           }, {
             name: "apps/m/pages/m_intro/main"
+          }, {
+            name: "apps/m/pages/m_signup/main"
           }, {
             name: "apps/manage/pages/api/main"
           }, {
@@ -228,18 +232,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    shell: {
-      devbr: {
-        command: function(brname) {
-          return [
-            'git checkout master',
-            'git pull',
-            'git branch ' + brname,
-            'git checkout ' + brname
-          ].join('&&');
-        }
-      }
-    },
     newapp: {
       options: {
         dest: ""
@@ -280,7 +272,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-stylus");
   grunt.loadNpmTasks("grunt-contrib-cssmin");
   grunt.loadNpmTasks("grunt-contrib-copy");
-  grunt.loadNpmTasks("grunt-shell");
   grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("private-grunt-jade-runtime");
   grunt.loadNpmTasks("grunt-filerev");
