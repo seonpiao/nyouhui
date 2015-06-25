@@ -1,0 +1,1 @@
+require([ "apps/api/pages/weixin/modules" ], function() {});

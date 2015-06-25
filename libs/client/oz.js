@@ -300,7 +300,7 @@
                         }
                         this[dep].push(m);
                     } else {
-                        delays[mname][0] --;
+                        delays[mname][0]--;
                     }
                 }, _refers);
                 if (delays[mname][0] > 0) {
@@ -621,5 +621,5 @@
 })();
 
 require.config({
-    baseUrl: 'http://static.nyouhui.com/dist/'
+    baseUrl: 'http://' + __global.base["static"] + '/dist/'
 });

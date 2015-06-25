@@ -1,0 +1,237 @@
+.kangbao_show
+  height:100%
+  display:block
+  // display:none
+  *
+    transition(all .2s ease-out)
+  .screen
+    position:relative
+    height:100%
+    width:100%
+    overflow:hidden
+    .background
+      position:absolute
+      top:50%
+      margin-top:-252px
+      background-size:100%
+      width:320px
+      height:504px
+      left:50%
+      margin-left:-160px
+    .content
+      position:absolute
+      top:0
+      height:100%
+      width:100%
+  .screen1
+    .background
+      background-image:url($bgUrl + 'dist/images/m/photo.png')
+      transform(scale(.6))
+      .mask
+        height:100%
+        background:url($bgUrl + 'dist/images/m/mask.png')
+        background-size:100%
+    .kangbao-info
+      position:absolute
+      top:20px
+      right:15px
+      width:79px
+      height:40px
+      background-image:url($bgUrl + 'dist/images/m/kangbao_info.png')
+      background-size:100%
+    .self-desc
+      height:40px
+      width:200px
+      background:rgba(#ff6100,.65)
+      bottom:65px
+      position:absolute
+      line-height:40px
+      text-align:center
+      color:white
+      left:-200px
+    .bg
+      position:absolute
+      bottom:0
+      height:65px
+      width:226px
+      background:rgba(#000,.5)
+      left:-226px
+    .at-kangbao
+      position:absolute
+      bottom:37px
+      width:193px
+      height:16px
+      left:15px
+      background-image:url($bgUrl + 'dist/images/m/at_kangbao.png')
+      background-size:100%
+      left:-193px
+  .screen2
+    .background
+      background-image:url($bgUrl + 'dist/images/m/hereiskangbao.jpg')
+      background-size:100%
+  .screen3
+    .background
+      background-image:url($bgUrl + 'dist/images/m/daka_bg.png')
+      background-size:100%
+    .daka-title
+      background-image:url($bgUrl + 'dist/images/m/daka_title.png')
+      background-size:100%
+      position:absolute
+      top:10px
+      height:55px
+      width:184px
+      left:50%
+      margin-left:-92px
+    .daka
+      width:142px
+      height:142px
+      position:absolute
+      transform:scale(.5)
+    .daka-name
+      position:absolute
+      background-repeat:no-repeat
+      background-size:100%
+    .daka1
+      top:79px
+      left:-11px
+      background-image:url($bgUrl + 'dist/images/m/touxiang_1.png')
+      background-size:100%
+      .daka-name
+        top:58px
+        left:49px
+        background-image:url($bgUrl + 'dist/images/m/mingzi_1.png')
+        width:128px
+        height:38px
+    .daka2
+      top:128px
+      right:-12px
+      background-image:url($bgUrl + 'dist/images/m/touxiang_2.png')
+      background-size:100%
+      .daka-name
+        top:66px
+        left:-45px
+        background-image:url($bgUrl + 'dist/images/m/mingzi_2.png')
+        width:128px
+        height:39px
+    .daka3
+      top:238px
+      left:49px
+      background-image:url($bgUrl + 'dist/images/m/touxiang_3.png')
+      background-size:100%
+      .daka-name
+        top:60px
+        left:88px
+        background-image:url($bgUrl + 'dist/images/m/mingzi_3.png')
+        width:140px
+        height:39px
+    .daka4
+      bottom:23px
+      right:-26px
+      background-image:url($bgUrl + 'dist/images/m/touxiang_4.png')
+      background-size:100%
+      .daka-name
+        top:66px
+        left:-45px
+        background-image:url($bgUrl + 'dist/images/m/mingzi_4.png')
+        width:128px
+        height:39px
+    .daka5
+      bottom:-13px
+      left:-13px
+      background-image:url($bgUrl + 'dist/images/m/touxiang_5.png')
+      background-size:100%
+      .daka-name
+        top:71px
+        left:40px
+        background-image:url($bgUrl + 'dist/images/m/mingzi_5.png')
+        background-size:100%
+        width:129px
+        height:39px
+  .screen4
+    .photo-big
+      width:105px
+      height:150px
+      position:absolute
+    .photo-small
+      width:105px
+      height:74px
+      position:absolute
+    .photo1
+      background-image:url($bgUrl + 'dist/images/m/photo1.png')
+      background-size:100%
+      top:0
+      left:0
+    .photo2
+      background-image:url($bgUrl + 'dist/images/m/photo2.png')
+      background-size:100%
+      top:155px
+      left:0
+    .photo3
+      background-image:url($bgUrl + 'dist/images/m/photo3.png')
+      background-size:100%
+      top:0px
+      left:110px
+    .photo4
+      background-image:url($bgUrl + 'dist/images/m/photo4.png')
+      background-size:100%
+      top:79px
+      left:110px
+    .photo5
+      background-image:url($bgUrl + 'dist/images/m/photo5.png')
+      background-size:100%
+      top:0px
+      left:220px
+    .photo6
+      background-image:url($bgUrl + 'dist/images/m/photo6.png')
+      background-size:100%
+      top:155px
+      left:220px
+    .mid-text
+      background-image:url($bgUrl + 'dist/images/m/mid_text.png')
+      background-size:100%
+      top:248px
+      left:50%
+      margin-left:-92px
+      width:185px
+      height:13px
+      position:absolute
+    .photo7
+      background-image:url($bgUrl + 'dist/images/m/photo7.png')
+      background-size:100%
+      left:0
+      bottom:0
+      width:100%
+      height:227px
+      position:absolute
+  .screen5
+    .pic
+      background-image:url($bgUrl + 'dist/images/m/big_photo.png')
+      background-size:100%
+      margin:20px auto 0
+      width:280px
+      height:280px
+    .title
+      line-height:70px
+      text-align:center
+      font-size:1.2em
+    p
+      margin:0 20px
+      .num
+        display:inline-block
+        width:100px
+        text-align:right
+        color:#ff6000
+      .desc
+        padding-left:12px
+  .scroll-up
+    width:26px
+    height:14px
+    position:absolute
+    bottom:15px
+    left:50%
+    margin-left:-13px
+    background-size:100%
+    &.scroll-up-white
+      background-image:url($bgUrl + 'dist/images/m/scroll_up_white.png')
+    &.scroll-up-orange
+      background-image:url($bgUrl + 'dist/images/m/scroll_up_orange.png')

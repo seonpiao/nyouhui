@@ -153,7 +153,7 @@ module.exports = function(grunt) {
         dest: "dist/images",
         filter: "isFile",
         rename: function(dest, filepath) {
-          return path.join(dest, filepath.replace("images/", ""));
+          return path.join(dest, filepath.replace("static/images/", ""));
         }
       }
     },
