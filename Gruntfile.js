@@ -104,6 +104,8 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/weixin/main"
           }, {
+            name: "apps/m/pages/kangbao_profile/main"
+          }, {
             name: "apps/m/pages/kangbao_show/main"
           }, {
             name: "apps/m/pages/m_intro/main"

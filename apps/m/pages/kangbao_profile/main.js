@@ -1,0 +1,1 @@
+require([ "apps/m/pages/kangbao_profile/modules" ], function() {});
