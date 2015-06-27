@@ -30,7 +30,7 @@ define(["libs/client/views/base", "libs/client/sha1"], function(Base) {
       var now = this.createTimestamp();
       var nonceStr = this.createNonceStr();
       $.ajax({
-        url: 'http://beima.nyouhui.com:9003/weixin/ticket',
+        url: 'http://api.firstre.cn/weixin/ticket',
         // url:'http://dev.api.tvall.com:8999/video/ticket',
         success: function(data) {
           var ticket = data.result.ticket;
