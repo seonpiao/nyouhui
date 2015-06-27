@@ -102,6 +102,8 @@ define(["libs/client/views/base", "libs/client/sha1"], function(Base) {
                 url: 'http://api.firstre.cn/weixin/downmedia?media_id=' + serverId,
                 dataType: 'json',
                 success: function(json) {
+                  alert(typeof json);
+                  alert(json);
                   if (json.code === 0) {
                     alert(serverId);
                     callback({
