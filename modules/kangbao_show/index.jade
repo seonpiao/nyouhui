@@ -1,10 +1,10 @@
 .kangbao_show(data-module="kangbao_show")
   .screen.screen1
-    .background
+    .background(style="background-image:url(" + result.data[db][collection].url + ")")
       .mask
     .content
       .kangbao-info
-      .self-desc 我是王微微，岗位0368
+      .self-desc= "我是" + result.data[db][collection].name + "，岗位" + result.data[db][collection].no
       .bg
       .at-kangbao
       .scroll-up.scroll-up-white

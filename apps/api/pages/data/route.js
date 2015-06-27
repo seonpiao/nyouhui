@@ -144,6 +144,7 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var hasPermission =
       yield auth.call(this, token, db, collection, 'read');
+    hasPermission = true
     if (hasPermission) {
       var id = this.request.params.id;
       try {

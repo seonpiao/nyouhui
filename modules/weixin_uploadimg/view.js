@@ -1,9 +1,6 @@
-define(["libs/client/views/base"], function(Base) {
+define(["libs/client/views/base", "libs/client/sha1"], function(Base) {
   var View = Base.extend({
     moduleName: "weixin_uploadimg",
-    events: {
-      'click .btn': 'chooseImage'
-    },
     init: function() {
       this.getTicket();
     },
@@ -32,9 +29,8 @@ define(["libs/client/views/base"], function(Base) {
       var self = this;
       var now = this.createTimestamp();
       var nonceStr = this.createNonceStr();
-      alert(1)
       $.ajax({
-        url: 'http://local.seon.im:9003/weixin/ticket',
+        url: 'http://beima.nyouhui.com:9003/weixin/ticket',
         // url:'http://dev.api.tvall.com:8999/video/ticket',
         success: function(data) {
           var ticket = data.result.ticket;
@@ -45,10 +41,11 @@ define(["libs/client/views/base"], function(Base) {
             url: location.href.replace(/#.*$/, '')
           };
           var string = self.raw(ret);
-          var sign = hex_sha1(string);
+          var sign = shalUtil.hex_sha1(string);
+          alert(ticket)
           wx.config({
             debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-            appId: 'wxd03c0faf00969a98', // 必填，公众号的唯一标识
+            appId: 'wx8cfeb90d2826a007', // 必填，公众号的唯一标识
             timestamp: now, // 必填，生成签名的时间戳
             nonceStr: nonceStr, // 必填，生成签名的随机串
             signature: sign, // 必填，签名，见附录1
@@ -92,7 +89,7 @@ define(["libs/client/views/base"], function(Base) {
         }
       });
     },
-    chooseImage: function() {
+    chooseImage: function(callback) {
       var self = this;
       wx.chooseImage({
         success: function(res) {
@@ -102,8 +99,18 @@ define(["libs/client/views/base"], function(Base) {
             isShowProgressTips: 1, // 默认为1，显示进度提示
             success: function(res) {
               var serverId = res.serverId; // 返回图片的服务器端ID
-              alert(serverId);
-              self.$('img').attr('src', 'http://local.seon.im:9003/weixin/downmedia?media_id=' + serverId);
+              $.ajax({
+                url: 'http://api.firstre.cn/weixin/downmedia?media_id=' + serverId,
+                dataType: 'json',
+                success: function(json) {
+                  if (json.code === 0) {
+                    callback({
+                      mediaId: serverId,
+                      url: json.result.url
+                    });
+                  }
+                }
+              })
             }
           });
         }

@@ -1,11 +1,14 @@
 var thunkify = require('thunkify');
 var request = require('request');
+var path = require('path');
+var cp = require('child_process');
+var fs = require('fs');
 
 var token, jsapiTicket;
 
 function* refreshToken() {
-  var appid = 'wxd03c0faf00969a98';
-  var appsec = 'ff732d23e3d41d306d2c160a27aedd37';
+  var appid = 'wx8cfeb90d2826a007';
+  var appsec = 'e94128f0d35ea2cb3667b7f60864a409';
   var now = Date.now();
   if (!token || (now - token.timestamp > 6000 * 1000)) {
     var result =
@@ -74,7 +77,7 @@ module.exports = function(app) {
   });
 
   route.nested('/downmedia').get(function*(next) {
-    this.raw = true;
+    this.json = true;
     var mediaId = this.request.query.media_id;
     if (!token) {
       yield refreshToken();
@@ -85,8 +88,23 @@ module.exports = function(app) {
         qs: {
           access_token: token.access_token,
           media_id: mediaId
-        }
+        },
+        encoding: null
       });
-    console.log(result[1]);
+    this.type = result[0].headers['content-type'];
+    var extname = this.type.replace(/.*\//, '');
+    var fileName = mediaId + '.' + extname;
+    var tmpFile = path.join(__dirname, fileName);
+    yield thunkify(fs.writeFile.bind(fs))(tmpFile, result[1]);
+    var remoteDir = path.join(app.config.upload.path, 'weixin_upload');
+    yield thunkify(cp.exec.bind(cp))('ssh root@' + app.config.upload.host + ' "mkdir -p ' + remoteDir + '"')
+    yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, fileName))
+    yield thunkify(cp.exec.bind(cp))('rm -f ' + tmpFile);
+    this.result = {
+      code: 0,
+      result: {
+        url: 'http://' + this.global.base['static'] + '/weixin_upload/' + fileName
+      }
+    };
   });
 };
