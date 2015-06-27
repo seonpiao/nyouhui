@@ -53,7 +53,6 @@ define(["libs/client/views/base"], function(Base) {
       var self = this;
       var name = this.$('.edit-name input').val();
       var no = this.$('.edit-no input').val();
-      this.url = 'http://static.firstre.cn/weixin_upload/1rUSFWMQdPTrxjMg_DNNQzQyQBpo7RduMj-wsqR0cz2CycPq9B8SLoD3hoBX3U0O.jpeg'
       if (this.url && name && no) {
         $.ajax({
           url: 'http://api.firstre.cn/data/kangbao/uploadimg',
