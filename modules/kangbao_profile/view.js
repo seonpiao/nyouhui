@@ -58,15 +58,15 @@ define(["libs/client/views/base"], function(Base) {
             self.$('.screen1').hide();
             self.$('.screen2').show();
             wx.onMenuShareTimeline({
-              title: '我在康宝', // 分享标题
-              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
+              title: '我在康宝马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
+              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
               imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo_dark.png', //
               success: self.shareSuccess
             });
             wx.onMenuShareAppMessage({
-              title: '《女神的房间》', // 分享标题
-              desc: '我正在《女神的房间》和长腿御姐、混血超模、萝莉公主一起玩，你不来看么？',
-              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
+              title: '第一反应', // 分享标题
+              desc: '我在康宝马拉松守护跑友的生命安全，我是第一反应人',
+              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
               imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo.png', //
               success: self.shareSuccess
             });
