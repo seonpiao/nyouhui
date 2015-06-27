@@ -30,21 +30,6 @@ define(["libs/client/views/base"], function(Base) {
           transform: 'scale(' + scale + ')'
         });
       });
-      wx.ready(function() {
-        wx.onMenuShareTimeline({
-          title: '我在康宝', // 分享标题
-          link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
-          imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo_dark.png', //
-          success: self.shareSuccess
-        });
-        wx.onMenuShareAppMessage({
-          title: '《女神的房间》', // 分享标题
-          desc: '我正在《女神的房间》和长腿御姐、混血超模、萝莉公主一起玩，你不来看么？',
-          link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
-          imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo.png', //
-          success: self.shareSuccess
-        });
-      });
     },
     shareSuccess: function() {
       alert('分享成功');
@@ -72,6 +57,19 @@ define(["libs/client/views/base"], function(Base) {
             self.$('.self-desc').html('我是' + name + '，岗位' + no);
             self.$('.screen1').hide();
             self.$('.screen2').show();
+            wx.onMenuShareTimeline({
+              title: '我在康宝', // 分享标题
+              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
+              imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo_dark.png', //
+              success: self.shareSuccess
+            });
+            wx.onMenuShareAppMessage({
+              title: '《女神的房间》', // 分享标题
+              desc: '我正在《女神的房间》和长腿御姐、混血超模、萝莉公主一起玩，你不来看么？',
+              link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId, // 分享链接
+              imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo.png', //
+              success: self.shareSuccess
+            });
           }
         });
       } else {}
@@ -81,7 +79,6 @@ define(["libs/client/views/base"], function(Base) {
       this.module('weixin_uploadimg', function(module) {
         if (module) {
           module.chooseImage(function(info) {
-            alert(JSON.stringify(info));
             self.url = info.url;
             self.mediaId = info.mediaId;
             self.check();
