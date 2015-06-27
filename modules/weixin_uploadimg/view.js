@@ -103,6 +103,7 @@ define(["libs/client/views/base", "libs/client/sha1"], function(Base) {
                 dataType: 'json',
                 success: function(json) {
                   if (json.code === 0) {
+                    alert(serverId);
                     callback({
                       mediaId: serverId,
                       url: json.result.url

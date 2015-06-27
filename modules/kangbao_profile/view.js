@@ -81,6 +81,7 @@ define(["libs/client/views/base"], function(Base) {
       this.module('weixin_uploadimg', function(module) {
         if (module) {
           module.chooseImage(function(info) {
+            alert(JSON.stringify(info));
             self.url = info.url;
             self.mediaId = info.mediaId;
             self.check();
