@@ -82,6 +82,11 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base
           if (config) {
             self.playConfig(config);
           }
+          if (n === 4) {
+            setTimeout(function() {
+              self.showSharePanel();
+            }, 4000);
+          }
         }
       });
     },
