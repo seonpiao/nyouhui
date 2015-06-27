@@ -1,6 +1,11 @@
 define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base) {
   var View = Base.extend({
     moduleName: "kangbao_show",
+    events: {
+      'click .screen5': 'showSharePanel',
+      'click .share-panel': 'hideSharePanel',
+      'click .btn-replay': 'replay'
+    },
     init: function() {
       var winWidth = $(window).width();
       var winHeight = $(window).height();
@@ -43,17 +48,35 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base
             '500': ['.screen1 .self-desc left 0px'],
             '700': ['.screen1 .bg left 20px', '.screen1 .at-kangbao left 35px'],
             '900': ['.screen1 .bg left 0px', '.screen1 .at-kangbao left 15px']
-          }, null, {
+          }, {
+            '50': ['.screen2 opacity 1']
+          }, {
             '0': ['.daka1 transform scale(1.2)'],
-            '200': ['.daka1 transform scale(1)'],
-            '400': ['.daka2 transform scale(1.2)'],
-            '600': ['.daka2 transform scale(1)'],
-            '800': ['.daka3 transform scale(1.2)'],
-            '1000': ['.daka3 transform scale(1)'],
-            '1200': ['.daka4 transform scale(1.2)'],
-            '1400': ['.daka4 transform scale(1)'],
-            '1600': ['.daka5 transform scale(1.2)'],
-            '1800': ['.daka5 transform scale(1)']
+            '199': ['.daka1 transform scale(1)'],
+            '100': ['.daka2 transform scale(1.2)'],
+            '299': ['.daka2 transform scale(1)'],
+            '200': ['.daka3 transform scale(1.2)'],
+            '399': ['.daka3 transform scale(1)'],
+            '300': ['.daka4 transform scale(1.2)'],
+            '499': ['.daka4 transform scale(1)'],
+            '400': ['.daka5 transform scale(1.2)'],
+            '599': ['.daka5 transform scale(1)']
+          }, {
+            '0': ['.photo1 transform scale(1.2)'],
+            '199': ['.photo1 transform scale(1)'],
+            '100': ['.photo3 transform scale(1.2)'],
+            '299': ['.photo3 transform scale(1)'],
+            '200': ['.photo5 transform scale(1.2)'],
+            '399': ['.photo5 transform scale(1)'],
+            '300': ['.photo6 transform scale(1.2)'],
+            '499': ['.photo6 transform scale(1)'],
+            '400': ['.photo2 transform scale(1.2)'],
+            '599': ['.photo2 transform scale(1)'],
+            '700': ['.photo7 left 0']
+          }, {
+            '0': ['.screen5 .p1 opacity 1'],
+            '1000': ['.screen5 .p2 opacity 1'],
+            '2000': ['.screen5 .p3 opacity 1']
           }];
           var config = configs[n];
           if (config) {
@@ -76,6 +99,17 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base
           }, timer);
         })(timer)
       }
+    },
+    showSharePanel: function() {
+      this.$('.share-panel').show();
+    },
+    hideSharePanel: function(e) {
+      this.$('.share-panel').hide();
+      e.stopPropagation();
+    },
+    replay: function() {
+      location.href = location.pathname + '#1'
+      location.reload();
     }
   });
   return View;
