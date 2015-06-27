@@ -83,7 +83,7 @@ define(["libs/client/views/base"], function(Base) {
         if (module) {
           module.chooseImage(function(info) {
             self.url = info.url;
-            this.mediaId = info.mediaId;
+            self.mediaId = info.mediaId;
             self.check();
           });
         }
