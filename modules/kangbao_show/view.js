@@ -133,7 +133,7 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify", "libs/client/s
           });
         }
       });
-    }
+    },
     shareSuccess: function() {
       alert('分享成功');
     },
