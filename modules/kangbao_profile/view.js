@@ -82,7 +82,7 @@ define(["libs/client/views/base"], function(Base) {
             self.url = info.url;
             self.mediaId = info.mediaId;
             self.$('.placeholder').css({
-              backgroundImage: 'url(' + info.url ')'
+              backgroundImage: 'url(' + info.url + ')'
             });
             self.check();
           });
