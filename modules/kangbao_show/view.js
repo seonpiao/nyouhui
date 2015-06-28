@@ -120,14 +120,14 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify", "libs/client/s
             wx.onMenuShareTimeline({
               title: '我在康宝马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
               link: location.href, // 分享链接
-              imgUrl: 'http://' + __global.base["static"] + 'dist/images/m/150x150.png', //
+              imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
             wx.onMenuShareAppMessage({
               title: '第一反应', // 分享标题
               desc: '我在康宝马拉松守护跑友的生命安全，我是第一反应人',
               link: location.href, // 分享链接
-              imgUrl: 'http://' + __global.base["static"] + 'dist/images/m/150x150.png', //
+              imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
           });
