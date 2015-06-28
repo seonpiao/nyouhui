@@ -97,6 +97,7 @@ if [ "$choice" = "y" ]; then
       find dist/${upload_dirs[i]}/ -name "*.*"  | grep -v '\.\w\{16\}\.' | sed  's/\/\{1,\}/\//g' | xargs rm -f
     fi
     #copy到static server
+    ssh root@$static_online_host "mkdir -p $server_path/${upload_dirs[i]}"
     scp -r dist/${upload_dirs[i]}/* root@$static_online_host:$server_path/${upload_dirs[i]}
     str="${str} ./dist/${upload_dirs[i]}"
   done
