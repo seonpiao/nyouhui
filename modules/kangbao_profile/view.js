@@ -60,14 +60,14 @@ define(["libs/client/views/base"], function(Base) {
             self.$('.screen1').hide();
             self.$('.screen2').show();
             wx.onMenuShareTimeline({
-              title: '我在康宝马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
+              title: '我在康保马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
               link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
               imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
             wx.onMenuShareAppMessage({
               title: '第一反应', // 分享标题
-              desc: '我在康宝马拉松守护跑友的生命安全，我是第一反应人',
+              desc: '我在康保马拉松守护跑友的生命安全，我是第一反应人',
               link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
               imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess

@@ -29,6 +29,29 @@ function* refreshToken() {
   return token;
 }
 
+function* getTicket() {
+  if (!token) {
+    yield refreshToken();
+  }
+  var result =
+    yield thunkify(request)({
+      url: 'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
+      qs: {
+        access_token: token.access_token,
+        type: 'jsapi'
+      }
+    });
+  if (result) {
+    var body = result[1];
+    var data = JSON.parse(body);
+  }
+  if (!data || !data.ticket) {
+    token = null;
+    return yield getTicket();
+  }
+  return data;
+}
+
 module.exports = function(app) {
 
   var route = app.route('/weixin');
@@ -49,22 +72,8 @@ module.exports = function(app) {
   route.nested('/ticket').get(function*(next) {
     this.json = true
     var now = Date.now();
-    if (!jsapiTicket || (now - token.timestamp > 6000 * 1000) || token.errcode === 42001) {
-      if (!token) {
-        yield refreshToken();
-      }
-      var result =
-        yield thunkify(request)({
-          url: 'https://api.weixin.qq.com/cgi-bin/ticket/getticket',
-          qs: {
-            access_token: token.access_token,
-            type: 'jsapi'
-          }
-        });
-      if (result) {
-        var body = result[1];
-        jsapiTicket = JSON.parse(body);
-      }
+    if (!jsapiTicket) {
+      jsapiTicket = yield getTicket();
     }
     this.result = {
       code: 0,

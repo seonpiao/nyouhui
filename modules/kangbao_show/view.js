@@ -118,14 +118,14 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify", "libs/client/s
           });
           wx.ready(function() {
             wx.onMenuShareTimeline({
-              title: '我在康宝马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
+              title: '我在康保马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
               link: location.href, // 分享链接
               imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
             wx.onMenuShareAppMessage({
               title: '第一反应', // 分享标题
-              desc: '我在康宝马拉松守护跑友的生命安全，我是第一反应人',
+              desc: '我在康保马拉松守护跑友的生命安全，我是第一反应人',
               link: location.href, // 分享链接
               imgUrl: 'http://' + __global.base["static"] + '/dist/images/m/150x150.png', //
               success: self.shareSuccess
@@ -156,17 +156,6 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify", "libs/client/s
           }, {
             '50': ['.screen2 opacity 1']
           }, {
-            '0': ['.daka1 transform scale(1.2)'],
-            '199': ['.daka1 transform scale(1)'],
-            '100': ['.daka2 transform scale(1.2)'],
-            '299': ['.daka2 transform scale(1)'],
-            '200': ['.daka3 transform scale(1.2)'],
-            '399': ['.daka3 transform scale(1)'],
-            '300': ['.daka4 transform scale(1.2)'],
-            '499': ['.daka4 transform scale(1)'],
-            '400': ['.daka5 transform scale(1.2)'],
-            '599': ['.daka5 transform scale(1)']
-          }, {
             '0': ['.photo1 transform scale(1.2)'],
             '199': ['.photo1 transform scale(1)'],
             '100': ['.photo3 transform scale(1.2)'],
@@ -178,6 +167,17 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify", "libs/client/s
             '400': ['.photo2 transform scale(1.2)'],
             '599': ['.photo2 transform scale(1)'],
             '700': ['.photo7 left 0']
+          }, {
+            '0': ['.daka1 transform scale(1.2)'],
+            '199': ['.daka1 transform scale(1)'],
+            '100': ['.daka2 transform scale(1.2)'],
+            '299': ['.daka2 transform scale(1)'],
+            '200': ['.daka3 transform scale(1.2)'],
+            '399': ['.daka3 transform scale(1)'],
+            '300': ['.daka4 transform scale(1.2)'],
+            '499': ['.daka4 transform scale(1)'],
+            '400': ['.daka5 transform scale(1.2)'],
+            '599': ['.daka5 transform scale(1)']
           }, {
             '0': ['.screen5 .p1 opacity 1'],
             '1000': ['.screen5 .p2 opacity 1'],
