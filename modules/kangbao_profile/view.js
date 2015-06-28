@@ -81,12 +81,19 @@ define(["libs/client/views/base"], function(Base) {
           module.chooseImage(function(info) {
             self.url = info.url;
             self.mediaId = info.mediaId;
+            self.$('.placeholder').css({
+              backgroundImage: 'url(' + info.url ')'
+            });
             self.check();
           });
         }
       });
     },
     reupload: function() {
+      //设置为auto是不合法的值，浏览器会忽略
+      this.$('.placeholder').css({
+        backgroundImage: 'auto'
+      });
       this.$('.screen1').show();
       this.$('.screen2').hide();
     }
