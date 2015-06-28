@@ -4,7 +4,9 @@ define(["libs/client/views/base"], function(Base) {
     events: {
       'click .placeholder': 'uploadImg',
       'click .reupload': 'reupload',
-      'change .screen1 input': 'check'
+      'change .screen1 input': 'check',
+      'click .share-mask': 'hideShareMask',
+      'click .share': 'showShareMask'
     },
     init: function() {
       var winWidth = $(window).width();
@@ -60,14 +62,14 @@ define(["libs/client/views/base"], function(Base) {
             wx.onMenuShareTimeline({
               title: '我在康宝马拉松守护跑友的生命安全，我是第一反应人', // 分享标题
               link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
-              imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo_dark.png', //
+              imgUrl: 'http://' + __global.base["static"] + 'dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
             wx.onMenuShareAppMessage({
               title: '第一反应', // 分享标题
               desc: '我在康宝马拉松守护跑友的生命安全，我是第一反应人',
               link: 'http://m.firstre.cn/kangbao_show?id=' + self.mediaId + '#1', // 分享链接
-              imgUrl: 'http://www.wanleyun.com/h5game/images/room_logo.png', //
+              imgUrl: 'http://' + __global.base["static"] + 'dist/images/m/150x150.png', //
               success: self.shareSuccess
             });
           }
@@ -88,6 +90,13 @@ define(["libs/client/views/base"], function(Base) {
           });
         }
       });
+    },
+    showShareMask: function() {
+      this.$('.screen2>.background').show();
+    },
+    hideShareMask: function(e) {
+      this.$('.screen2>.background').hide();
+      e.stopPropagation();
     },
     reupload: function() {
       //设置为auto是不合法的值，浏览器会忽略

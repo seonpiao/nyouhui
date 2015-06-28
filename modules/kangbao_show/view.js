@@ -4,7 +4,9 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base
     events: {
       'click .screen5': 'showSharePanel',
       'click .share-panel': 'hideSharePanel',
-      'click .btn-replay': 'replay'
+      'click .btn-replay': 'replay',
+      'click .share-mask': 'hideShareMask',
+      'click .btn-share': 'showShareMask'
     },
     init: function() {
       var winWidth = $(window).width();
@@ -112,8 +114,15 @@ define(["libs/client/views/base", "libs/client/jquery.scrollify"], function(Base
       this.$('.share-panel').hide();
       e.stopPropagation();
     },
+    showShareMask: function() {
+      this.$('.background').show();
+    },
+    hideShareMask: function(e) {
+      this.$('.background').hide();
+      e.stopPropagation();
+    },
     replay: function() {
-      location.href = location.pathname + '#1'
+      location.href = location.pathname + location.search + '#1'
       location.reload();
     }
   });
