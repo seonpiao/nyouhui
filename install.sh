@@ -22,6 +22,7 @@ if [ ! -d "$node_path" ]; then
   mkdir -p $node_path
 fi
 cp -rn $node_dirname/* $node_path
+ln -s $node_path/bin/node /usr/bin/node
 set_path_str="PATH=\$PATH:$node_path/bin"
 bash_profile=`cat ~/.bash_profile`
 if [[ ! $bash_profile =~ "$set_path_str" ]]; then
