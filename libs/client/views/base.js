@@ -1,6 +1,6 @@
 define(function() {
   var View = Backbone.View.extend({
-    __base: 'http://static.nyouhui.com/dist/template/',
+    __base: 'http://' + __global.base['static'] + '/dist/template/',
     _templates: {},
     // __base: '/jsdev/dist/template/modules/',
     loadTemplate: function(template, callback) {
