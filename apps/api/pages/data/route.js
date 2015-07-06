@@ -123,7 +123,6 @@ module.exports = function(app) {
           uid: uid
         }, 'group');
     }
-
     // 判断权限
     if (userGroup) {
       userGroup = (userGroup || '').split(',');
@@ -266,7 +265,6 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var hasPermission =
       yield auth.call(this, token, db, collection, 'read');
-    hasPermission = true
     if (hasPermission) {
       var id = this.request.params.id;
       try {

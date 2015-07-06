@@ -412,7 +412,7 @@ module.exports = function(app) {
       if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'privilege', {
-            db: db,
+            db: originData.db,
             collection: originData.collection
           });
           console.log('del:' + key)
@@ -507,10 +507,11 @@ module.exports = function(app) {
       if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
-            db: app.config.user.db,
-            collection: app.config.user.collection
+            db: originData.db,
+            collection: originData.collection
           });
-          yield thunkify(client.del.bind(client))(key);
+          console.log('del: ' + key);
+          var result = yield thunkify(client.del.bind(client))(key);
         })();
       }
       if (db === app.config.user.db && collection === app.config.user.collection) {
