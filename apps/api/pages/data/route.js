@@ -6,6 +6,7 @@ var redis = require("redis");
 var co = require('co');
 var jwt = require('jsonwebtoken');
 var moment = require('moment');
+var extend = require('node.extend');
 
 module.exports = function(app) {
 
@@ -135,6 +136,129 @@ module.exports = function(app) {
     return privilege;
   }
 
+  var getFieldExtData = function*(fields) {
+    var extDatas = [];
+    for (var i = 0; i < fields.length; i++) {
+      var field = fields[i];
+      //从controls表里面，获取字段的附件数据
+      var fieldExtData =
+        yield Mongo.request({
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
+          db: app.config.control.db,
+          collection: app.config.control.collection,
+          id: field.type
+        });
+      fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
+      if (fieldExtData) {
+        var fieldParams = fieldExtData.params;
+        if (fieldParams) {
+          try {
+            fieldParams = JSON.parse(fieldParams);
+          } catch (e) {
+            fieldParams = {};
+          }
+          //有db和collection，说明这个字段的数据是与外表有关联的
+          if (fieldParams.db && fieldParams.collection) {
+            //把db和collection附加到field定义上，表名这个字段有关联的外表数据
+            field.db = fieldParams.db;
+            field.collection = fieldParams.collection;
+            var fieldData =
+              yield Mongo.request({
+                host: app.config.mongo.host,
+                port: app.config.mongo.port,
+                db: fieldParams.db,
+                collection: fieldParams.collection
+              });
+            extDatas.push(fieldData);
+          }
+        }
+      }
+    }
+    return extDatas;
+  };
+
+  var getCollectionData = function*() {
+    var db = this.request.params.db;
+    var collection = this.request.params.collection;
+    var query = this.request.query;
+    var pagesize = query.pagesize || 10;
+    var page = 1;
+    if (query.page >= 1) {
+      page = parseInt(query.page, 10);
+    }
+    var skip = pagesize * (page - 1);
+    query.limit = pagesize;
+    query.skip = skip;
+    delete query.page;
+    delete query.pagesize;
+    //要显示的列表数据
+    var data =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: db,
+        collection: collection
+      }, {
+        qs: query
+      });
+    var list = data[db][collection];
+    //列表的字段定义数据
+    var schema =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.schema.db,
+        collection: app.config.schema.collection,
+        one: true
+      }, {
+        qs: {
+          query: JSON.stringify({
+            db: db,
+            collection: collection
+          })
+        }
+      });
+    var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+    if (schemaData) {
+      var fields = schemaData.fields;
+      //下面是要获取有外联的字段的附加数据
+      //获取到关联的外表数据
+      var extDatas =
+        yield getFieldExtData(fields);
+      extDatas.forEach(function(extData) {
+        extend(true, data, extData);
+      });
+    }
+    var dbconn =
+      yield Mongo.get({
+        db: db,
+        hosts: app.config.mongo.replset.split(',')
+      });
+    var coll = dbconn.collection(collection);
+    var filter = {};
+    try {
+      filter = JSON.parse(query.query);
+    } catch (e) {}
+    var count =
+      yield thunkify(coll.count.bind(coll))(filter);
+    return {
+      data: data,
+      db: db,
+      collection: collection,
+      config: {
+        schema: app.config.schema,
+        control: app.config.control
+      },
+      page: {
+        total: count,
+        pagesize: pagesize,
+        page: page,
+        ret: list.length
+      }
+    };
+  }
+
   var route = app.route('/data');
 
   route.nested('/:db/:collection/:id?').get(function*(next) {
@@ -148,23 +272,10 @@ module.exports = function(app) {
     if (hasPermission) {
       var id = this.request.params.id;
       try {
-        var data =
-          yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
-            db: db,
-            collection: collection,
-            id: id
-          }, {
-            qs: this.request.query
-          });
+        var result = yield getCollectionData.call(this);
         this.result = {
           code: 0,
-          result: {
-            db: db,
-            collection: collection,
-            data: data
-          }
+          result: result
         }
       } catch (e) {
         this.result = app.Errors.DATA_READ_ERROR;

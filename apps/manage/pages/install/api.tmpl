@@ -75,6 +75,7 @@ module.exports = function(app) {
     mongo: {
       host: '{{mongo_host}}',
       port: {{mongo_port}},
+      replset: '{{mongo_replset}}',
       defaultDB: '{{mongo_db}}'
     },
     redis: {
@@ -88,6 +89,14 @@ module.exports = function(app) {
     privilege: {
       db: '{{privilege_db}}',
       collection: '{{privilege_collection}}'
+    },
+    schema: {
+      db: '{{schema_db}}',
+      collection: '{{schema_collection}}'
+    },
+    control: {
+      db: '{{control_db}}',
+      collection: '{{control_collection}}'
     },
     user: {
       db: '{{user_db}}',

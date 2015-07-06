@@ -17,6 +17,8 @@ var sha1 = function(str) {
   return shasum.digest('hex')
 }
 
+var errorCount = {};
+
 module.exports = function(app) {
 
   var auth = require('../../util/auth')(app);
@@ -192,6 +194,7 @@ module.exports = function(app) {
       yield thunkify(client.set.bind(client))('app_session_' + result.uid, Date.now());
       //设置一个月的有效期
       yield thunkify(client.expire.bind(client))('app_session_' + result.uid, 60 * 60 * 24 * 30);
+      errorCount[phone] = 0;
       this.result = {
         code: 0,
         result: {
@@ -200,6 +203,10 @@ module.exports = function(app) {
         }
       }
     } else {
+      if (!phone in errorCount) {
+        errorCount[phone] = 0;
+      }
+      errorCount[phone]++;
       this.result = app.Errors.SIGN_LOGIN_FAILED
     }
   });
