@@ -181,6 +181,7 @@ module.exports = function(app) {
   var getCollectionData = function*() {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var id = this.request.params.id;
     var query = this.request.query;
     var pagesize = query.pagesize || 10;
     var page = 1;
@@ -198,7 +199,8 @@ module.exports = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: db,
-        collection: collection
+        collection: collection,
+        id: id
       }, {
         qs: query
       });
