@@ -246,10 +246,6 @@ module.exports = function(app) {
       data: data,
       db: db,
       collection: collection,
-      config: {
-        schema: app.config.schema,
-        control: app.config.control
-      },
       page: {
         total: count,
         pagesize: pagesize,
