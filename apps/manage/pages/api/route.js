@@ -23,6 +23,10 @@ var sha1 = function(str) {
 
 module.exports = function(app) {
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
+  var uploader = require('koa-bylh-upload')({
+    host: app.config.upload.host,
+    path: app.config.upload.path
+  });
 
   var queryByQuery = function*(db, collection, query) {
     var data =
@@ -592,48 +596,10 @@ module.exports = function(app) {
     var part, size = 0;
 
     try {
-      while (part =
-        yield parts) {
-        var tmpDir = path.join(process.cwd(), 'upload_tmp', dir);
-        yield mkdir(tmpDir);
-        var filename = part.filename;
-        var extname = path.extname(filename);
-        var tmpFile = path.join(tmpDir, filename);
-        var fileStream = fs.createWriteStream(tmpFile);
-        size = yield uploadPart(fileStream, part);
-        var hash =
-          yield calcHash(tmpFile);
-        var remoteDir = path.join(app.config.upload.path, 'upload', dir);
-        yield thunkify(cp.exec.bind(cp))('ssh root@' + app.config.upload.host + ' "mkdir -p ' + remoteDir + '"')
-        var newFilename = filename;
-        if (keepname === '1') {
-          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
-        } else {
-          newFilename = hash + extname;
-          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
-        }
-        var relPath = path.join(dir, newFilename);
-        this.url = 'http://' + this.global.base['static'] + '/upload/' + relPath;
-        yield thunkify(cp.exec.bind(cp))('rm -rf ' + tmpDir);
-      }
-      if (from === 'editor') {
-        this.result = {
-          originalName: filename,
-          name: newFilename,
-          url: this.url,
-          size: size,
-          type: path.extname(filename),
-          state: 'SUCCESS',
-          hash: hash
-        }
-      } else {
-        this.result = {
-          code: 200,
-          result: {
-            url: this.url,
-            hash: hash
-          }
-        };
+      var result = yield uploader.call(this);
+      this.result = {
+        code: 200,
+        result: result
       }
     } catch (e) {
       logger.error(e.stack);
