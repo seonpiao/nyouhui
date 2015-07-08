@@ -136,7 +136,7 @@ module.exports = function(app) {
   }
 
   var getFieldExtData = function*(fields) {
-    var extDatas = [];
+    var extDatas = {};
     for (var i = 0; i < fields.length; i++) {
       var field = fields[i];
       //从controls表里面，获取字段的附件数据
@@ -169,7 +169,12 @@ module.exports = function(app) {
                 db: fieldParams.db,
                 collection: fieldParams.collection
               });
-            extDatas.push(fieldData);
+            var fieldList = fieldData[fieldParams.db][fieldParams.collection];
+            if (fieldList) {
+              fieldList.forEach(function(item) {
+                extDatas[item._id.toString()] = item;
+              });
+            }
           }
         }
       }
