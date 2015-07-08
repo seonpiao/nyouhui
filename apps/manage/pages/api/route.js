@@ -285,6 +285,7 @@ module.exports = function(app) {
     var id = this.request.params.id;
     try {
       var newData = this.request.body;
+      var saveData = {};
       var originData =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -359,13 +360,14 @@ module.exports = function(app) {
           }
         }
       }
-      extend(originData, newData);
-      delete originData._id;
+      extend(saveData, originData);
+      extend(saveData, newData);
+      delete saveData._id;
       //用户表要加密密码
-      if (originData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
-        originData.password = sha1(originData.password);
+      if (saveData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+        saveData.password = sha1(saveData.password);
       }
-      originData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+      saveData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -374,7 +376,7 @@ module.exports = function(app) {
           collection: collection,
           id: id
         }, {
-          json: originData,
+          json: saveData,
           method: this.method
         });
       //修改schema，要调整索引
