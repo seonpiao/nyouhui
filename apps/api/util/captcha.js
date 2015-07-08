@@ -1,4 +1,6 @@
 var padnum = require('padnum');
+var thunkify = require('thunkify');
+var request = require('request');
 var captchas = {};
 
 var captchasCache = function(key, captcha) {
@@ -24,7 +26,33 @@ var verifyCaptcha = function(key, captcha) {
 
 var sendCaptchaBySms = function*(phone) {
   var captcha = getCaptcha(phone);
-  return captcha;
+  var max = 3;
+  var tried = 0;
+  var result;
+  while (tried < max) {
+    try {
+      result = yield thunkify(request)({
+        url: 'http://yunpian.com/v1/sms/send.json',
+        method: 'POST',
+        form: {
+          mobile: phone,
+          apikey: '6d29b1b3847725fd4b00d88b47af48da',
+          text: '验证码是：' + captcha
+        }
+      });
+      result = JSON.parse(result[1]);
+      break;
+    } catch (e) {
+      tried++;
+    }
+  }
+  if (tried === max) {
+    throw new Error('Network error');
+  }
+
+  if (result.code !== 0) {
+    throw new Error(result.msg);
+  }
 };
 
 var getCaptcha = function(key) {

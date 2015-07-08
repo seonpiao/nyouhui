@@ -137,13 +137,15 @@ module.exports = function(app) {
     this.json = true;
     var phone = this.request.query.phone;
     if (phone) {
-      var num =
-        yield captcha.sendCaptchaBySms(phone);
-      this.result = {
-        code: 0,
-        result: {
-          num: num
+      try {
+        var num =
+          yield captcha.sendCaptchaBySms(phone);
+        this.result = {
+          code: 0
         }
+      } catch (e) {
+        logger.error(e.stack);
+        this.result = app.Errors.SIGN_SEND_SMS_FAILED;
       }
     } else {
       this.result = app.Errors.SIGN_MISSING_PHONE;
