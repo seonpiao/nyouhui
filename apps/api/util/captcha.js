@@ -47,12 +47,14 @@ var sendCaptchaBySms = function*(phone) {
     }
   }
   if (tried === max) {
-    throw new Error('Network error');
+    // throw new Error('Network error');
   }
 
   if (result.code !== 0) {
-    throw new Error(result.msg);
+    // throw new Error(result.msg);
   }
+
+  return captcha;
 };
 
 var getCaptcha = function(key) {
