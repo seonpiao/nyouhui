@@ -31,16 +31,16 @@ var sendCaptchaBySms = function*(phone) {
   var result;
   while (tried < max) {
     try {
-      result = yield thunkify(request)({
-        url: 'http://yunpian.com/v1/sms/send.json',
-        method: 'POST',
-        form: {
-          mobile: phone,
-          apikey: '6d29b1b3847725fd4b00d88b47af48da',
-          text: '【云片网】您的验证码是' + captcha + '。如非本人操作，请忽略本短信'
-        }
-      });
-      result = JSON.parse(result[1]);
+      // result = yield thunkify(request)({
+      //   url: 'http://yunpian.com/v1/sms/send.json',
+      //   method: 'POST',
+      //   form: {
+      //     mobile: phone,
+      //     apikey: '6d29b1b3847725fd4b00d88b47af48da',
+      //     text: '【云片网】您的验证码是' + captcha + '。如非本人操作，请忽略本短信'
+      //   }
+      // });
+      // result = JSON.parse(result[1]);
       break;
     } catch (e) {
       tried++;
