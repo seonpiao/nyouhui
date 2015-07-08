@@ -10,6 +10,7 @@ var resetctx = require('./libs/server/resetctx');
 var response = require('./libs/server/response');
 var staticServe = require('koa-static');
 var co = require('co');
+var parse = require('co-busboy');
 
 var APP_PATH = path.join(__dirname, 'apps');
 
@@ -38,10 +39,24 @@ function init(app, options) {
 
   app.config = appConfig;
 
+  app.use(function*(next) {
+    yield resetctx.call(this);
+    yield next;
+  });
+
   app.use(views(pagePath, {
     default: 'jade',
     cache: process.env.NODE_ENV === 'production' ? true : false
   }));
+
+  app.use(function*(next) {
+    if (!this.request.is('multipart/*')) return yield next;
+    var parts = parse(this, {
+      autoFields: true
+    });
+    this.parts = parts;
+    yield next;
+  });
 
   //parse body
   app.use(body({
@@ -85,7 +100,6 @@ global.DOMAIN = domain || 'nyouhui.com';
 var defaultRoute = function(app) {
   app.use(function*(next) {
     var self = this;
-    yield resetctx.call(this);
     var baseRule;
     _.some(bases, function(item, key) {
       var exp = new RegExp(sanitize(key));
