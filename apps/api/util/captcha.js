@@ -51,6 +51,7 @@ var sendCaptchaBySms = function*(phone) {
   }
 
   if (result.code !== 0) {
+    console.log(result);
     // throw new Error(result.msg);
   }
 
