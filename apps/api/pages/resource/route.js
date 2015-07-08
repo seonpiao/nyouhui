@@ -20,6 +20,7 @@ module.exports = function(app) {
     try {
       var result = yield uploader.call(this);
       if (app.config.upload.db && app.config.upload.collection) {
+        result.owner = uid;
         var db = yield Mongo.get({
           hosts: app.config.mongo.replset.split(','),
           db: app.config.upload.db
