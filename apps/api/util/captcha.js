@@ -50,10 +50,9 @@ var sendCaptchaBySms = function*(phone) {
     // throw new Error('Network error');
   }
 
-  if (result.code !== 0) {
-    console.log(result);
-    // throw new Error(result.msg);
-  }
+  // if (result.code !== 0) {
+  //   throw new Error(result.msg);
+  // }
 
   return captcha;
 };
