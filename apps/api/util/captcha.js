@@ -37,7 +37,7 @@ var sendCaptchaBySms = function*(phone) {
         form: {
           mobile: phone,
           apikey: '6d29b1b3847725fd4b00d88b47af48da',
-          text: '验证码是：' + captcha
+          text: '【第一反应】您的验证码是' + captcha + '。如非本人操作，请忽略本短信'
         }
       });
       result = JSON.parse(result[1]);
