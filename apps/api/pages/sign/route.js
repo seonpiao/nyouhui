@@ -84,7 +84,7 @@ module.exports = function(app) {
       json: extend(userData, {
         uid: uid,
         source: source,
-        nickname: uid,
+        nickname: userData.nickname || uid,
         group: ['normal'], // 默认用户组
         reg_ip: this.ip,
         create_time: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
@@ -240,6 +240,7 @@ module.exports = function(app) {
     var oauthToken = this.request.body.token;
     var oauthUid = this.request.body.uid;
     var valid = false;
+    var nickname;
     switch (from) {
       case 'weixin':
         var result = yield thunkify(request)({
@@ -248,17 +249,37 @@ module.exports = function(app) {
         result = JSON.parse(result[1]);
         if (result.openid) {
           valid = true;
+          nickname: result.nickname
         }
         break;
       case 'weibo':
         var result = yield thunkify(request)({
-          url: 'https://api.weibo.com/oauth2/get_token_info',
-          method: 'POST',
-          form: 'access_token=' + oauthToken
+          url: 'https://api.weibo.com/2/users/show.json',
+          qs: {
+            access_token: oauthToken,
+            uid: oauthUid
+          }
         });
         result = JSON.parse(result[1]);
-        if (result.uid == oauthUid) {
+        if (result.id == oauthUid) {
           valid = true;
+          nickname = result.screen_name
+        }
+        break;
+      case 'qq':
+        var result = yield thunkify(request)({
+          url: 'https://graph.qq.com/user/get_user_info',
+          qs: {
+            access_token: oauthToken,
+            oauth_consumer_key: '1103784041',
+            openid: oauthUid
+          }
+        });
+        result = JSON.parse(result[1]);
+        console.log(result)
+        if (result.ret === 0) {
+          valid = true;
+          nickname = result.nickname
         }
         break;
     }
@@ -284,7 +305,8 @@ module.exports = function(app) {
         try {
           var uid =
             yield addUser({
-              oauth_uid: oauthUid
+              oauth_uid: oauthUid,
+              nickname: nickname
             }, 2);
         } catch (e) {
           this.result = e;
