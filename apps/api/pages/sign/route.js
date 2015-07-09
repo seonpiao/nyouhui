@@ -257,7 +257,7 @@ module.exports = function(app) {
           form: 'access_token=' + oauthToken
         });
         result = JSON.parse(result[1]);
-        if (result.uid === oauthUid) {
+        if (result.uid == oauthUid) {
           valid = true;
         }
         break;
