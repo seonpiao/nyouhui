@@ -87,7 +87,7 @@ module.exports = function(app) {
         })
       })
     } catch (e) {
-      return app.Errors.SIGN_PHONE_DUPLICATE
+      throw app.Errors.SIGN_PHONE_DUPLICATE;
     }
     result.uid++;
     var objectId = result._id + '';
@@ -102,7 +102,17 @@ module.exports = function(app) {
       method: 'put',
       json: result
     });
-    return null;
+    return uid;
+  };
+
+  var createSession = function*(uid) {
+    var token = jwt.sign({
+      uid: uid
+    }, app.jwt_secret);
+    yield thunkify(client.set.bind(client))('app_session_' + uid, Date.now());
+    //设置一个月的有效期
+    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 * 60 * 24 * 30);
+    return token;
   };
 
   var route = app.route('/sign');
@@ -165,21 +175,20 @@ module.exports = function(app) {
     if (isCaptchaValid) {
       password = sha1(password);
       try {
-        var error =
+        var uid =
           yield addUser({
             phone: phone,
             password: password
           });
-        if (!error) {
-          this.result = {
-            code: 0
+        var token = yield createSession(uid);
+        this.result = {
+          code: 0,
+          result: {
+            token: token
           }
-        } else {
-          this.result = error;
         }
       } catch (e) {
-        logger.error(e.stack);
-        this.result = app.Errors.UNKNOWN
+        this.result = e;
       }
     } else {
       this.result = app.Errors.SIGN_INVALID_CAPTCHA
@@ -193,18 +202,12 @@ module.exports = function(app) {
     var result =
       yield auth(phone, password);
     if (result) {
-      var token = jwt.sign({
-        uid: result.uid
-      }, app.jwt_secret);
-      yield thunkify(client.set.bind(client))('app_session_' + result.uid, Date.now());
-      //设置一个月的有效期
-      yield thunkify(client.expire.bind(client))('app_session_' + result.uid, 60 * 60 * 24 * 30);
+      var token = yield createSession(result.uid);
       errorCount[phone] = 0;
       this.result = {
         code: 0,
         result: {
-          token: token,
-          uid: result.uid
+          token: token
         }
       }
     } else {

@@ -28,6 +28,7 @@ module.exports = function(app) {
 
   var recordHelp = function*(helpData) {
     helpData.create_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    helpData.rescuer = [];
     helpData.status = 1; //status为1表示正在进行的呼救，2为已解除的呼救，3为已经完成的呼救
     var db = yield Mongo.get({
       hosts: app.config.mongo.replset.split(','),
@@ -59,7 +60,7 @@ module.exports = function(app) {
         coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]
       };
       var helpResult = yield recordHelp({
-        uid: user.uid,
+        me: user,
         loc: user.loc
       });
       yield saveUser(user);
@@ -77,6 +78,9 @@ module.exports = function(app) {
 
   route.nested('/cancel').post(function*() {
     this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
     var helpId = this.request.body.help_id;
     var result =
       yield Mongo.request({
@@ -108,6 +112,9 @@ module.exports = function(app) {
 
   route.nested('/finish').post(function*() {
     this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
     var helpId = this.request.body.help_id;
     var result =
       yield Mongo.request({
@@ -120,6 +127,41 @@ module.exports = function(app) {
     result = result[app.config.mongo.defaultDB]['sos'];
     if (result) {
       result.status = 3;
+      delete result._id;
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.mongo.defaultDB,
+        collection: 'sos',
+        id: helpId
+      }, {
+        method: 'put',
+        json: result
+      });
+    }
+    this.result = {
+      code: 0
+    }
+  });
+  route.nested('/coming').post(function*() {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var user =
+      yield getUserById.call(this, uid);
+    var helpId = this.request.body.help_id;
+    var result =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.mongo.defaultDB,
+        collection: 'sos',
+        id: helpId
+      });
+    result = result[app.config.mongo.defaultDB]['sos'];
+    if (result) {
+      result.rescuer.push(user);
       delete result._id;
       yield Mongo.request({
         host: app.config.mongo.host,
