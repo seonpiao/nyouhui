@@ -276,7 +276,6 @@ module.exports = function(app) {
           }
         });
         result = JSON.parse(result[1]);
-        console.log(result)
         if (result.ret === 0) {
           valid = true;
           nickname = result.nickname
@@ -302,16 +301,12 @@ module.exports = function(app) {
       if (user && user.length === 1) {
         uid = user[0].uid;
       } else {
-        try {
-          var uid =
-            yield addUser({
-              oauth_uid: oauthUid,
-              nickname: nickname
-            }, 2);
-        } catch (e) {
-          this.result = e;
-          return
-        }
+        var uid =
+          yield addUser({
+            oauth_uid: oauthUid,
+            nickname: nickname,
+            oauth_from: from
+          }, 2);
       }
       var token = yield createSession(uid);
       this.result = {
