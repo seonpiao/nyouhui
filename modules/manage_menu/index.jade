@@ -31,26 +31,38 @@ mixin drawMenu(menus)
 // sidebar menu: : style can be found in sidebar.less
 ul.sidebar-menu
   //- li.header MAIN NAVIGATION
-  - var menus = result.menu;
+  - var menus = __global.menu;
   - var menuTree = {name:'root',childs:{}};
   - var currNode = menuTree;
+  - var privilege = JSON.parse(__global.user.privilege || 'null');
   each item in menus
-    - item.leaf = true;
-    - var menuPath = item.path.replace(/^\/*/,'').replace(/\/*$/,'');
-    - var menuPathArr = menuPath.split('/');
-    each menuName in menuPathArr
-      if menuName
-        if !currNode.childs[menuName]
-          - currNode.childs[menuName] = {name:menuName,childs:{}};
-        - currNode.childs[menuName].parent = currNode;
-        - currNode = currNode.childs[menuName];
-    - currNode.childs[item.name] = item;
-    - item.parent = currNode;
-    - currNode = menuTree;
-    - var pattern = new RegExp(item.url.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") + '(?:\\/|$)');
-    if path.match(pattern)
-      - var activeNode = item
-      while activeNode.name !== 'root'
-        - activeNode.active = true;
-        - activeNode = activeNode.parent;
+    - var hasPermission = true;
+    - var crud = item.url.match(/\/crud\/([^\/]+)\/([^\/]+)(\/|$)/);
+    - var db,collection;
+    if crud
+      - db = crud[1];
+      - collection = crud[2];
+    if db && collection && privilege && !privilege[db][collection].read
+      - hasPermission = false
+    if item.url.match(/^\/schema$/) && __global.user.username != 'root'
+      - hasPermission = false
+    if hasPermission
+      - item.leaf = true;
+      - var menuPath = item.path.replace(/^\/*/,'').replace(/\/*$/,'');
+      - var menuPathArr = menuPath.split('/');
+      each menuName in menuPathArr
+        if menuName
+          if !currNode.childs[menuName]
+            - currNode.childs[menuName] = {name:menuName,childs:{}};
+          - currNode.childs[menuName].parent = currNode;
+          - currNode = currNode.childs[menuName];
+      - currNode.childs[item.name] = item;
+      - item.parent = currNode;
+      - currNode = menuTree;
+      - var pattern = new RegExp(item.url.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") + '(?:\\/|$)');
+      if path.match(pattern)
+        - var activeNode = item
+        while activeNode.name !== 'root'
+          - activeNode.active = true;
+          - activeNode = activeNode.parent;
   +drawMenu(menuTree.childs)

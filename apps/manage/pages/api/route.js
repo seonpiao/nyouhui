@@ -104,6 +104,17 @@ module.exports = function(app) {
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     var query = this.request.query;
     var pagesize = query.pagesize || Infinity;
@@ -162,6 +173,17 @@ module.exports = function(app) {
   }).post(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var body = this.request.body;
     try {
       //用户表要加密密码
@@ -282,6 +304,17 @@ module.exports = function(app) {
   }).put(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     try {
       var newData = this.request.body;
@@ -445,6 +478,17 @@ module.exports = function(app) {
   }).delete(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     try {
       var originData =

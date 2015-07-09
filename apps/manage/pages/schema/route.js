@@ -7,6 +7,10 @@ var Mongo = require('../../../../libs/server/mongodb');
 
 module.exports = function(app) {
   app.route('/schema').get(function*(next) {
+    if (this.session.username !== 'root') {
+      this.status = 403;
+      return;
+    }
     var db = app.config.schema.db;
     var collection = app.config.schema.collection;
     try {

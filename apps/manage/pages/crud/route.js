@@ -157,6 +157,15 @@ module.exports = function(app) {
   app.route('/crud/:db/:collection').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.status = 403;
+      return;
+    }
     try {
       var result =
         yield getCollectionData.call(this);
@@ -219,6 +228,15 @@ module.exports = function(app) {
   app.route('/crud/:db/:collection/create').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.status = 403;
+      return;
+    }
     // 后续做基础组件选择时用
     // this.global = this.global || {};
     // this.global.allModules = fs.readdirSync('modules');
@@ -317,6 +335,15 @@ module.exports = function(app) {
   app.route('/crud/:db/:collection/update/:id').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.status = 403;
+      return;
+    }
     var id = this.request.params.id;
     try {
       //table data
