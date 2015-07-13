@@ -138,6 +138,13 @@ module.exports = function(app) {
     var user =
       yield getUserById.call(this, uid);
     if (user) {
+      yield Mongo.exec({
+        hosts: app.config.mongo.replset.split(','),
+        db: app.config.user.db,
+        collection: app.config.user.collection
+      }, 'ensureIndex', {
+        loc: "2dsphere"
+      });
       user.loc = {
         type: 'Point',
         coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]

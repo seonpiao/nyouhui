@@ -49,7 +49,14 @@ Mongo.get = function*(options) {
   assert(db);
   dbs[dbname] = db;
   return db;
-}
+};
+
+Mongo.exec = function*(dbOptions, cmd) {
+  var args = Array.prototype.slice.call(arguments, 2);
+  var db = yield Mongo.get(dbOptions);
+  var collection = db.collection(dbOptions.collection);
+  return yield thunkify(collection[cmd]).apply(collection, args);
+};
 
 Mongo.request = function*(dbOptions, requestOptions) {
   requestOptions = requestOptions || {};

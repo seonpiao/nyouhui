@@ -87,6 +87,7 @@ module.exports = function(app) {
         nickname: userData.nickname || uid,
         group: ['normal'], // 默认用户组
         reg_ip: this.ip,
+        helping: [],
         create_time: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
       })
     })

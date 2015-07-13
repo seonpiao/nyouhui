@@ -120,8 +120,6 @@ var defaultRoute = function(app) {
     if (!this.result) {
       this.page = '404';
     } else {
-      this.result.query = this.request.query;
-      this.result.path = this.path;
       this.page = this.page || this.path.substring(1).replace(/\/.*/, '');
     }
     this.global.page = this.page;
