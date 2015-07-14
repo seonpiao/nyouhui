@@ -27,7 +27,7 @@ module.exports = function(app) {
   };
 
   var recordHelp = function*(helpData) {
-    helpData.create_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    helpData.create_time = Date.now();
     helpData.rescuer = [];
     helpData.status = 1; //status为1表示正在进行的呼救，2为已解除的呼救，3为已经完成的呼救
     var db = yield Mongo.get({

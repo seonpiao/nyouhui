@@ -68,7 +68,8 @@ module.exports = function(app) {
       if (data) {
         Object.keys(data).forEach(function(field) {
           co(function*() {
-            yield thunkify(client.hset.bind(client))(key, field, data[field]);
+            yield thunkify(client.hset.bind(client))(key, field,
+              data[field]);
           })();
         });
         if (data[field]) {
@@ -187,7 +188,9 @@ module.exports = function(app) {
     var body = this.request.body;
     try {
       //用户表要加密密码
-      if (body.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+      if (body.password && ((db === app.config.admin.db && collection ===
+          app.config.admin.collection) || (db === app.config.user.db &&
+          collection === app.config.user.collection))) {
         body.password = sha1(body.password);
       }
       if (db === 'cl' && collection === 'sells') {
@@ -250,9 +253,9 @@ module.exports = function(app) {
           }
         }
       }
-      var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-      body.create_time = timeStr;
-      body.modify_time = timeStr;
+      var now = Date.now();
+      body.create_time = now;
+      body.modify_time = now;
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -265,7 +268,8 @@ module.exports = function(app) {
         });
       if (data[db][collection]['ok']) {
         //新增schema，要调整索引
-        if (db === app.config.schema.db && collection === app.config.schema.collection) {
+        if (db === app.config.schema.db && collection === app.config.schema
+          .collection) {
           var fields = body.fields;
           var dbconn =
             yield Mongo.get({
@@ -278,9 +282,10 @@ module.exports = function(app) {
             if (field.index !== 'no') {
               var indexes = {};
               indexes[field.name] = 1;
-              yield thunkify(collection.ensureIndex.bind(collection))(indexes, {
-                unique: field.index === 'unique'
-              });
+              yield thunkify(collection.ensureIndex.bind(collection))(
+                indexes, {
+                  unique: field.index === 'unique'
+                });
             }
           }
         }
@@ -397,7 +402,9 @@ module.exports = function(app) {
       extend(saveData, newData);
       delete saveData._id;
       //用户表要加密密码
-      if (saveData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+      if (saveData.password && ((db === app.config.admin.db && collection ===
+          app.config.admin.collection) || (db === app.config.user.db &&
+          collection === app.config.user.collection))) {
         saveData.password = sha1(saveData.password);
       }
       saveData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -413,7 +420,8 @@ module.exports = function(app) {
           method: this.method
         });
       //修改schema，要调整索引
-      if (db === app.config.schema.db && collection === app.config.schema.collection) {
+      if (db === app.config.schema.db && collection === app.config.schema
+        .collection) {
         var body = this.request.body;
         var fields = body.fields;
         var dropped = [];
@@ -428,18 +436,21 @@ module.exports = function(app) {
           if (field.index !== 'no') {
             var indexes = {};
             indexes[field.name] = 1;
-            yield thunkify(_collection.ensureIndex.bind(_collection))(indexes, {
-              unique: field.index === 'unique'
-            });
+            yield thunkify(_collection.ensureIndex.bind(_collection))(
+              indexes, {
+                unique: field.index === 'unique'
+              });
           } else {
             dropped.push(field.name);
           }
         }
         for (var i = 0; i < dropped.length; i++) {
           var exist =
-            yield thunkify(_collection.indexExists.bind(_collection))(dropped[i] + '_1');
+            yield thunkify(_collection.indexExists.bind(_collection))(
+              dropped[i] + '_1');
           if (exist) {
-            yield thunkify(_collection.dropIndex.bind(_collection))(dropped[i] + '_1');
+            yield thunkify(_collection.dropIndex.bind(_collection))(
+              dropped[i] + '_1');
           }
         }
       }
@@ -448,7 +459,8 @@ module.exports = function(app) {
         result: data
       }
 
-      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+      if (db === app.config.privilege.db && collection === app.config.privilege
+        .collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'privilege', {
             db: originData.db,
@@ -554,7 +566,8 @@ module.exports = function(app) {
       };
 
       // 判断是否需要清空 redis 缓存
-      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+      if (db === app.config.privilege.db && collection === app.config.privilege
+        .collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
             db: originData.db,

@@ -88,7 +88,7 @@ module.exports = function(app) {
         group: ['normal'], // 默认用户组
         reg_ip: this.ip,
         helping: [],
-        create_time: moment().format('YYYY-MM-DD HH:mm:ss.SSS')
+        create_time: Date.now()
       })
     })
     result.uid++;
@@ -113,7 +113,8 @@ module.exports = function(app) {
     }, app.jwt_secret);
     yield thunkify(client.set.bind(client))('app_session_' + uid, Date.now());
     //设置一个月的有效期
-    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 * 60 * 24 * 30);
+    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 *
+      60 * 24 * 30);
     return token;
   };
 
@@ -245,7 +246,8 @@ module.exports = function(app) {
     switch (from) {
       case 'weixin':
         var result = yield thunkify(request)({
-          url: 'https://api.weixin.qq.com/sns/userinfo?access_token=' + oauthToken + '&openid=' + oauthUid
+          url: 'https://api.weixin.qq.com/sns/userinfo?access_token=' +
+            oauthToken + '&openid=' + oauthUid
         });
         result = JSON.parse(result[1]);
         if (result.openid) {

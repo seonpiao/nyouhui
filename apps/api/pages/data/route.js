@@ -62,7 +62,8 @@ module.exports = function(app) {
       if (data) {
         Object.keys(data).forEach(function(field) {
           co(function*() {
-            yield thunkify(client.hset.bind(client))(key, field, data[field]);
+            yield thunkify(client.hset.bind(client))(key, field,
+              data[field]);
           })();
         });
         if (data[field]) {
@@ -99,10 +100,11 @@ module.exports = function(app) {
     var isTokenValid = false;
     var uid, userGroup, privilege = false;
     var permissibleGroup =
-      yield getHashCacheByQuery(app.config.privilege.db, app.config.privilege.collection, {
-        db: db,
-        collection: collection
-      }, action);
+      yield getHashCacheByQuery(app.config.privilege.db, app.config.privilege
+        .collection, {
+          db: db,
+          collection: collection
+        }, action);
     permissibleGroup = (permissibleGroup || '').split(',');
     if (permissibleGroup.indexOf('all') !== -1) {
       return true;
@@ -148,7 +150,9 @@ module.exports = function(app) {
           collection: app.config.control.collection,
           id: field.type
         });
-      fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
+      fieldExtData = fieldExtData[app.config.control.db][app.config.control
+        .collection
+      ];
       if (fieldExtData) {
         var fieldParams = fieldExtData.params;
         if (fieldParams) {
@@ -290,9 +294,9 @@ module.exports = function(app) {
       yield auth.call(this, token, db, collection, 'write');
     if (hasPermission) {
       try {
-        var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-        body.create_time = timeStr;
-        body.modify_time = timeStr;
+        var now = Date.now();
+        body.create_time = now;
+        body.modify_time = now;
         var data =
           yield Mongo.request({
             host: app.config.mongo.host,
