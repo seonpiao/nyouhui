@@ -54,7 +54,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.status = 200;
-    _.extend(this.locals, requestInfo);
+    _.extend(this.body, requestInfo);
     // _.extend(this.body, defaultLocals);
   } else if (this.text || this.raw) {
     this.status = 200;
