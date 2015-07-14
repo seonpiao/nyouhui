@@ -45,7 +45,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.body = this.result || {};
-    this.body.time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+    this.body.time = Date.now();
   } else if (this.text || this.raw) {
     this.body = this.result || '';
   } else {
