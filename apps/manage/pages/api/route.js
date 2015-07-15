@@ -407,7 +407,7 @@ module.exports = function(app) {
           collection === app.config.user.collection))) {
         saveData.password = sha1(saveData.password);
       }
-      saveData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+      saveData.modify_time = Date.now();
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,

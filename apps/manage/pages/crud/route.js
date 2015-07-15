@@ -29,7 +29,9 @@ module.exports = function(app) {
           collection: app.config.control.collection,
           id: field.type
         });
-      fieldExtData = fieldExtData[app.config.control.db][app.config.control.collection];
+      fieldExtData = fieldExtData[app.config.control.db][app.config.control
+        .collection
+      ];
       if (fieldExtData) {
         var fieldParams = fieldExtData.params;
         if (fieldParams) {
@@ -173,7 +175,8 @@ module.exports = function(app) {
         code: 200,
         result: result
       }
-      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'index.jade'))) {
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection,
+          'index.jade'))) {
         this.view = path.join('views', db, collection, 'index');
       }
     } catch (e) {
@@ -192,7 +195,8 @@ module.exports = function(app) {
     var query = this.request.query;
     if (query.iDisplayStart && query.iDisplayLength) {
       query.pagesize = query.iDisplayLength;
-      query.page = Math.ceil((query.iDisplayStart * 1 + 1) / (query.iDisplayLength * 1));
+      query.page = Math.ceil((query.iDisplayStart * 1 + 1) / (query.iDisplayLength *
+        1));
       delete query.iDisplayStart;
       delete query.iDisplayLength;
     }
@@ -298,11 +302,13 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
-        try {
-          control.params = (control.params !== '' ? JSON.parse(control.params) : {});
-        } catch (e) {}
-      });
+      controls[app.config.control.db][app.config.control.collection].forEach(
+        function(control) {
+          try {
+            control.params = (control.params !== '' ? JSON.parse(
+              control.params) : {});
+          } catch (e) {}
+        });
       extend(true, _data, controls);
       this.result = {
         code: 200,
@@ -317,7 +323,8 @@ module.exports = function(app) {
           }
         }
       }
-      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection,
+          'update.jade'))) {
         this.view = path.join('views', db, collection, 'update');
       } else {
         this.view = 'update';
@@ -387,11 +394,13 @@ module.exports = function(app) {
           db: app.config.control.db,
           collection: app.config.control.collection
         });
-      controls[app.config.control.db][app.config.control.collection].forEach(function(control) {
-        try {
-          control.params = (control.params !== '' ? JSON.parse(control.params) : {});
-        } catch (e) {}
-      });
+      controls[app.config.control.db][app.config.control.collection].forEach(
+        function(control) {
+          try {
+            control.params = (control.params !== '' ? JSON.parse(
+              control.params) : {});
+          } catch (e) {}
+        });
       extend(true, _data, controls);
       this.result = {
         code: 200,
@@ -407,7 +416,8 @@ module.exports = function(app) {
           collection: collection
         }
       }
-      if (fs.existsSync(path.join(__dirname, 'views', db, collection, 'update.jade'))) {
+      if (fs.existsSync(path.join(__dirname, 'views', db, collection,
+          'update.jade'))) {
         this.view = path.join('views', db, collection, 'update');
       } else {
         this.view = 'update';
