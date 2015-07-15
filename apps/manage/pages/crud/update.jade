@@ -72,6 +72,10 @@ block append content
               +manage_ctrl_datepicker(params)
             else if field.base === 'draggableselector'
               +manage_ctrl_draggableselector(params)
+            else if field.base === 'control1'
+              +manage_ctrl_control1(params)
+            else if field.base === 'checkboxselect'
+              +manage_ctrl_checkboxselect(params)
             else if field.base === 'won2yuan'
               -params.unitWon = data ? data.unit_won : '';
               -params.unitYuan = data ? data.unit_yuan : '';
@@ -100,4 +104,4 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
-  script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.c3ac40a560c04a7f.js")
+  script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.7ea5a597bfc13560.js")
