@@ -8,7 +8,7 @@ define(["libs/client/views/base"], function(Base) {
       });
     },
     value: function() {
-      return this.$('input').val()
+      return moment(this.$('input').val()) * 1
     },
     name: function() {
       return this.$('input').attr('name');

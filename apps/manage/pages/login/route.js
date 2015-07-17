@@ -50,7 +50,7 @@ module.exports = function(app) {
     if (result) {
       this.session.uid = result._id.toString();
       this.session.username = username;
-      this.redirect(this.session.redirectUrl || '/schema');
+      this.redirect(this.session.redirectUrl || '/');
     } else {
       this.redirect('/login');
     }

@@ -33,7 +33,9 @@ module.exports = function(app) {
     },
     upload:{
       host:'{{upload_host}}',
-      path:'{{upload_path}}'
+      path:'{{upload_path}}',
+      db:'{{upload_db}}',
+      collection:'{{upload_collection}}'
     },
     schema: {
       db: '{{schema_db}}',

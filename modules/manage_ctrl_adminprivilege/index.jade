@@ -1,0 +1,14 @@
+mixin manage_ctrl_adminprivilege(options)
+  .form-group(data-module="manage_ctrl_adminprivilege",data-form-control="adminprivilege",data-db=options.db,data-collection=options.collection,data-value=options.value,data-name=options.name)
+    if options.label
+      label= options.label
+    if options.editable === 'required'
+      span.text-red *
+    table.table.table-bordered.table-striped
+      thead
+        tr
+          th db
+          th collection
+          th 权限
+      tbody
+    

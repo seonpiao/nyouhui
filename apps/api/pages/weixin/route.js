@@ -6,9 +6,7 @@ var fs = require('fs');
 
 var token, jsapiTicket;
 
-function* refreshToken() {
-  var appid = 'wx8cfeb90d2826a007';
-  var appsec = 'e94128f0d35ea2cb3667b7f60864a409';
+function* refreshToken(appid, appsec) {
   var now = Date.now();
   if (!token || (now - token.timestamp > 6000 * 1000)) {
     var result =
@@ -29,9 +27,9 @@ function* refreshToken() {
   return token;
 }
 
-function* getTicket() {
+function* getTicket(appid, appsec) {
   if (!token) {
-    yield refreshToken();
+    yield refreshToken(appid, appsec);
   }
   var result =
     yield thunkify(request)({
@@ -58,8 +56,10 @@ module.exports = function(app) {
 
   route.nested('/token').get(function*(next) {
     this.json = true;
+    var appid = 'wx8cfeb90d2826a007';
+    var appsec = 'e94128f0d35ea2cb3667b7f60864a409';
     var result =
-      yield refreshToken();
+      yield refreshToken(appid, appsec);
     this.result = {
       code: 0,
       result: {
@@ -70,10 +70,30 @@ module.exports = function(app) {
   });
 
   route.nested('/ticket').get(function*(next) {
-    this.json = true
+    this.json = true;
+    var appid = 'wx8cfeb90d2826a007';
+    var appsec = 'e94128f0d35ea2cb3667b7f60864a409';
     var now = Date.now();
     if (!jsapiTicket) {
-      jsapiTicket = yield getTicket();
+      jsapiTicket = yield getTicket(appid, appsec);
+    }
+    this.result = {
+      code: 0,
+      result: {
+        ticket: jsapiTicket.ticket,
+        expires: jsapiTicket.expires_in,
+        timestamp: now
+      }
+    };
+  });
+
+  route.nested('/wlyticket').get(function*(next) {
+    this.json = true;
+    var appid = 'wxd730ab919042bc31';
+    var appsec = '85cea6455d7e0727c63cf8d2504894ee';
+    var now = Date.now();
+    if (!jsapiTicket) {
+      jsapiTicket = yield getTicket(appid, appsec);
     }
     this.result = {
       code: 0,

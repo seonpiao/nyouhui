@@ -23,6 +23,10 @@ var sha1 = function(str) {
 
 module.exports = function(app) {
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
+  var uploader = require('koa-bylh-upload')({
+    host: app.config.upload.host,
+    path: app.config.upload.path
+  });
 
   var queryByQuery = function*(db, collection, query) {
     var data =
@@ -64,7 +68,8 @@ module.exports = function(app) {
       if (data) {
         Object.keys(data).forEach(function(field) {
           co(function*() {
-            yield thunkify(client.hset.bind(client))(key, field, data[field]);
+            yield thunkify(client.hset.bind(client))(key, field,
+              data[field]);
           })();
         });
         if (data[field]) {
@@ -100,6 +105,17 @@ module.exports = function(app) {
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     var query = this.request.query;
     var pagesize = query.pagesize || Infinity;
@@ -158,10 +174,23 @@ module.exports = function(app) {
   }).post(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var body = this.request.body;
     try {
       //用户表要加密密码
-      if (body.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
+      if (body.password && ((db === app.config.admin.db && collection ===
+          app.config.admin.collection) || (db === app.config.user.db &&
+          collection === app.config.user.collection))) {
         body.password = sha1(body.password);
       }
       if (db === 'cl' && collection === 'sells') {
@@ -224,9 +253,9 @@ module.exports = function(app) {
           }
         }
       }
-      var timeStr = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
-      body.create_time = timeStr;
-      body.modify_time = timeStr;
+      var now = Date.now();
+      body.create_time = now;
+      body.modify_time = now;
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -239,7 +268,8 @@ module.exports = function(app) {
         });
       if (data[db][collection]['ok']) {
         //新增schema，要调整索引
-        if (db === app.config.schema.db && collection === app.config.schema.collection) {
+        if (db === app.config.schema.db && collection === app.config.schema
+          .collection) {
           var fields = body.fields;
           var dbconn =
             yield Mongo.get({
@@ -252,9 +282,10 @@ module.exports = function(app) {
             if (field.index !== 'no') {
               var indexes = {};
               indexes[field.name] = 1;
-              yield thunkify(collection.ensureIndex.bind(collection))(indexes, {
-                unique: field.index === 'unique'
-              });
+              yield thunkify(collection.ensureIndex.bind(collection))(
+                indexes, {
+                  unique: field.index === 'unique'
+                });
             }
           }
         }
@@ -278,9 +309,21 @@ module.exports = function(app) {
   }).put(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     try {
       var newData = this.request.body;
+      var saveData = {};
       var originData =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -355,13 +398,16 @@ module.exports = function(app) {
           }
         }
       }
-      extend(originData, newData);
-      delete originData._id;
+      extend(saveData, originData);
+      extend(saveData, newData);
+      delete saveData._id;
       //用户表要加密密码
-      if (originData.password && ((db === app.config.admin.db && collection === app.config.admin.collection) || (db === app.config.user.db && collection === app.config.user.collection))) {
-        originData.password = sha1(originData.password);
+      if (saveData.password && ((db === app.config.admin.db && collection ===
+          app.config.admin.collection) || (db === app.config.user.db &&
+          collection === app.config.user.collection))) {
+        saveData.password = sha1(saveData.password);
       }
-      originData.modify_time = moment().format('YYYY-MM-DD HH:mm:ss.SSS');
+      saveData.modify_time = Date.now();
       var data =
         yield Mongo.request({
           host: app.config.mongo.host,
@@ -370,11 +416,12 @@ module.exports = function(app) {
           collection: collection,
           id: id
         }, {
-          json: originData,
+          json: saveData,
           method: this.method
         });
       //修改schema，要调整索引
-      if (db === app.config.schema.db && collection === app.config.schema.collection) {
+      if (db === app.config.schema.db && collection === app.config.schema
+        .collection) {
         var body = this.request.body;
         var fields = body.fields;
         var dropped = [];
@@ -389,18 +436,21 @@ module.exports = function(app) {
           if (field.index !== 'no') {
             var indexes = {};
             indexes[field.name] = 1;
-            yield thunkify(_collection.ensureIndex.bind(_collection))(indexes, {
-              unique: field.index === 'unique'
-            });
+            yield thunkify(_collection.ensureIndex.bind(_collection))(
+              indexes, {
+                unique: field.index === 'unique'
+              });
           } else {
             dropped.push(field.name);
           }
         }
         for (var i = 0; i < dropped.length; i++) {
           var exist =
-            yield thunkify(_collection.indexExists.bind(_collection))(dropped[i] + '_1');
+            yield thunkify(_collection.indexExists.bind(_collection))(
+              dropped[i] + '_1');
           if (exist) {
-            yield thunkify(_collection.dropIndex.bind(_collection))(dropped[i] + '_1');
+            yield thunkify(_collection.dropIndex.bind(_collection))(
+              dropped[i] + '_1');
           }
         }
       }
@@ -409,10 +459,11 @@ module.exports = function(app) {
         result: data
       }
 
-      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+      if (db === app.config.privilege.db && collection === app.config.privilege
+        .collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'privilege', {
-            db: db,
+            db: originData.db,
             collection: originData.collection
           });
           console.log('del:' + key)
@@ -439,6 +490,17 @@ module.exports = function(app) {
   }).delete(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
+    var hasPermission = true;
+    try {
+      var privilege = JSON.parse(this.global.user.privilege);
+      hasPermission = !!privilege[db][collection].read;
+    } catch (e) {}
+    if (!hasPermission) {
+      this.result = {
+        code: 403
+      };
+      return;
+    }
     var id = this.request.params.id;
     try {
       var originData =
@@ -504,13 +566,15 @@ module.exports = function(app) {
       };
 
       // 判断是否需要清空 redis 缓存
-      if (db === app.config.privilege.db && collection === app.config.privilege.collection) {
+      if (db === app.config.privilege.db && collection === app.config.privilege
+        .collection) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
-            db: app.config.user.db,
-            collection: app.config.user.collection
+            db: originData.db,
+            collection: originData.collection
           });
-          yield thunkify(client.del.bind(client))(key);
+          console.log('del: ' + key);
+          var result = yield thunkify(client.del.bind(client))(key);
         })();
       }
       if (db === app.config.user.db && collection === app.config.user.collection) {
@@ -582,57 +646,17 @@ module.exports = function(app) {
 
   app.route('/api/upload$').post(function*(next) {
     this.json = true;
-    var dir = this.request.query.dir || '';
-    var keepname = this.request.query.keepname;
     var from = this.request.query.from;
-    var parts = parse(this, {
-      autoFields: true
-    });
-    var part, size = 0;
-
     try {
-      while (part =
-        yield parts) {
-        var tmpDir = path.join(process.cwd(), 'upload_tmp', dir);
-        yield mkdir(tmpDir);
-        var filename = part.filename;
-        var extname = path.extname(filename);
-        var tmpFile = path.join(tmpDir, filename);
-        var fileStream = fs.createWriteStream(tmpFile);
-        size = yield uploadPart(fileStream, part);
-        var hash =
-          yield calcHash(tmpFile);
-        var remoteDir = path.join(app.config.upload.path, 'upload', dir);
-        yield thunkify(cp.exec.bind(cp))('ssh root@' + app.config.upload.host + ' "mkdir -p ' + remoteDir + '"')
-        var newFilename = filename;
-        if (keepname === '1') {
-          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
-        } else {
-          newFilename = hash + extname;
-          yield thunkify(cp.exec.bind(cp))('scp ' + tmpFile + ' root@' + app.config.upload.host + ':' + path.join(remoteDir, newFilename))
-        }
-        var relPath = path.join(dir, newFilename);
-        this.url = 'http://' + this.global.base['static'] + '/upload/' + relPath;
-        yield thunkify(cp.exec.bind(cp))('rm -rf ' + tmpDir);
-      }
+      var result = yield uploader.call(this);
       if (from === 'editor') {
-        this.result = {
-          originalName: filename,
-          name: newFilename,
-          url: this.url,
-          size: size,
-          type: path.extname(filename),
-          state: 'SUCCESS',
-          hash: hash
-        }
+        result.state = 'SUCCESS';
+        this.result = result;
       } else {
         this.result = {
           code: 200,
-          result: {
-            url: this.url,
-            hash: hash
-          }
-        };
+          result: result
+        }
       }
     } catch (e) {
       logger.error(e.stack);

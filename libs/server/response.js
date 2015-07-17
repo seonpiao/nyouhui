@@ -5,6 +5,7 @@ var errorMsgs = {
 }
 
 var _ = require('underscore');
+var moment = require('moment');
 
 module.exports = function*(view) {
   if (this.status === 301 || this.status === 302) {
@@ -18,6 +19,11 @@ module.exports = function*(view) {
     },
     __global: this.global || {}
   };
+
+  var requestInfo = {
+    query: this.request.query,
+    path: this.path
+  }
 
   this.locals = this.locals || defaultLocals;
 
@@ -39,6 +45,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.body = this.result || {};
+    this.body.time = Date.now();
   } else if (this.text || this.raw) {
     this.body = this.result || '';
   } else {
@@ -47,6 +54,7 @@ module.exports = function*(view) {
 
   if (this.json) {
     this.status = 200;
+    _.extend(this.body, requestInfo);
     // _.extend(this.body, defaultLocals);
   } else if (this.text || this.raw) {
     this.status = 200;
@@ -54,6 +62,7 @@ module.exports = function*(view) {
     this.status = 200;
   } else {
     _.extend(this.locals, defaultLocals);
+    _.extend(this.locals, requestInfo);
     this.status = 200;
     yield this.render(this.page + '/' + this.view);
   }

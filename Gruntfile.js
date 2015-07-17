@@ -96,6 +96,8 @@ module.exports = function(grunt) {
           }, {
             name: "apps/api/pages/finance/main"
           }, {
+            name: "apps/api/pages/resource/main"
+          }, {
             name: "apps/api/pages/sign/main"
           }, {
             name: "apps/api/pages/sos/main"
@@ -240,6 +242,13 @@ module.exports = function(grunt) {
       devbr: {
         command: function(brname) {
           return [ "git checkout master", "git pull", "git branch " + brname, "git checkout " + brname ].join("&&");
+        }
+      }
+    },
+    shell: {
+      devbr: {
+        command: function(brname) {
+          return ["git checkout master", "git pull", "git branch " + brname, "git checkout " + brname].join("&&");
         }
       }
     },

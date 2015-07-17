@@ -1,0 +1,14 @@
+- var list = result.data[result.db][result.collection];
+each item in list
+  - var read,write;
+  if value[item.db] && value[item.db][item.collection]
+    - read = value[item.db][item.collection].read;
+    - write = value[item.db][item.collection].write;
+    - console.log(read,write)
+  tr
+    td= item.db
+    td= item.collection
+    td
+      input(type="checkbox",checked=!!read,data-db=item.db,data-collection=item.collection,data-action="read")
+    //- td
+    //-   input(type="checkbox",checked=!!write,data-db=item.db,data-collection=item.collection,data-action="write")

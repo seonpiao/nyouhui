@@ -34,7 +34,7 @@ html
     // tagsinput
     link(href='/plugins/tagsinput/tagsinput.css', rel='stylesheet', type='text/css')
     link(href='/plugins/wizard/wizard.css', rel='stylesheet', type='text/css')
-    link(href='http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css', rel='stylesheet', type='text/css')
+    link(href='/css/fontawesome.min.css', rel='stylesheet', type='text/css')
     link(href='/plugins/umeditor/themes/default/css/umeditor.css', rel='stylesheet', type='text/css')
     // HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries
     // WARNING: Respond.js doesn't work if you view the page via file://
@@ -77,8 +77,12 @@ html
       include ../../../modules/manage_ctrl_continue/index
       include ../../../modules/manage_ctrl_contentblock/index
       include ../../../modules/manage_ctrl_draggableselector/index
+<<<<<<< HEAD
       include ../../../modules/manage_ctrl_control1/index
       include ../../../modules/manage_ctrl_checkboxselect/index
+=======
+      include ../../../modules/manage_ctrl_adminprivilege/index
+>>>>>>> 32fb225c649935c13c944d5a7aa39cd5fff95833
 
       //socket
       include ../../../modules/socket/index
@@ -122,6 +126,11 @@ html
     script(src='/js/app.min.js', type='text/javascript')
     // AdminLTE for demo purposes
     //- script(src='/js/demo.js', type='text/javascript')
+<<<<<<< HEAD
     script(src='http://' + __global.base.static + '/dist/template/tpl-ver.b05f8c42b8e51927.js')
     script(type="text/javascript",src='http://' + __global.base.static + '/dist/js/manage/common.min.8f1ad4f6a26b948e.js')
+=======
+    script(src='http://' + __global.base.static + '/dist/template/tpl-ver.03d276993d79ddf3.js')
+    script(type="text/javascript",src='http://' + __global.base.static + '/dist/js/manage/common.min.a90c91987c4afa19.js')
+>>>>>>> 32fb225c649935c13c944d5a7aa39cd5fff95833
     block footjs

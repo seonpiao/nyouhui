@@ -32,7 +32,6 @@ module.exports = function(app) {
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
-    var token = this.request.body.token;
     var user =
       yield getUserById.call(this, uid);
     if (user) {
@@ -50,11 +49,10 @@ module.exports = function(app) {
   route.nested('/modifyPassword').post(function*(next) {
     this.json = true;
     var uid =
-    yield checkLogin.call(this);
+      yield checkLogin.call(this);
     if (!uid) return;
     var password = this.request.body.password;
     var newPassword = this.request.body.new_password;
-    var token = this.request.body.token;
     var user =
       yield auth(uid, password);
     if (user) {
@@ -64,6 +62,40 @@ module.exports = function(app) {
       }
     } else {
       this.result = app.Errors.USER_INCORRECT_PASSWORD;
+    }
+  });
+
+  route.nested('/updateUserInfo').post(function*(next) {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var body = this.request.body;
+    var user =
+      yield getUserById.call(this, uid);
+    if (user) {
+      extend(user, {
+        name: body.name,
+        sex: body.sex,
+        country: body.country,
+        birth: body.birth,
+        id_type: body.id_type,
+        id_num: body.id_num,
+        height: body.height,
+        weight: body.weight,
+        blood_type: body.blood_type,
+        email: body.email,
+        address: body.address,
+        workplace: body.workplace,
+        job: body.job,
+        emergency_contact: body.emergency_contact
+      });
+      yield saveUser(user);
+      this.result = {
+        code: 0
+      }
+    } else {
+      this.result = app.Errors.USER_NOT_EXIST;
     }
   });
 
@@ -106,6 +138,13 @@ module.exports = function(app) {
     var user =
       yield getUserById.call(this, uid);
     if (user) {
+      yield Mongo.exec({
+        hosts: app.config.mongo.replset.split(','),
+        db: app.config.user.db,
+        collection: app.config.user.collection
+      }, 'ensureIndex', {
+        loc: "2dsphere"
+      });
       user.loc = {
         type: 'Point',
         coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]

@@ -27,6 +27,9 @@ define(["libs/client/views/base"], function(Base) {
         var $ctrl = $(ctrl);
         var key, value;
         var view = $ctrl.data('view');
+        if (view.skip && view.skip()) {
+          return;
+        }
         if (_.isArray(view.name())) {
           view.name().forEach(function(v, i) {
             key = view.name()[i];
@@ -69,7 +72,6 @@ define(["libs/client/views/base"], function(Base) {
       }, 200);
     },
     submit: function(e) {
-      console.log(this.$(':focus').attr('nosubmit'))
       e.preventDefault();
       if (!this.$submit.hasClass('disabled')) {
         this.fillModel();

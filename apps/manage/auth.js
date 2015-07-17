@@ -16,8 +16,6 @@ var auth = function*(next) {
   }
   //登录
   else if ((this.session && this.session.username) || isTokenValid) {
-    this.global.username = this.session.username;
-    this.global.uid = this.session.uid;
     yield next;
   } else {
     if (this.path.match(/^\/api/)) {

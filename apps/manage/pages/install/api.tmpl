@@ -50,6 +50,10 @@ module.exports = function(app) {
       code: 2005,
       message: '手机号不存在'
     },
+    'SIGN_SEND_SMS_FAILED': {
+      code: 2006,
+      message: '验证码发送失败'
+    },
     //user
     'USER_INCORRECT_PASSWORD': {
       code: 3000,
@@ -67,6 +71,11 @@ module.exports = function(app) {
     'DATA_READ_ERROR': {
       code: 4001,
       message: '读取数据库失败'
+    },
+    //resource
+    'UPLOAD_FAILED': {
+      code: 5000,
+      message: '资源上传失败'
     }
   };
 
@@ -75,6 +84,7 @@ module.exports = function(app) {
     mongo: {
       host: '{{mongo_host}}',
       port: {{mongo_port}},
+      replset: '{{mongo_replset}}',
       defaultDB: '{{mongo_db}}'
     },
     redis: {
@@ -83,11 +93,21 @@ module.exports = function(app) {
     },
     upload:{
       host:'{{upload_host}}',
-      path:'{{upload_path}}'
+      path:'{{upload_path}}',
+      db:'{{upload_db}}',
+      collection:'{{upload_collection}}'
     },
     privilege: {
       db: '{{privilege_db}}',
       collection: '{{privilege_collection}}'
+    },
+    schema: {
+      db: '{{schema_db}}',
+      collection: '{{schema_collection}}'
+    },
+    control: {
+      db: '{{control_db}}',
+      collection: '{{control_collection}}'
     },
     user: {
       db: '{{user_db}}',
