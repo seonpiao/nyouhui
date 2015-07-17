@@ -1,0 +1,1 @@
+require([ "apps/m/pages/m_eventactivity/modules" ], function() {});

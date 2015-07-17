@@ -1,0 +1,7 @@
+- var res = result[db][collection];
+.event_box
+	h1.event_acttit(id=res._id)= res.title
+	p.event_acttime= "["+res.type+"]"
+		span= moment(res.create_time).format('YYYY-MM-DD')
+	article.event_con!= res.content
+	img.event_actimg.mb33(width="100%",src=res.pic)
