@@ -21,13 +21,14 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: app.config.admin.db,
         collection: app.config.admin.collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify({
-            username: username,
-            password: password
-          })
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              username: username,
+              password: password
+            })
+          }
         }
       });
     result = result[app.config.admin.db][app.config.admin.collection];

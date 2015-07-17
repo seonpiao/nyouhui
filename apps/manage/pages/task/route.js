@@ -101,7 +101,8 @@ module.exports = function(app) {
             id: id
           });
         originStep = originStep[app.config.step.db][app.config.step.collection];
-        var step = require(path.join(__dirname, 'steps', originStep.stepid + '.js'));
+        var step = require(path.join(__dirname, 'steps', originStep.stepid +
+          '.js'));
         step.id = originStep.stepid;
         try {
           step.params = JSON.parse(originStep.params);
@@ -141,15 +142,16 @@ module.exports = function(app) {
       host: app.config.mongo.host,
       port: app.config.mongo.port,
       db: app.config.tasklog.db,
-      collection: app.config.tasklog.collection
-    }, {
-      method: 'post',
-      json: true,
-      body: {
-        start: moment(start).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
-        end: moment(end).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
-        taskid: taskid,
-        result: JSON.stringify(this.result)
+      collection: app.config.tasklog.collection,
+      request: {
+        method: 'post',
+        json: true,
+        body: {
+          start: moment(start).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
+          end: moment(end).format('YYYY年MM月DD日 HH:mm:ss.SSS'),
+          taskid: taskid,
+          result: JSON.stringify(this.result)
+        }
       }
     })
   };

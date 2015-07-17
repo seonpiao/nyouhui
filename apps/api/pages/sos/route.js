@@ -133,10 +133,11 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: app.config.mongo.defaultDB,
         collection: 'sos',
-        id: helpId
-      }, {
-        method: 'put',
-        json: result
+        id: helpId,
+        request: {
+          method: 'put',
+          json: result
+        }
       });
     }
     this.result = {
@@ -182,10 +183,11 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: app.config.mongo.defaultDB,
         collection: 'sos',
-        id: helpId
-      }, {
-        method: 'put',
-        json: result
+        id: helpId,
+        request: {
+          method: 'put',
+          json: result
+        }
       });
     }
     this.result = {
@@ -220,10 +222,11 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.mongo.defaultDB,
           collection: 'sos',
-          id: helpId
-        }, {
-          method: 'put',
-          json: result
+          id: helpId,
+          request: {
+            method: 'put',
+            json: result
+          }
         });
         yield saveUser(user);
       }
@@ -249,12 +252,13 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.mongo.defaultDB,
           collection: 'sos',
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              me: me.uid
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                me: me.uid
+              })
+            }
           }
         });
       helpData = helpData[app.config.mongo.defaultDB]['sos'];
@@ -262,20 +266,21 @@ module.exports = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: app.config.user.db,
-        collection: app.config.user.collection
-      }, {
-        qs: {
-          query: JSON.stringify({
-            uid: {
-              $in: helpData.rescuer
-            }
-          }),
-          fields: JSON.stringify({
-            uid: 1,
-            nickname: 1,
-            helping: 1,
-            loc: 1
-          })
+        collection: app.config.user.collection,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              uid: {
+                $in: helpData.rescuer
+              }
+            }),
+            fields: JSON.stringify({
+              uid: 1,
+              nickname: 1,
+              helping: 1,
+              loc: 1
+            })
+          }
         }
       });
       allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
@@ -283,26 +288,27 @@ module.exports = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: app.config.user.db,
-        collection: app.config.user.collection
-      }, {
-        qs: {
-          query: JSON.stringify({
-            loc: {
-              $near: {
-                $geometry: me.loc,
-                $maxDistance: distance
+        collection: app.config.user.collection,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              loc: {
+                $near: {
+                  $geometry: me.loc,
+                  $maxDistance: distance
+                }
+              },
+              uid: {
+                $in: helpData.rescuer
               }
-            },
-            uid: {
-              $in: helpData.rescuer
-            }
-          }),
-          fields: JSON.stringify({
-            uid: 1,
-            nickname: 1,
-            helping: 1,
-            loc: 1
-          })
+            }),
+            fields: JSON.stringify({
+              uid: 1,
+              nickname: 1,
+              helping: 1,
+              loc: 1
+            })
+          }
         }
       });
       aroundHelpers = aroundHelpers[app.config.user.db][app.config.user.collection];

@@ -34,12 +34,13 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: app.config.uid.db,
         collection: app.config.uid.collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify({
-            source: source
-          })
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              source: source
+            })
+          }
         }
       });
     result = result[app.config.uid.db][app.config.uid.collection];
@@ -48,12 +49,13 @@ module.exports = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: app.config.uid.db,
-        collection: app.config.uid.collection
-      }, {
-        method: 'post',
-        json: {
-          uid: 0,
-          source: source
+        collection: app.config.uid.collection,
+        request: {
+          method: 'post',
+          json: {
+            uid: 0,
+            source: source
+          }
         }
       });
       result =
@@ -62,12 +64,13 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.uid.db,
           collection: app.config.uid.collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              source: source
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                source: source
+              })
+            }
           }
         });
       result = result[app.config.uid.db][app.config.uid.collection];
@@ -78,18 +81,19 @@ module.exports = function(app) {
       host: app.config.mongo.host,
       port: app.config.mongo.port,
       db: app.config.user.db,
-      collection: app.config.user.collection
-    }, {
-      method: 'post',
-      json: extend(userData, {
-        uid: uid,
-        source: source,
-        nickname: userData.nickname || uid,
-        group: ['normal'], // 默认用户组
-        reg_ip: this.ip,
-        helping: [],
-        create_time: Date.now()
-      })
+      collection: app.config.user.collection,
+      request: {
+        method: 'post',
+        json: extend(userData, {
+          uid: uid,
+          source: source,
+          nickname: userData.nickname || uid,
+          group: ['normal'], // 默认用户组
+          reg_ip: this.ip,
+          helping: [],
+          create_time: Date.now()
+        })
+      }
     })
     result.uid++;
     var objectId = result._id + '';
@@ -99,10 +103,11 @@ module.exports = function(app) {
       port: app.config.mongo.port,
       db: app.config.uid.db,
       collection: app.config.uid.collection,
-      id: objectId
-    }, {
-      method: 'put',
-      json: result
+      id: objectId,
+      request: {
+        method: 'put',
+        json: result
+      }
     });
     return uid;
   };
@@ -181,12 +186,13 @@ module.exports = function(app) {
           host: app.config.mongo.host,
           port: app.config.mongo.port,
           db: app.config.user.db,
-          collection: app.config.user.collection
-        }, {
-          qs: {
-            query: JSON.stringify({
-              phone: phone
-            })
+          collection: app.config.user.collection,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                phone: phone
+              })
+            }
           }
         });
       user = user[app.config.user.db][app.config.user.collection];
@@ -291,12 +297,13 @@ module.exports = function(app) {
           host: app.config.mongo.host,
           port: app.config.mongo.port,
           db: app.config.user.db,
-          collection: app.config.user.collection
-        }, {
-          qs: {
-            query: JSON.stringify({
-              oauth_uid: oauthUid
-            })
+          collection: app.config.user.collection,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                oauth_uid: oauthUid
+              })
+            }
           }
         });
       user = user[app.config.user.db][app.config.user.collection];
@@ -337,12 +344,13 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.user.db,
           collection: app.config.user.collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              phone: phone
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                phone: phone
+              })
+            }
           }
         });
       user = user[app.config.user.db][app.config.user.collection];
@@ -355,10 +363,11 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.user.db,
           collection: app.config.user.collection,
-          id: id
-        }, {
-          method: 'put',
-          json: user
+          id: id,
+          request: {
+            method: 'put',
+            json: user
+          }
         });
         this.result = {
           code: 0

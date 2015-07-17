@@ -13,10 +13,11 @@ var saveUser = function(app) {
       port: app.config.mongo.port,
       db: app.config.user.db,
       collection: app.config.user.collection,
-      id: id
-    }, {
-      method: method,
-      json: userData
+      id: id,
+      request: {
+        method: method,
+        json: userData
+      }
     });
   };
 }

@@ -19,9 +19,10 @@ module.exports = function(app) {
           host: app.config.mongo.host,
           port: app.config.mongo.port,
           db: db,
-          collection: collection
-        }, {
-          qs: this.request.query
+          collection: collection,
+          request: {
+            qs: this.request.query
+          }
         });
       this.result = {
         code: 200,
@@ -81,9 +82,10 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: db,
           collection: collection,
-          id: id
-        }, {
-          qs: this.request.query
+          id: id,
+          request: {
+            qs: this.request.query
+          }
         });
       var controls =
         yield Mongo.request({

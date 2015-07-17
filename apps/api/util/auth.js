@@ -23,10 +23,11 @@ var auth = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: app.config.user.db,
-        collection: app.config.user.collection
-      }, {
-        qs: {
-          query: JSON.stringify(query)
+        collection: app.config.user.collection,
+        request: {
+          qs: {
+            query: JSON.stringify(query)
+          }
         }
       });
     result = result[app.config.user.db][app.config.user.collection];

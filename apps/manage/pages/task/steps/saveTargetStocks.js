@@ -23,13 +23,14 @@ module.exports = {
                 port: data.mongo.port,
                 db: db,
                 collection: 'fellstocks',
-                one: true
-              }, {
-                qs: {
-                  query: JSON.stringify({
-                    code: stockCode,
-                    date: fellStock.date
-                  })
+                one: true,
+                request: {
+                  qs: {
+                    query: JSON.stringify({
+                      code: stockCode,
+                      date: fellStock.date
+                    })
+                  }
                 }
               });
             result = result[db]['fellstocks'];
@@ -39,14 +40,15 @@ module.exports = {
                 port: data.mongo.port,
                 db: db,
                 collection: 'fellstocks',
-                id: result._id + ''
-              }, {
-                method: 'put',
-                json: {
-                  code: stockCode,
-                  date: fellStock.date,
-                  fell_days: fellStock.fellDays,
-                  marks: fellStock.marks
+                id: result._id + '',
+                request: {
+                  method: 'put',
+                  json: {
+                    code: stockCode,
+                    date: fellStock.date,
+                    fell_days: fellStock.fellDays,
+                    marks: fellStock.marks
+                  }
                 }
               });
             } else {
@@ -54,14 +56,15 @@ module.exports = {
                 host: data.mongo.host,
                 port: data.mongo.port,
                 db: db,
-                collection: 'fellstocks'
-              }, {
-                method: 'post',
-                json: {
-                  code: stockCode,
-                  date: fellStock.date,
-                  fell_days: fellStock.fellDays,
-                  marks: fellStock.marks
+                collection: 'fellstocks',
+                request: {
+                  method: 'post',
+                  json: {
+                    code: stockCode,
+                    date: fellStock.date,
+                    fell_days: fellStock.fellDays,
+                    marks: fellStock.marks
+                  }
                 }
               });
             }

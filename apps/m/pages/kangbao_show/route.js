@@ -15,12 +15,13 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: db,
           collection: collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              media_id: id
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                media_id: id
+              })
+            }
           }
         });
       this.result = {

@@ -12,52 +12,46 @@ var jade = require('jade');
 
 module.exports = function(app) {
 
+  Mongo.init(app);
+
   var sanitize = function(s) {
     return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
   }
 
-  var getFieldExtData = function*(fields) {
-    var extDatas = [];
-    for (var i = 0; i < fields.length; i++) {
-      var field = fields[i];
-      //从controls表里面，获取字段的附件数据
-      var fieldExtData =
-        yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.control.db,
-          collection: app.config.control.collection,
-          id: field.type
-        });
-      fieldExtData = fieldExtData[app.config.control.db][app.config.control
-        .collection
-      ];
-      if (fieldExtData) {
-        var fieldParams = fieldExtData.params;
-        if (fieldParams) {
-          try {
-            fieldParams = JSON.parse(fieldParams);
-          } catch (e) {
-            fieldParams = {};
-          }
-          //有db和collection，说明这个字段的数据是与外表有关联的
-          if (fieldParams.db && fieldParams.collection) {
-            //把db和collection附加到field定义上，表名这个字段有关联的外表数据
-            field.db = fieldParams.db;
-            field.collection = fieldParams.collection;
-            var fieldData =
-              yield Mongo.request({
-                host: app.config.mongo.host,
-                port: app.config.mongo.port,
-                db: fieldParams.db,
-                collection: fieldParams.collection
-              });
-            extDatas.push(fieldData);
+  var applyCustomTemplate = function*(list, db, collection) {
+    var schema =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.schema.db,
+        collection: app.config.schema.collection,
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              db: db,
+              collection: collection
+            })
           }
         }
-      }
+      });
+    var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+    if (schemaData) {
+      var fields = schemaData.fields;
+      //检查有哪些自定义的模板
+      var templates = {};
+      fields.forEach(function(field) {
+        if (field.template) {
+          templates[field.name] = field.template;
+        }
+      });
+      Object.keys(templates).forEach(function(fieldName) {
+        list.forEach(function(row) {
+          console.log(fieldName)
+          row[fieldName] = jade.render(templates[fieldName], row);
+        });
+      });
     }
-    return extDatas;
   };
 
   var getCollectionData = function*() {
@@ -80,64 +74,29 @@ module.exports = function(app) {
         host: app.config.mongo.host,
         port: app.config.mongo.port,
         db: db,
-        collection: collection
-      }, {
-        qs: query
+        collection: collection,
+        request: {
+          qs: query
+        }
       });
     var list = data[db][collection];
     //列表的字段定义数据
     var _data = {};
-    var schema =
-      yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.schema.db,
-        collection: app.config.schema.collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify({
-            db: db,
-            collection: collection
-          })
-        }
-      });
-    var schemaData = schema[app.config.schema.db][app.config.schema.collection];
-    if (schemaData) {
-      var fields = schemaData.fields;
-      //下面是要获取有外联的字段的附加数据
-      //获取到关联的外表数据
-      var extDatas =
-        yield getFieldExtData(fields);
-      extDatas.forEach(function(extData) {
-        extend(true, _data, extData);
-      });
-      //检查有哪些自定义的模板
-      var templates = {};
-      fields.forEach(function(field) {
-        if (field.template) {
-          templates[field.name] = field.template;
-        }
-      });
-      Object.keys(templates).forEach(function(fieldName) {
-        list.forEach(function(row) {
-          row[fieldName] = jade.render(templates[fieldName], row);
-        });
-      });
+    var extDatas = yield Mongo.getExtData({
+      collection: collection
+    });
+    for (var i = 0; i < extDatas.length; i++) {
+      extend(true, _data, extDatas[i]);
     }
-    extend(true, _data, schema);
-    var dbconn =
-      yield Mongo.get({
-        db: db,
-        hosts: app.config.mongo.replset.split(',')
-      });
-    var coll = dbconn.collection(collection);
+    yield applyCustomTemplate(list, db, collection);
     var filter = {};
     try {
       filter = JSON.parse(query.query);
     } catch (e) {}
     var count =
-      yield thunkify(coll.count.bind(coll))(filter);
+      yield Mongo.exec({
+        collection: collection
+      }, 'count', filter);
     return {
       data: data,
       _data: _data,
