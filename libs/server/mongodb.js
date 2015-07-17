@@ -1,103 +1,14 @@
-var MongoClient = require('mongodb').MongoClient;
-var format = require('util').format;
-var thunkify = require('thunkify');
-var assert = require('assert');
-var request = require('request');
-var querystring = require('querystring');
-var _ = require('underscore');
-var logger = require('log4js').getLogger('mongo');
+var Mongo = require('carrier-mongo');
 
-var dbs = {};
-
-var Mongo = function(hosts, db, collection) {
-  this.db = db;
-  this.collection;
-  this.hosts = hosts;
-};
-
-var appendID = function(url, id) {
-  if (id) {
-    var isObjectID = !!id.match(/[a-z0-9]{24}/i);
-    if (isObjectID) {
-      return url + '/' + id;
-    } else {
-      return url + (url.indexOf('?') > 0 ? '&' : '?') + querystring.stringify({
-        query: (JSON.stringify({
-          id: id
-        }))
-      });
-    }
-  } else {
-    return url;
-  }
-}
-
-Mongo.get = function*(options) {
-  var dbname = options.db;
-  var hosts = options.hosts;
-  if (dbs[dbname]) {
-    return dbs[dbname];
-  }
-  var constr = format('mongodb://%s/%s', hosts.join(','), dbname);
-  var db =
-    yield thunkify(MongoClient.connect.bind(MongoClient))(constr, {
-      db: {
-        w: hosts.length,
-        readPreference: 'secondary'
-      }
-    });
-  assert(db);
-  dbs[dbname] = db;
-  return db;
-};
-
-Mongo.exec = function*(dbOptions, cmd) {
-  var args = Array.prototype.slice.call(arguments, 2);
-  var db = yield Mongo.get(dbOptions);
-  var collection = db.collection(dbOptions.collection);
-  return yield thunkify(collection[cmd]).apply(collection, args);
-};
-
-Mongo.request = function*(dbOptions, requestOptions) {
-  requestOptions = requestOptions || {};
-  requestOptions.method = requestOptions.method || 'get';
-  var requestUrl;
-  if (dbOptions.path) {
-    requestUrl = 'http://' + dbOptions.host + ':' + dbOptions.port + '/' + dbOptions.path;
-  } else {
-    requestUrl = 'http://' + dbOptions.host + ':' + dbOptions.port + '/' + dbOptions.db + '/' + dbOptions.collection;
-  }
-  requestUrl = appendID(requestUrl, dbOptions.id);
-  _.extend(requestOptions, {
-    url: requestUrl
-  });
-  var result =
-    yield thunkify(request)(requestOptions);
-  //mongo rest 返回的直接就是对象
-  if (_.isObject(result[1])) {
-    result = result[1];
-  } else {
-    try {
-      result = JSON.parse(result[1]);
-    } catch (e) {
-      logger.error(result[1]);
-      logger.error(e.stack);
-    }
-  }
-  if (requestOptions.method !== 'get' && !result.ok) {
-    throw new Error('operation failed');
-  }
-  //如果传了id，就只返回一条
-  if (dbOptions.id) {
-    dbOptions.one = true;
-  }
-  if (dbOptions.one && Array.isArray(result)) {
-    result = result[0];
-  }
-  var data = {};
-  data[dbOptions.db] = {};
-  data[dbOptions.db][dbOptions.collection] = result;
-  return data;
+Mongo.init = function(app) {
+  Mongo.host = app.config.mongo.host;
+  Mongo.hosts = app.config.mongo.replset.split(',');
+  Mongo.port = app.config.mongo.port;
+  Mongo.db = app.config.mongo.defaultDB;
+  Mongo.schemaDb = app.config.schema.db;
+  Mongo.schemaCollection = app.config.schema.collection;
+  Mongo.controlDb = app.config.control.db;
+  Mongo.controlCollection = app.config.control.collection;
 };
 
 module.exports = Mongo;

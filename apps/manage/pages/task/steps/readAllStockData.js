@@ -15,7 +15,8 @@ module.exports = {
     var count = 0;
     var max = Infinity;
     // var max = 1000;
-    async.eachLimit(data.allStocks.slice(0, max), 4, function(stockCode, finishOne) {
+    async.eachLimit(data.allStocks.slice(0, max), 4, function(stockCode,
+      finishOne) {
       var stockData;
       co(function*() {
         stockData =
@@ -23,12 +24,13 @@ module.exports = {
             host: data.mongo.host,
             port: data.mongo.port,
             db: db,
-            collection: collection
-          }, {
-            qs: {
-              query: JSON.stringify({
-                code: stockCode
-              })
+            collection: collection,
+            request: {
+              qs: {
+                query: JSON.stringify({
+                  code: stockCode
+                })
+              }
             }
           });
         var allDays = stockData[db][collection];

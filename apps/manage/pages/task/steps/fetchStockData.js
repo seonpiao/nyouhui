@@ -24,9 +24,15 @@ module.exports = {
         subfix = '.sz';
         stockcode = 'SZ' + stockcode.replace('.sz', '');
       }
-      var timeStr = (self.params.startYear || moment().format('YYYY')) + '-' + padnum(parseInt(self.params.startMonth || moment().format('MM'), 10), 2) + '-' + padnum(parseInt(self.params.startDay || moment().add(-1, 'days').format('DD'), 10), 2) + ' 00:00:00';
+      var timeStr = (self.params.startYear || moment().format('YYYY')) +
+        '-' + padnum(parseInt(self.params.startMonth || moment().format(
+          'MM'), 10), 2) + '-' + padnum(parseInt(self.params.startDay ||
+          moment().add(-1, 'days').format('DD'), 10), 2) + ' 00:00:00';
       var start = new Date(timeStr).getTime();
-      var url = 'http://xueqiu.com/stock/forchartk/stocklist.json?symbol=' + stockcode + '&period=1' + period + '&type=before&begin=' + start + '&end=' + Date.now();
+      var url =
+        'http://xueqiu.com/stock/forchartk/stocklist.json?symbol=' +
+        stockcode + '&period=1' + period + '&type=before&begin=' +
+        start + '&end=' + Date.now();
       var retry = new Retry({
         max: 5,
         done: callback,
@@ -52,7 +58,8 @@ module.exports = {
               retry();
             }
             if (body.chartlist) {
-              async.eachSeries(body.chartlist, function(item, savedOne) {
+              async.eachSeries(body.chartlist, function(item,
+                savedOne) {
                 var time = moment(new Date(item.time));
                 var code = body.stock.symbol;
                 code = code.replace(/SH|SZ/, '') + subfix;
@@ -80,17 +87,22 @@ module.exports = {
                 }
                 co(function*() {
                   try {
-                    console.log('==============================');
+                    console.log(
+                      '=============================='
+                    );
                     yield Mongo.request({
                       host: data.mongo.host,
                       port: data.mongo.port,
                       db: self.params.db,
-                      collection: self.params.collection
-                    }, {
-                      method: 'post',
-                      json: stockData
+                      collection: self.params.collection,
+                      request: {
+                        method: 'post',
+                        json: stockData
+                      }
                     });
-                    console.log('insert: ' + stockcode + ', ' + time.format('YYYY-MM-DD'));
+                    console.log('insert: ' + stockcode +
+                      ', ' + time.format('YYYY-MM-DD')
+                    );
                   } catch (e) {
                     console.log(e.stack);
                     console.log('skip: ' + stockcode);

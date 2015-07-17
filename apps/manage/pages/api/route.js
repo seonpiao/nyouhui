@@ -35,10 +35,11 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: db,
         collection: collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify(query)
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify(query)
+          }
         }
       });
     data = data[db][collection];
@@ -135,9 +136,10 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: db,
           collection: collection,
-          id: id
-        }, {
-          qs: query
+          id: id,
+          request: {
+            qs: query
+          }
         });
       var dbconn =
         yield Mongo.get({
@@ -201,12 +203,13 @@ module.exports = function(app) {
             host: app.config.mongo.host,
             port: app.config.mongo.port,
             db: 'cl',
-            collection: 'goods'
-          }, {
-            qs: {
-              query: JSON.stringify({
-                name: goodsName
-              })
+            collection: 'goods',
+            request: {
+              qs: {
+                query: JSON.stringify({
+                  name: goodsName
+                })
+              }
             }
           });
         goods = goods['cl']['goods'];
@@ -244,10 +247,11 @@ module.exports = function(app) {
                 port: app.config.mongo.port,
                 db: 'cl',
                 collection: 'goods',
-                id: goodsId
-              }, {
-                method: 'put',
-                json: item
+                id: goodsId,
+                request: {
+                  method: 'put',
+                  json: item
+                }
               });
             }
           }
@@ -261,10 +265,11 @@ module.exports = function(app) {
           host: app.config.mongo.host,
           port: app.config.mongo.port,
           db: db,
-          collection: collection
-        }, {
-          json: body,
-          method: this.method
+          collection: collection,
+          request: {
+            json: body,
+            method: this.method
+          }
         });
       if (data[db][collection]['ok']) {
         //新增schema，要调整索引
@@ -348,12 +353,13 @@ module.exports = function(app) {
             host: app.config.mongo.host,
             port: app.config.mongo.port,
             db: 'cl',
-            collection: 'goods'
-          }, {
-            qs: {
-              query: JSON.stringify({
-                name: goodsName
-              })
+            collection: 'goods',
+            request: {
+              qs: {
+                query: JSON.stringify({
+                  name: goodsName
+                })
+              }
             }
           });
         goods = goods['cl']['goods'];
@@ -389,10 +395,11 @@ module.exports = function(app) {
                 port: app.config.mongo.port,
                 db: 'cl',
                 collection: 'goods',
-                id: goodsId
-              }, {
-                method: 'put',
-                json: item
+                id: goodsId,
+                request: {
+                  method: 'put',
+                  json: item
+                }
               });
             }
           }
@@ -414,10 +421,11 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: db,
           collection: collection,
-          id: id
-        }, {
-          json: saveData,
-          method: this.method
+          id: id,
+          request: {
+            json: saveData,
+            method: this.method
+          }
         });
       //修改schema，要调整索引
       if (db === app.config.schema.db && collection === app.config.schema
@@ -520,12 +528,13 @@ module.exports = function(app) {
             host: app.config.mongo.host,
             port: app.config.mongo.port,
             db: 'cl',
-            collection: 'goods'
-          }, {
-            qs: {
-              query: JSON.stringify({
-                name: goodsName
-              })
+            collection: 'goods',
+            request: {
+              qs: {
+                query: JSON.stringify({
+                  name: goodsName
+                })
+              }
             }
           });
         goods = goods['cl']['goods'];
@@ -541,10 +550,11 @@ module.exports = function(app) {
               port: app.config.mongo.port,
               db: 'cl',
               collection: 'goods',
-              id: goodsId
-            }, {
-              method: 'put',
-              json: item
+              id: goodsId,
+              request: {
+                method: 'put',
+                json: item
+              }
             });
             break;
           }
@@ -556,9 +566,10 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: db,
           collection: collection,
-          id: id
-        }, {
-          method: this.method
+          id: id,
+          request: {
+            method: this.method
+          }
         });
       this.result = {
         code: 200,

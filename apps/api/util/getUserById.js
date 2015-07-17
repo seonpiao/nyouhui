@@ -8,12 +8,13 @@ var getUserById = function(app) {
         port: app.config.mongo.port,
         db: app.config.user.db,
         collection: app.config.user.collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify({
-            uid: uid
-          })
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              uid: uid
+            })
+          }
         }
       });
     result = result[app.config.user.db][app.config.user.collection];
