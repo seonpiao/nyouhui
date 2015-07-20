@@ -42,6 +42,10 @@ module.exports = function(app) {
     return inserted.ops[0];
   };
 
+  route.nested('/articles').get(function*() {
+    var result = 1;
+  });
+
   route.nested('/helpme').post(function*() {
     this.json = true;
     var uid =
@@ -242,6 +246,8 @@ module.exports = function(app) {
   route.nested('/around').get(function*(next) {
     this.json = true;
     var distance = 1000;
+    var allHelpers = [],
+      aroundHelpers = [];
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
@@ -263,56 +269,60 @@ module.exports = function(app) {
           }
         });
       helpData = helpData[app.config.mongo.defaultDB]['sos'];
-      var allHelpers = yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.user.db,
-        collection: app.config.user.collection,
-        request: {
-          qs: {
-            query: JSON.stringify({
-              uid: {
-                $in: helpData.rescuer
-              }
-            }),
-            fields: JSON.stringify({
-              uid: 1,
-              nickname: 1,
-              helping: 1,
-              loc: 1
-            })
-          }
-        }
-      });
-      allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
-      var aroundHelpers = yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.user.db,
-        collection: app.config.user.collection,
-        request: {
-          qs: {
-            query: JSON.stringify({
-              loc: {
-                $near: {
-                  $geometry: me.loc,
-                  $maxDistance: distance
+      if (helpData) {
+        allHelpers = yield Mongo.request({
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
+          db: app.config.user.db,
+          collection: app.config.user.collection,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                uid: {
+                  $in: helpData.rescuer
                 }
-              },
-              uid: {
-                $in: helpData.rescuer
-              }
-            }),
-            fields: JSON.stringify({
-              uid: 1,
-              nickname: 1,
-              helping: 1,
-              loc: 1
-            })
+              }),
+              fields: JSON.stringify({
+                uid: 1,
+                nickname: 1,
+                helping: 1,
+                loc: 1
+              })
+            }
           }
-        }
-      });
-      aroundHelpers = aroundHelpers[app.config.user.db][app.config.user.collection];
+        });
+        allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
+        aroundHelpers = yield Mongo.request({
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
+          db: app.config.user.db,
+          collection: app.config.user.collection,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                loc: {
+                  $near: {
+                    $geometry: me.loc,
+                    $maxDistance: distance
+                  }
+                },
+                uid: {
+                  $in: helpData.rescuer
+                }
+              }),
+              fields: JSON.stringify({
+                uid: 1,
+                nickname: 1,
+                helping: 1,
+                loc: 1
+              })
+            }
+          }
+        });
+        aroundHelpers = aroundHelpers[app.config.user.db][app.config.user
+          .collection
+        ];
+      }
       this.result = {
         code: 0,
         result: {
