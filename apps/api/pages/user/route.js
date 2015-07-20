@@ -27,11 +27,12 @@ module.exports = function(app) {
 
   var route = app.route('/user');
 
-  route.nested('/getUserInfo').get(function*(next) {
+  route.nested('/getUserInfo/:uid?').get(function*(next) {
     this.json = true;
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
+    uid = this.request.params.uid || uid;
     var user =
       yield getUserById.call(this, uid);
     if (user) {
