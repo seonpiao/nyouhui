@@ -1,7 +1,0 @@
-mixin manage_ctrl_control1(options)
-  .form-group(data-module="manage_ctrl_control1")
-    if options.label
-      label= options.label
-    if options.editable === 'required'
-      span.text-red *
-    input.form-control(type=(options.type || "text"), placeholder=options.placeholder || '', name=options.name, value=(options.type != 'password' ? (options.value || '') : ''),required=(options.editable === 'required'))

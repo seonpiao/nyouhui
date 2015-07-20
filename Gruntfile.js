@@ -7,51 +7,52 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     stylus: {
       compress: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "apps",
-          src: [ "**/modules.styl" ],
+          src: ["**/modules.styl"],
           dest: "dist/css",
           rename: function(dest, filepath) {
-            return path.join(dest, filepath.replace("pages/", "").replace("/modules", ""));
+            return path.join(dest, filepath.replace("pages/", "").replace(
+              "/modules", ""));
           },
           ext: ".css"
-        } ]
+        }]
       }
     },
     cssmin: {
       compress: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "dist/css",
           src: "**/*.css",
           dest: "dist/css",
           ext: ".min.css"
-        } ]
+        }]
       }
     },
     watch: {
       scripts: {
-        files: [ "apps/**/common.js", "libs/client/**/*.js" ],
-        tasks: [ "combine" ]
+        files: ["apps/**/common.js", "libs/client/**/*.js"],
+        tasks: ["combine"]
       },
       stylesheets: {
-        files: [ "**/*.styl" ],
-        tasks: [ "stylus" ]
+        files: ["**/*.styl"],
+        tasks: ["stylus"]
       },
       jade: {
-        files: [ "**/*.jade" ],
-        tasks: [ "jade" ]
+        files: ["**/*.jade"],
+        tasks: ["jade"]
       },
       images: {
-        files: [ "apps/**/static/images/*.*" ],
-        tasks: [ "copy:images" ]
+        files: ["apps/**/static/images/*.*"],
+        tasks: ["copy:images"]
       }
     },
     jade: {
       site: {
         files: {
-          "dist/template": [ "modules/**/*.jade" ]
+          "dist/template": ["modules/**/*.jade"]
         }
       },
       options: {
@@ -60,13 +61,13 @@ module.exports = function(grunt) {
     },
     uglify: {
       compress: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "dist/js",
           src: "**/*.js",
           dest: "dist/js",
           ext: ".min.js"
-        } ]
+        }]
       }
     },
     requirejs: {
@@ -85,7 +86,7 @@ module.exports = function(grunt) {
             oz: "libs/client/oz",
             jaderuntime: "libs/client/runtime"
           },
-          modules: [ {
+          modules: [{
             name: "apps/api/common"
           }, {
             name: "apps/m/common"
@@ -131,7 +132,7 @@ module.exports = function(grunt) {
             name: "apps/manage/pages/task/main"
           }, {
             name: "apps/manage/pages/user/main"
-          } ]
+          }]
         }
       }
     },
@@ -139,27 +140,29 @@ module.exports = function(grunt) {
       common: {
         expand: true,
         cwd: "dist/js/temp",
-        src: [ "apps/**/common.js", "!node_modules/**/*.*" ],
+        src: ["apps/**/common.js", "!node_modules/**/*.*"],
         dest: "dist/js",
         filter: "isFile",
         rename: function(dest, filepath) {
-          return path.join(dest, filepath.replace("apps/", "").replace("pages/", "").replace("/modules", ""));
+          return path.join(dest, filepath.replace("apps/", "").replace(
+            "pages/", "").replace("/modules", ""));
         }
       },
       modules: {
         expand: true,
         cwd: "dist/js/temp",
-        src: [ "**/main.js", "!node_modules/**/*.*" ],
+        src: ["**/main.js", "!node_modules/**/*.*"],
         dest: "dist/js",
         filter: "isFile",
         rename: function(dest, filepath) {
-          return path.join(dest, filepath.replace("apps/", "").replace("pages/", "").replace("/main", ""));
+          return path.join(dest, filepath.replace("apps/", "").replace(
+            "pages/", "").replace("/main", ""));
         }
       },
       images: {
         expand: true,
         cwd: "apps",
-        src: [ "**/static/images/*.*", "!node_modules/**/*.*" ],
+        src: ["**/static/images/*.*", "!node_modules/**/*.*"],
         dest: "dist/images",
         filter: "isFile",
         rename: function(dest, filepath) {
@@ -168,7 +171,7 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      js: [ "dist/js/temp" ]
+      js: ["dist/js/temp"]
     },
     filerev: {
       options: {
@@ -176,7 +179,7 @@ module.exports = function(grunt) {
         length: 16
       },
       js: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "dist/",
           src: "js/**/*.js",
@@ -184,10 +187,10 @@ module.exports = function(grunt) {
           filter: function(filepath) {
             return !filepath.match(/\w+\.\w{16}\.js/);
           }
-        } ]
+        }]
       },
       tpl: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "dist/",
           src: "template/**/*.js",
@@ -195,7 +198,7 @@ module.exports = function(grunt) {
           filter: function(filepath) {
             return !filepath.match(/\w+\.\w{16}\.js/);
           }
-        } ]
+        }]
       },
       "tpl-ver": {
         src: "dist/template/tpl-ver.js",
@@ -205,7 +208,7 @@ module.exports = function(grunt) {
         }
       },
       css: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "dist/",
           src: "css/**/*.css",
@@ -214,41 +217,40 @@ module.exports = function(grunt) {
             console.log(filepath);
             return !filepath.match(/\w+\.\w{16}\.css/);
           }
-        } ]
+        }]
       }
     },
     "string-replace": {
       src: {
-        files: [ {
+        files: [{
           expand: true,
           cwd: "./",
-          src: [ "**/*.jade", "**/*.html", "!node_modules/**/*.*", "!dist/**/*.*" ],
+          src: ["**/*.jade", "**/*.html", "!node_modules/**/*.*",
+            "!dist/**/*.*"
+          ],
           dest: "./"
-        } ],
+        }],
         options: {
-          replacements: [ {
+          replacements: [{
             pattern: /\/dist\/(.*\.(js|css))/gm,
             replacement: function(match) {
-              var file = match.replace(/(.*\.)\w{16}\.(js|css)/, "$1$2");
+              var file = match.replace(/(.*\.)\w{16}\.(js|css)/,
+                "$1$2");
               ori = file.replace("/dist", "dist");
               console.log(file);
-              return grunt.filerev.summary[ori].replace(/^dist/g, "/dist");
+              return grunt.filerev.summary[ori].replace(/^dist/g,
+                "/dist");
             }
-          } ]
+          }]
         }
       }
     },
     shell: {
       devbr: {
         command: function(brname) {
-          return [ "git checkout master", "git pull", "git branch " + brname, "git checkout " + brname ].join("&&");
-        }
-      }
-    },
-    shell: {
-      devbr: {
-        command: function(brname) {
-          return ["git checkout master", "git pull", "git branch " + brname, "git checkout " + brname].join("&&");
+          return ["git checkout master", "git pull", "git branch " +
+            brname, "git checkout " + brname
+          ].join("&&");
         }
       }
     },
@@ -298,7 +300,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-filerev");
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-carrier-helper");
-  grunt.registerTask("default", [ "watch" ]);
+  grunt.registerTask("default", ["watch"]);
   grunt.registerTask("tpl-ver", function() {
     var summary = grunt.filerev.summary;
     var map = {};
@@ -312,7 +314,10 @@ module.exports = function(grunt) {
     var str = "window.tplMapping = " + JSON.stringify(map);
     fs.writeFileSync("dist/template/tpl-ver.js", str);
   });
-  grunt.registerTask("md5", [ "filerev", "tpl-ver", "string-replace" ]);
-  grunt.registerTask("combine", [ "requirejs", "copy", "clean" ]);
-  grunt.registerTask("build", [ "combine", "stylus", "cssmin", "uglify", "jade", "filerev:tpl", "tpl-ver", "filerev:tpl-ver", "filerev:js", "filerev:css", "string-replace" ]);
+  grunt.registerTask("md5", ["filerev", "tpl-ver", "string-replace"]);
+  grunt.registerTask("combine", ["requirejs", "copy", "clean"]);
+  grunt.registerTask("build", ["combine", "stylus", "cssmin", "uglify",
+    "jade", "filerev:tpl", "tpl-ver", "filerev:tpl-ver", "filerev:js",
+    "filerev:css", "string-replace"
+  ]);
 };
