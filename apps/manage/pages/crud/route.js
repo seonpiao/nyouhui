@@ -248,11 +248,11 @@ module.exports = function(app) {
         });
       var schemaData = schema[app.config.schema.db][app.config.schema.collection];
       var fields = schemaData.fields;
-      var extDatas =
-        yield getFieldExtData(fields);
-      extDatas.forEach(function(extData) {
-        extend(true, _data, extData);
-      });
+      // var extDatas =
+      //   yield getFieldExtData(fields);
+      // extDatas.forEach(function(extData) {
+      //   extend(true, _data, extData);
+      // });
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
@@ -340,11 +340,11 @@ module.exports = function(app) {
         });
       var schemaData = schema[app.config.schema.db][app.config.schema.collection];
       var fields = schemaData.fields;
-      var extDatas =
-        yield getFieldExtData(fields);
-      extDatas.forEach(function(extData) {
-        extend(true, _data, extData);
-      });
+      // var extDatas =
+      //   yield getFieldExtData(fields);
+      // extDatas.forEach(function(extData) {
+      //   extend(true, _data, extData);
+      // });
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
