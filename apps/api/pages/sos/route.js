@@ -248,6 +248,16 @@ module.exports = function(app) {
     var distance = 1000;
     var allHelpers = [],
       aroundHelpers = [];
+    var userDataStruct = {
+      uid: 1,
+      nickname: 1,
+      phone: 1,
+      level: 1,
+      level_name: 1,
+      avatar: 1,
+      qualification: 1,
+      loc: 1
+    };
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
@@ -283,16 +293,7 @@ module.exports = function(app) {
                   $in: helpData.rescuer
                 }
               }),
-              fields: JSON.stringify({
-                uid: 1,
-                nickname: 1,
-                phone: 1,
-                level: 1,
-                level_name: 1,
-                avatar: 1,
-                qualification: 1,
-                loc: 1
-              })
+              fields: JSON.stringify(userDataStruct)
             }
           }
         });
@@ -315,16 +316,7 @@ module.exports = function(app) {
                   $in: helpData.rescuer
                 }
               }),
-              fields: JSON.stringify({
-                uid: 1,
-                nickname: 1,
-                phone: 1,
-                level: 1,
-                level_name: 1,
-                avatar: 1,
-                qualification: 1,
-                loc: 1
-              })
+              fields: JSON.stringify(userDataStruct)
             }
           }
         });
