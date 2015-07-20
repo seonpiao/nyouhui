@@ -263,7 +263,8 @@ module.exports = function(app) {
           request: {
             qs: {
               query: JSON.stringify({
-                me: me.uid
+                me: me.uid,
+                status: 1
               })
             }
           }
