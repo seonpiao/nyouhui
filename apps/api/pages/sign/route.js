@@ -91,6 +91,9 @@ module.exports = function(app) {
           group: ['normal'], // 默认用户组
           reg_ip: this.ip,
           helping: [],
+          level: 1,
+          avatar: '',
+          qualification: [],
           create_time: Date.now()
         })
       }
