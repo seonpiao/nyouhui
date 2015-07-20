@@ -1,0 +1,17 @@
+extends ../../layouts/index
+
+block append title
+
+block append meta
+
+block append stylesheet
+  link(type="text/css",rel="stylesheet",href="http://" + __global.base.static + "/dist/css/m/m_eventactivity.1234567890abcdef.css")
+
+block append headjs
+  script(type="text/javascript",src="http://" + __global.base.static + "/dist/js/m/common.min.1234567890abcdef.js")
+
+block append body
+  include ../../../../modules/firstre_event_activity/index
+
+block append footjs
+  script(type="text/javascript",src="/dist/js/m/m_eventactivity.min.1234567890abcdef.js")

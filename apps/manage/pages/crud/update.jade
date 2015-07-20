@@ -74,6 +74,10 @@ block append content
               +manage_ctrl_adminprivilege(params)
             else if field.base === 'draggableselector'
               +manage_ctrl_draggableselector(params)
+            else if field.base === 'control1'
+              +manage_ctrl_control1(params)
+            else if field.base === 'checkboxselect'
+              +manage_ctrl_checkboxselect(params)
             else if field.base === 'won2yuan'
               -params.unitWon = data ? data.unit_won : '';
               -params.unitYuan = data ? data.unit_yuan : '';
@@ -102,4 +106,8 @@ block append content
         a.btn.btn-default.btn-cancel 取消
 
 block append footjs
+<<<<<<< HEAD
+  script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.7ea5a597bfc13560.js")
+=======
   script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.87023840acc87ced.js")
+>>>>>>> 32fb225c649935c13c944d5a7aa39cd5fff95833
