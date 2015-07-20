@@ -5,23 +5,22 @@ var Mongo = require('../../../../libs/server/mongodb');
 global.moment = require('moment');
 
 module.exports = function(app) {
+  Mongo.init(app);
   app.route('/m_eventactivity/:id?').get(function*(next) {
     try {
       var id = this.request.params.id;
-      var db = 'firstre';
-      var collection = 'saishi';
       var data =
-        yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: db,
-          collection: collection,
+        yield Mongo.concat([{
+          collection: 'saishi',
           id: id
-        });
+        }, {
+          collection: 'saishi_list'
+        }]);
+      console.log(data);
       this.result = {
         result: data,
-        db: db,
-        collection: collection
+        db: app.config.mongo.defaultDB,
+        collection: 'saishi'
       };
     } catch (e) {
       logger.error(e.stack);
