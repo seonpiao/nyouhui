@@ -29,10 +29,11 @@ module.exports = function(app) {
         port: app.config.mongo.port,
         db: db,
         collection: collection,
-        one: true
-      }, {
-        qs: {
-          query: JSON.stringify(query)
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify(query)
+          }
         }
       });
     data = data[db][collection];
@@ -240,10 +241,11 @@ module.exports = function(app) {
             host: app.config.mongo.host,
             port: app.config.mongo.port,
             db: db,
-            collection: collection
-          }, {
-            json: body,
-            method: this.method
+            collection: collection,
+            request: {
+              json: body,
+              method: this.method
+            }
           });
         if (data[db][collection]['ok']) {
           this.result = {

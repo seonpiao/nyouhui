@@ -116,7 +116,7 @@ module.exports = function(app) {
       //从救援人的救援列表中删除本次救援
       if (result.rescuer.length > 0) {
         for (var i = 0; i < result.rescuer.length; i++) {
-          var rescuerId = rescuer[i];
+          var rescuerId = result.rescuer[i];
           var user = yield getUserById(rescuerId);
           var index = user.helping.indexOf(result._id.toString());
           if (index !== -1) {
