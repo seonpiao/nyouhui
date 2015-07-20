@@ -286,7 +286,6 @@ module.exports = function(app) {
               fields: JSON.stringify({
                 uid: 1,
                 nickname: 1,
-                helping: 1,
                 loc: 1
               })
             }
@@ -314,7 +313,6 @@ module.exports = function(app) {
               fields: JSON.stringify({
                 uid: 1,
                 nickname: 1,
-                helping: 1,
                 loc: 1
               })
             }
