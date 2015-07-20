@@ -219,13 +219,14 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              db: db,
-              collection: collection
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                db: db,
+                collection: collection
+              })
+            }
           }
         });
 
@@ -237,22 +238,24 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              db: db,
-              collection: collection
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                db: db,
+                collection: collection
+              })
+            }
           }
         });
       var schemaData = schema[app.config.schema.db][app.config.schema.collection];
       var fields = schemaData.fields;
-      // var extDatas =
-      //   yield getFieldExtData(fields);
-      // extDatas.forEach(function(extData) {
-      //   extend(true, _data, extData);
-      // });
+      var extDatas = yield Mongo.getExtData({
+        collection: collection
+      });
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
+      });
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
@@ -329,22 +332,24 @@ module.exports = function(app) {
           port: app.config.mongo.port,
           db: app.config.schema.db,
           collection: app.config.schema.collection,
-          one: true
-        }, {
-          qs: {
-            query: JSON.stringify({
-              db: db,
-              collection: collection
-            })
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                db: db,
+                collection: collection
+              })
+            }
           }
         });
       var schemaData = schema[app.config.schema.db][app.config.schema.collection];
       var fields = schemaData.fields;
-      // var extDatas =
-      //   yield getFieldExtData(fields);
-      // extDatas.forEach(function(extData) {
-      //   extend(true, _data, extData);
-      // });
+      var extDatas = yield Mongo.getExtData({
+        collection: collection
+      });
+      extDatas.forEach(function(extData) {
+        extend(true, _data, extData);
+      });
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
