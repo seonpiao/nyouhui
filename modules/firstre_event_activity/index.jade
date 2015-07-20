@@ -1,8 +1,9 @@
 - var res = result[db][collection];
-- var saishiList = result[db]['saishi_list'];
+- var types = result[db]['saishi_type'];
+- var type = types.filter(function(item){return item._id.toString() === res.type})[0];
 .event_box
 	h1.event_acttit(id=res._id)= res.title
-	p.event_acttime= "["+res.type+"]"
+	p.event_acttime= "["+type.name+"]"
 		span= moment(res.create_time).format('YYYY-MM-DD')
 	article.event_con!= res.content
 	img.event_actimg.mb33(width="100%",src=res.pic)

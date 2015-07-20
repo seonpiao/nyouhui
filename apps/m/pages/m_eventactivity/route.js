@@ -14,9 +14,9 @@ module.exports = function(app) {
           collection: 'saishi',
           id: id
         }, {
-          collection: 'saishi_list'
+          collection: 'saishi_type'
         }]);
-      console.log(data);
+      // console.log(data);
       this.result = {
         result: data,
         db: app.config.mongo.defaultDB,
