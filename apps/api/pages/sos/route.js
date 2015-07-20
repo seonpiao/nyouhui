@@ -58,7 +58,8 @@ module.exports = function(app) {
       db: app.config.mongo.defaultDB,
       collection: 'sos'
     }, 'count', {
-      me: uid
+      me: uid,
+      status: 1
     });
     if (count > 0) {
       this.result = app.Errors.SOS_MORE_THEN_ONCE;

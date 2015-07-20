@@ -172,12 +172,6 @@ module.exports = function(app) {
     for (var i = 0; i < extDatas.length; i++) {
       extend(true, data, extDatas[i]);
     }
-    var dbconn =
-      yield Mongo.get({
-        db: db,
-        hosts: app.config.mongo.replset.split(',')
-      });
-    var coll = dbconn.collection(collection);
     var filter = {};
     try {
       filter = JSON.parse(query.query);
