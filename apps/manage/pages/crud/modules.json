@@ -4,6 +4,6 @@
   "manage_ctrl_draggableselector", "manage_ctrl_checkbox", "socket",
   "manage_tasksocket", "manage_ctrl_won2yuan", "manage_ctrl_autocomplete",
   "manage_ctrl_datepicker", "manage_ctrl_continue", "manage_ctrl_contentblock",
-  "editor", "manage_ctrl_adminprivilege", "manage_ctrl_control1",
+  "editor", "manage_ctrl_adminprivilege",
   "manage_ctrl_checkboxselect"
 ]
