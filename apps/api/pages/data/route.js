@@ -167,7 +167,8 @@ module.exports = function(app) {
       });
     var list = data[db][collection];
     var extDatas = yield Mongo.getExtData({
-      collection: collection
+      collection: collection,
+      withoutSchema: true
     });
     for (var i = 0; i < extDatas.length; i++) {
       extend(true, data, extDatas[i]);

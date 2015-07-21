@@ -1,0 +1,99 @@
+script#template-upload(type='text/x-tmpl').
+  {% for (var i=0, file; file=o.files[i]; i++) { %}
+  <tr class="template-upload fade">
+  <td>
+  <span class="preview"></span>
+  </td>
+  <td>
+  <p class="name">{%=file.name%}</p>
+  <strong class="error text-danger"></strong>
+  </td>
+  <td>
+  <p class="size">Processing...</p>
+  <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-bar progress-bar-success" style="width:0%;"></div></div>
+  </td>
+  <td>
+  {% if (!i && !o.options.autoUpload) { %}
+  <button class="btn btn-primary start" disabled>
+  <i class="glyphicon glyphicon-upload"></i>
+  <span>Start</span>
+  </button>
+  {% } %}
+  {% if (!i) { %}
+  <button class="btn btn-warning cancel">
+  <i class="glyphicon glyphicon-ban-circle"></i>
+  <span>Cancel</span>
+  </button>
+  {% } %}
+  </td>
+  </tr>
+  {% } %}
+script#template-download(type='text/x-tmpl').
+  {% for (var i=0, file; file=o.files[i]; i++) { %}
+  <tr class="template-download fade">
+  <td>
+  <span class="preview">
+  {% if (file.thumbnailUrl) { %}
+  <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
+  {% } %}
+  </span>
+  </td>
+  <td>
+  <p class="name">
+  {% if (file.url) { %}
+  <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
+  {% } else { %}
+  <span>{%=file.name%}</span>
+  {% } %}
+  </p>
+  {% if (file.error) { %}
+  <div><span class="label label-danger">Error</span> {%=file.error%}</div>
+  {% } %}
+  </td>
+  <td>
+  <span class="size">{%=o.formatFileSize(file.size)%}</span>
+  </td>
+  <td>
+  {% if (file.deleteUrl) { %}
+  <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
+  <i class="glyphicon glyphicon-trash"></i>
+  <span>Delete</span>
+  </button>
+  <input type="checkbox" name="delete" value="1" class="toggle">
+  {% } else { %}
+  <button class="btn btn-warning cancel">
+  <i class="glyphicon glyphicon-ban-circle"></i>
+  <span>Cancel</span>
+  </button>
+  {% } %}
+  </td>
+  </tr>
+  {% } %}
+mixin manage_ctrl_fileuploader(options)
+  .form-group(data-module="manage_ctrl_fileuploader",data-form-control="fileuploader")
+    if options.label
+      label= options.label
+    if options.editable === 'required'
+      span.text-red *
+    div#fileupload(action='http://jquery-file-upload.appspot.com/', method='POST', enctype='multipart/form-data')
+      .row.fileupload-buttonbar
+        .col-lg-7
+          span.btn.btn-success.fileinput-button
+            i.glyphicon.glyphicon-plus
+            span Add files...
+            input(type='file', name='files[]', multiple='')
+          | 
+          button.btn.btn-primary.start(type='submit')
+            i.glyphicon.glyphicon-upload
+            span Start upload
+          | 
+          button.btn.btn-warning.cancel(type='reset')
+            i.glyphicon.glyphicon-ban-circle
+            span Cancel upload
+          span.fileupload-process
+        .col-lg-5.fileupload-progress.fade
+          .progress.progress-striped.active(role='progressbar', aria-valuemin='0', aria-valuemax='100')
+            .progress-bar.progress-bar-success(style='width:0%;')
+          .progress-extended
+      table.table.table-striped(role='presentation')
+        tbody.files

@@ -10,7 +10,7 @@ var thunkify = require('thunkify');
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
   shasum.update(str);
-  return shasum.digest('hex')
+  return shasum.digest('hex');
 }
 
 module.exports = function(app) {
@@ -207,7 +207,6 @@ module.exports = function(app) {
     var user =
       yield getUserById.call(this, uid);
     if (user) {
-
       var helpId = this.request.body.help_id;
       var result =
         yield Mongo.request({

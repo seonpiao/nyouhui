@@ -5,6 +5,9 @@ block append title
 block append meta
 
 block append stylesheet
+  //FileUploader
+  link(rel="stylesheet", href="/plugins/fileuploader/css/jquery.fileupload.css")
+  link(rel="stylesheet", href="/plugins/fileuploader/css/jquery.fileupload-ui.css")
   style.
     .edui-body-container img{
       max-width:100%;
@@ -76,6 +79,8 @@ block append content
               +manage_ctrl_draggableselector(params)
             else if field.base === 'checkboxselect'
               +manage_ctrl_checkboxselect(params)
+            else if field.base === 'fileuploader'
+              +manage_ctrl_fileuploader(params)
             else if field.base === 'won2yuan'
               -params.unitWon = data ? data.unit_won : '';
               -params.unitYuan = data ? data.unit_yuan : '';
@@ -102,6 +107,20 @@ block append content
         button.btn.btn-primary.btn-schema-add(type="submit") 确定
         | 
         a.btn.btn-default.btn-cancel 取消
+
+block append pluginjs
+  // FileUploader
+  script(src="/plugins/fileuploader/js/jquery.ui.widget.js")
+  script(src="/plugins/fileuploader/js/tmpl.min.js")
+  script(src="/plugins/fileuploader/js/load-image.all.min.js")
+  script(src="/plugins/fileuploader/js/jquery.iframe-transport.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-process.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-image.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-audio.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-video.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-validate.js")
+  script(src="/plugins/fileuploader/js/jquery.fileupload-ui.js")
 
 block append footjs
   script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.ac278b575284d0ce.js")
