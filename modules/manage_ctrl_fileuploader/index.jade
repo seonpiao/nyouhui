@@ -41,7 +41,7 @@ script#template-download(type='text/x-tmpl').
   <td>
   <p class="name">
   {% if (file.url) { %}
-  <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
+  <a class="file-url" href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
   {% } else { %}
   <span>{%=file.name%}</span>
   {% } %}
@@ -70,18 +70,18 @@ script#template-download(type='text/x-tmpl').
   </tr>
   {% } %}
 mixin manage_ctrl_fileuploader(options)
-  .form-group(data-module="manage_ctrl_fileuploader",data-form-control="fileuploader")
+  .form-group(data-module="manage_ctrl_fileuploader",data-form-control="fileuploader",data-name=options.name,data-max=options.max)
     if options.label
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    div.fileupload(action='http://jquery-file-upload.appspot.com/', method='POST', enctype='multipart/form-data')
+    div.fileupload
       .row.fileupload-buttonbar
         .col-lg-7
           span.btn.btn-success.fileinput-button
             i.glyphicon.glyphicon-plus
             span Add files...
-            input(type='file', name='files[]', multiple='')
+            input(type='file', multiple='')
           | 
           button.btn.btn-primary.start(type='submit')
             i.glyphicon.glyphicon-upload
