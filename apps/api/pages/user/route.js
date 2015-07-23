@@ -5,6 +5,7 @@ var moment = require('moment');
 var logger = require('log4js').getLogger('api/user');
 var extend = require('node.extend');
 var captcha = require('../../util/captcha');
+var thunkify = require('thunkify');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -18,6 +19,7 @@ module.exports = function(app) {
   var checkLogin = require('../../util/checkLogin')(app);
   var getUserById = require('../../util/getUserById')(app);
   var saveUser = require('../../util/saveUser')(app);
+  var Xinge = require('xinge');
 
   var modifyPassword = function*(user, password) {
     password = sha1(password);
@@ -26,6 +28,70 @@ module.exports = function(app) {
   };
 
   var route = app.route('/user');
+
+  route.nested('/regpush').post(function*(next) {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var user =
+      yield getUserById.call(this, uid);
+    var pushid = this.request.body.pushid;
+    var device = this.request.body.device;
+    if (!pushid || !device) {
+      this.result = app.Errors.MISSING_PARAMS;
+      return;
+    }
+    user.pushid = pushid;
+    user.device = device;
+    yield saveUser(user);
+    this.result = {
+      code: 0
+    };
+  });
+
+  route.nested('/push').get(function*(next) {
+    this.json = true;
+    var accessId = 2200133274;
+    var secretKey = '20c9f72b3c5cc2ec5777befbd3ed7167';
+    var xinge = new Xinge.XingeApp(accessId, secretKey);
+    var pushid = this.request.query.uid;
+    var iOSMessage = new Xinge.IOSMessage();
+    iOSMessage.alert = 'av';
+    iOSMessage.badge = 22;
+    iOSMessage.sound = 'df';
+    iOSMessage.acceptTime.push(new Xinge.TimeInterval(0, 0, 23, 0));
+    iOSMessage.customContent = {
+      event: {
+        name: 'event1',
+        data: {
+          a: 1,
+          b: 2
+        }
+      }
+    };
+    try {
+      var result = yield thunkify(xinge.pushToSingleDevice.bind(xinge))(
+        pushid,
+        iOSMessage, Xinge.IOS_ENV_DEV);
+      if (result) {
+        result = JSON.parse(result);
+        if (result.ret_code === 0) {
+          this.result = {
+            code: 0
+          };
+        } else {
+          app.Errors.USER_XINGE_REQUEST_ERROR.message = result.err_msg;
+          this.result = app.Errors.USER_XINGE_REQUEST_ERROR;
+        }
+      } else {
+        this.result = app.Errors.USER_XINGE_REQUEST_FAILED;
+      }
+    } catch (e) {
+      logger.error(e.stack);
+      this.result = app.Errors.UNKNOWN;
+    }
+  });
 
   route.nested('/getUserInfo').get(function*(next) {
     this.json = true;

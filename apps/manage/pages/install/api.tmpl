@@ -60,8 +60,16 @@ module.exports = function(app) {
       message: '密码不正确'
     },
     'USER_NOT_EXIST': {
-      code: 3000,
+      code: 3001,
       message: '用户不存在'
+    },
+    'USER_XINGE_REQUEST_FAILED': {
+      code: 3002,
+      message: '请求信鸽服务器失败'
+    },
+    'USER_XINGE_REQUEST_ERROR': {
+      code: 3003,
+      message: '请求信鸽服务器失败'
     },
     //data
     'DATA_INSERT_ERROR': {

@@ -75,7 +75,7 @@ mixin manage_ctrl_fileuploader(options)
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    div#fileupload(action='http://jquery-file-upload.appspot.com/', method='POST', enctype='multipart/form-data')
+    div.fileupload(action='http://jquery-file-upload.appspot.com/', method='POST', enctype='multipart/form-data')
       .row.fileupload-buttonbar
         .col-lg-7
           span.btn.btn-success.fileinput-button

@@ -39,7 +39,8 @@
     "seajs": "^3.0.1",
     "socket.io": "^1.3.5",
     "thunkify": "2.1.2",
-    "underscore": "1.7.0"
+    "underscore": "1.7.0",
+    "xinge": "^1.1.3"
   },
   "devDependencies": {
     "grunt": "^0.4.3",
