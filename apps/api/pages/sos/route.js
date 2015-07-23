@@ -254,6 +254,55 @@ module.exports = function(app) {
     }
   });
 
+  route.nested('/notcoming').post(function*() {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var user =
+      yield getUserById.call(this, uid);
+    if (user) {
+      var helpId = this.request.body.help_id;
+      var result =
+        yield Mongo.request({
+          host: app.config.mongo.host,
+          port: app.config.mongo.port,
+          db: app.config.mongo.defaultDB,
+          collection: 'sos',
+          id: helpId
+        });
+      result = result[app.config.mongo.defaultDB]['sos'];
+      if (result) {
+        var index = result.rescuer.indexOf(uid);
+        if (index !== -1) {
+          result.rescuer.splice(index, 1);
+          delete result._id;
+          yield Mongo.request({
+            host: app.config.mongo.host,
+            port: app.config.mongo.port,
+            db: app.config.mongo.defaultDB,
+            collection: 'sos',
+            id: helpId,
+            request: {
+              method: 'put',
+              json: result
+            }
+          });
+        }
+        index = user.helping.indexOf(helpId);
+        if (index !== -1) {
+          user.helping.splice(index, 1);
+          yield saveUser(user);
+        }
+      }
+      this.result = {
+        code: 0
+      }
+    } else {
+      this.result = app.Errors.USER_NOT_EXIST
+    }
+  });
+
   route.nested('/detail').get(function*(next) {
     this.json = true;
     var uid =
