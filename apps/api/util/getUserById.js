@@ -1,7 +1,8 @@
 var Mongo = require('../../../libs/server/mongodb');
 
 var getUserById = function(app) {
-  return function*(uid) {
+  return function*(uid, options) {
+    options = options || {};
     var result =
       yield Mongo.request({
         host: app.config.mongo.host,
@@ -13,7 +14,8 @@ var getUserById = function(app) {
           qs: {
             query: JSON.stringify({
               uid: uid
-            })
+            }),
+            fields: JSON.stringify(options.fields || {})
           }
         }
       });

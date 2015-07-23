@@ -24,9 +24,13 @@ define(["libs/client/views/base"], function(Base) {
       return this.$el.attr('data-name');
     },
     value: function() {
-      return _.map(this.$('.file-url'), function(el) {
-        return $(el).attr('href');
-      });
+      if (this.max === 1) {
+        return this.$('.file-url').attr('href');
+      } else {
+        return _.map(this.$('.file-url'), function(el) {
+          return $(el).attr('href');
+        });
+      }
     }
   });
   return View;

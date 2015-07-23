@@ -20,6 +20,17 @@ module.exports = function(app) {
   var getUserById = require('../../util/getUserById')(app);
   var saveUser = require('../../util/saveUser')(app);
 
+  var userDataStruct = {
+    uid: 1,
+    nickname: 1,
+    phone: 1,
+    level: 1,
+    level_name: 1,
+    avatar: 1,
+    qualification: 1,
+    loc: 1
+  };
+
   var route = app.route('/sos');
 
   var callForHelp = function*(user) {
@@ -155,6 +166,7 @@ module.exports = function(app) {
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
+    var status = (this.request.body.status || 3) * 1;
     var helpId = this.request.body.help_id;
     var result =
       yield Mongo.request({
@@ -167,8 +179,8 @@ module.exports = function(app) {
     result = result[app.config.mongo.defaultDB]['sos'];
     if (result) {
       //将救援状态置为完成
-      result.status = 3;
-      //从救援人的救援列表中删除本次救援
+      result.status = status // 3为救助成功，4为救助失败，5为转移至医院;
+        //从救援人的救援列表中删除本次救援
       if (result.rescuer.length > 0) {
         for (var i = 0; i < result.rescuer.length; i++) {
           var rescuerId = rescuer[i];
@@ -242,25 +254,60 @@ module.exports = function(app) {
     }
   });
 
+  route.nested('/detail').get(function*(next) {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var helpId = this.request.query.help_id;
+    var helpData =
+      yield Mongo.request({
+        host: app.config.mongo.host,
+        port: app.config.mongo.port,
+        db: app.config.mongo.defaultDB,
+        collection: 'sos',
+        id: helpId
+      });
+    helpData = helpData[app.config.mongo.defaultDB]['sos'];
+    var wounded = yield getUserById(helpData.me, {
+      fields: userDataStruct
+    });
+    var allHelpers = yield Mongo.request({
+      host: app.config.mongo.host,
+      port: app.config.mongo.port,
+      db: app.config.user.db,
+      collection: app.config.user.collection,
+      request: {
+        qs: {
+          query: JSON.stringify({
+            uid: {
+              $in: helpData.rescuer
+            }
+          }),
+          fields: JSON.stringify(userDataStruct)
+        }
+      }
+    });
+    allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
+    this.result = {
+      code: 0,
+      result: {
+        wounded: wounded,
+        all: allHelpers
+      }
+    }
+  });
   route.nested('/around').get(function*(next) {
     this.json = true;
     var distance = 1000;
     var allHelpers = [],
       aroundHelpers = [];
-    var userDataStruct = {
-      uid: 1,
-      nickname: 1,
-      phone: 1,
-      level: 1,
-      level_name: 1,
-      avatar: 1,
-      qualification: 1,
-      loc: 1
-    };
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
-    var me = yield getUserById(uid);
+    var me = yield getUserById(uid, {
+      fields: userDataStruct
+    });
     if (me) {
       var helpData =
         yield Mongo.request({
@@ -326,6 +373,7 @@ module.exports = function(app) {
       this.result = {
         code: 0,
         result: {
+          wounded: me,
           around: aroundHelpers,
           all: allHelpers,
           distance: distance
