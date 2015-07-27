@@ -30,7 +30,12 @@ var config = {
   },
   apps: {
     api: {
-      port: '9003'
+      port: '9003',
+      upload: {
+        host: 'static.test.bylh.tv',
+        path: '/usr/share/nginx/html/',
+        collection: 'resource'
+      }
     },
     m: {
       name: '北京马拉松',

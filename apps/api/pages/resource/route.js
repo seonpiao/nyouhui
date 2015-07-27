@@ -25,8 +25,11 @@ module.exports = function(app) {
       '.mp4': 3
     };
     try {
+      logger.info(1);
       var result = yield uploader.call(this);
+      logger.info(2);
       if (app.config.upload.collection) {
+        logger.info(3);
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         result.help_id = helpId;
@@ -39,11 +42,13 @@ module.exports = function(app) {
           (result, {
             fullResult: true
           });
+        logger.info(4);
         this.result = {
           code: 0,
           result: inserted.ops[0]
         }
       } else {
+        logger.info(5);
         this.result = {
           code: 0,
           result: result
