@@ -4,4 +4,4 @@ mixin manage_ctrl_checkboxselect(options)
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    input(type="checkbox",name=options.name, checked=(options.value === '1'))
+    input(style="margin:0 5px;",type="checkbox",name=options.name, checked=(options.value === '1'))
