@@ -11,13 +11,11 @@ module.exports = function(app) {
       this.status = 403;
       return;
     }
-    var db = app.config.schema.db;
-    var collection = app.config.schema.collection;
+    var db = app.config.mongo.defaultDB;
+    var collection = app.config.mongo.collections.schema;
     try {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           request: {
@@ -42,15 +40,12 @@ module.exports = function(app) {
   });
 
   app.route('/schema/create').get(function*(next) {
-    var db = app.config.schema.db;
-    var collection = app.config.schema.collection;
+    var db = app.config.mongo.defaultDB;
+    var collection = app.config.mongo.collections.schema;
     try {
       var controls =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.control.db,
-          collection: app.config.control.collection
+          collection: app.config.mongo.collections.control
         });
       this.result = {
         code: 200,
@@ -58,7 +53,7 @@ module.exports = function(app) {
           action: 'create',
           db: db,
           collection: collection,
-          controls: controls[app.config.control.db][app.config.control.collection]
+          controls: controls[app.config.mongo.defaultDB][app.config.mongo.collections.control]
         }
       }
     } catch (e) {
@@ -72,14 +67,12 @@ module.exports = function(app) {
   });
 
   app.route('/schema/update/:id').get(function*(next) {
-    var db = app.config.schema.db;
-    var collection = app.config.schema.collection;
+    var db = app.config.mongo.defaultDB;
+    var collection = app.config.mongo.collections.schema;
     var id = this.request.params.id;
     try {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id,
@@ -89,10 +82,7 @@ module.exports = function(app) {
         });
       var controls =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.control.db,
-          collection: app.config.control.collection
+          collection: app.config.mongo.collections.control
         });
       this.result = {
         code: 200,
@@ -101,7 +91,7 @@ module.exports = function(app) {
           data: data,
           db: db,
           collection: collection,
-          controls: controls[app.config.control.db][app.config.control.collection]
+          controls: controls[app.config.mongo.defaultDB][app.config.mongo.collections.control]
         }
       };
     } catch (e) {

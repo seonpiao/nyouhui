@@ -12,8 +12,6 @@ var jade = require('jade');
 
 module.exports = function(app) {
 
-  Mongo.init(app);
-
   var sanitize = function(s) {
     return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
   }
@@ -21,10 +19,7 @@ module.exports = function(app) {
   var applyCustomTemplate = function*(list, db, collection) {
     var schema =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.schema.db,
-        collection: app.config.schema.collection,
+        collection: app.config.mongo.collections.schema,
         one: true,
         request: {
           qs: {
@@ -35,7 +30,7 @@ module.exports = function(app) {
           }
         }
       });
-    var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+    var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
     if (schemaData) {
       var fields = schemaData.fields;
       //检查有哪些自定义的模板
@@ -47,7 +42,6 @@ module.exports = function(app) {
       });
       Object.keys(templates).forEach(function(fieldName) {
         list.forEach(function(row) {
-          console.log(fieldName)
           row[fieldName] = jade.render(templates[fieldName], row);
         });
       });
@@ -71,8 +65,6 @@ module.exports = function(app) {
     //要显示的列表数据
     var data =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
         db: db,
         collection: collection,
         request: {
@@ -103,8 +95,14 @@ module.exports = function(app) {
       db: db,
       collection: collection,
       config: {
-        schema: app.config.schema,
-        control: app.config.control
+        schema: {
+          db: app.config.mongo.defaultDB,
+          collection: app.config.mongo.collections.schema
+        },
+        control: {
+          db: app.config.mongo.defaultDB,
+          collection: app.config.mongo.collections.control
+        }
       },
       page: {
         total: count,
@@ -215,10 +213,7 @@ module.exports = function(app) {
       //table data
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.schema.db,
-          collection: app.config.schema.collection,
+          collection: app.config.mongo.collections.schema,
           one: true,
           request: {
             qs: {
@@ -234,10 +229,7 @@ module.exports = function(app) {
       var _data = {};
       var schema =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.schema.db,
-          collection: app.config.schema.collection,
+          collection: app.config.mongo.collections.schema,
           one: true,
           request: {
             qs: {
@@ -248,7 +240,7 @@ module.exports = function(app) {
             }
           }
         });
-      var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+      var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
       var fields = schemaData.fields;
       var extDatas = yield Mongo.getExtData({
         collection: collection
@@ -259,12 +251,9 @@ module.exports = function(app) {
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.control.db,
-          collection: app.config.control.collection
+          collection: app.config.mongo.collections.control
         });
-      controls[app.config.control.db][app.config.control.collection].forEach(
+      controls[app.config.mongo.defaultDB][app.config.mongo.collections.control].forEach(
         function(control) {
           try {
             control.params = (control.params !== '' ? JSON.parse(
@@ -280,8 +269,14 @@ module.exports = function(app) {
           db: db,
           collection: collection,
           config: {
-            schema: app.config.schema,
-            control: app.config.control
+            schema: {
+              db: app.config.mongo.defaultDB,
+              collection: app.config.mongo.collections.schema
+            },
+            control: {
+              db: app.config.mongo.defaultDB,
+              collection: app.config.mongo.collections.control
+            }
           }
         }
       }
@@ -318,8 +313,6 @@ module.exports = function(app) {
       //table data
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -328,10 +321,7 @@ module.exports = function(app) {
       var _data = {};
       var schema =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.schema.db,
-          collection: app.config.schema.collection,
+          collection: app.config.mongo.collections.schema,
           one: true,
           request: {
             qs: {
@@ -342,7 +332,7 @@ module.exports = function(app) {
             }
           }
         });
-      var schemaData = schema[app.config.schema.db][app.config.schema.collection];
+      var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
       var fields = schemaData.fields;
       var extDatas = yield Mongo.getExtData({
         collection: collection
@@ -353,12 +343,9 @@ module.exports = function(app) {
       extend(true, _data, schema);
       var controls =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.control.db,
-          collection: app.config.control.collection
+          collection: app.config.mongo.collections.control
         });
-      controls[app.config.control.db][app.config.control.collection].forEach(
+      controls[app.config.mongo.defaultDB][app.config.mongo.collections.control].forEach(
         function(control) {
           try {
             control.params = (control.params !== '' ? JSON.parse(
@@ -372,10 +359,15 @@ module.exports = function(app) {
           data: data,
           _data: _data,
           config: {
-            schema: app.config.schema,
-            control: app.config.control
+            schema: {
+              db: app.config.mongo.defaultDB,
+              collection: app.config.mongo.collections.schema
+            },
+            control: {
+              db: app.config.mongo.defaultDB,
+              collection: app.config.mongo.collections.control
+            }
           },
-          schema: app.config.schema,
           db: db,
           collection: collection
         }

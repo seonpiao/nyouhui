@@ -206,9 +206,9 @@ module.exports = function(app) {
       yield getUserById.call(this, uid);
     if (user) {
       yield Mongo.exec({
-        hosts: app.config.mongo.replset.split(','),
-        db: app.config.user.db,
-        collection: app.config.user.collection
+        hosts: app.config.mongo.hosts.split(','),
+        db: app.config.mongo.defaultDB,
+        collection: app.config.mongo.collections.user
       }, 'ensureIndex', {
         loc: "2dsphere"
       });

@@ -17,10 +17,7 @@ module.exports = function(app) {
     password = sha1(password);
     var result =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.admin.db,
-        collection: app.config.admin.collection,
+        collection: app.config.mongo.collections.admin,
         one: true,
         request: {
           qs: {
@@ -31,7 +28,7 @@ module.exports = function(app) {
           }
         }
       });
-    result = result[app.config.admin.db][app.config.admin.collection];
+    result = result[app.config.mongo.defaultDB][app.config.mongo.collections.admin];
     if (result) {
       return result;
     } else {

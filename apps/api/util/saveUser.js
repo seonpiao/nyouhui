@@ -9,10 +9,7 @@ var saveUser = function(app) {
       method = 'put';
     }
     yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.user.db,
-      collection: app.config.user.collection,
+      collection: app.config.mongo.collections.user,
       id: id,
       request: {
         method: method,

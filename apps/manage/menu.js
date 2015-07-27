@@ -6,12 +6,9 @@ var menu = function(app) {
     yield next;
     var menu =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.menu.db,
-        collection: app.config.menu.collection
+        collection: app.config.mongo.collections.menu
       });
-    menu = menu[app.config.menu.db][app.config.menu.collection];
+    menu = menu[app.config.mongo.defaultDB][app.config.mongo.collections.menu];
     this.global.menu = menu;
   }
 };

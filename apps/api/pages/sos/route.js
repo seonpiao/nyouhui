@@ -42,7 +42,7 @@ module.exports = function(app) {
     helpData.rescuer = [];
     helpData.status = 1; //status为1表示正在进行的呼救，2为已解除的呼救，3为已经完成的呼救
     var db = yield Mongo.get({
-      hosts: app.config.mongo.replset.split(','),
+      hosts: app.config.mongo.hosts.split(','),
       db: app.config.mongo.defaultDB
     });
     var collection = db.collection('sos');
@@ -68,27 +68,19 @@ module.exports = function(app) {
       this.result = app.Errors.MISSING_PARAMS;
       return;
     }
-    var count = yield Mongo.exec({
-      hosts: app.config.mongo.replset.split(','),
-      db: app.config.mongo.defaultDB,
-      collection: 'sos'
-    }, 'count', {
-      me: uid,
-      status: 1
-    });
-    if (count > 0) {
-      this.result = app.Errors.SOS_MORE_THEN_ONCE;
-      return;
-    }
     var user =
       yield getUserById.call(this, uid);
     if (user) {
+      if (user.help_id) {
+        this.result = app.Errors.SOS_MORE_THEN_ONCE;
+        return;
+      }
       user.loc = {
         type: 'Point',
         coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]
       };
       yield Mongo.exec({
-        hosts: app.config.mongo.replset.split(','),
+        hosts: app.config.mongo.hosts.split(','),
         db: app.config.mongo.defaultDB,
         collection: 'sos'
       }, 'ensureIndex', {
@@ -98,6 +90,7 @@ module.exports = function(app) {
         me: uid,
         loc: user.loc
       });
+      user.help_id = helpResult._id.toString();
       yield saveUser(user);
       yield callForHelp(user);
       this.result = {
@@ -107,7 +100,7 @@ module.exports = function(app) {
         }
       }
     } else {
-      this.result = app.Errors.USER_NOT_EXIST
+      this.result = app.Errors.USER_NOT_EXIST;
     }
   });
 
@@ -116,48 +109,51 @@ module.exports = function(app) {
     var uid =
       yield checkLogin.call(this);
     if (!uid) return;
-    var helpId = this.request.body.help_id;
-    var result =
-      yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.mongo.defaultDB,
-        collection: 'sos',
-        id: helpId
-      });
-    result = result[app.config.mongo.defaultDB]['sos'];
-    if (result) {
-      //将救援状态置为取消
-      result.status = 2;
-      //从救援人的救援列表中删除本次救援
-      if (result.rescuer.length > 0) {
-        for (var i = 0; i < result.rescuer.length; i++) {
-          var rescuerId = result.rescuer[i];
-          var user = yield getUserById(rescuerId);
-          var index = user.helping.indexOf(result._id.toString());
-          if (index !== -1) {
-            user.helping.splice(index, 1);
-            yield saveUser(user);
+    var me = yield getUserById(uid);
+    if (me) {
+      var helpId = me.help_id;
+      if (helpId) {
+        var result =
+          yield Mongo.request({
+            collection: 'sos',
+            id: helpId
+          });
+        result = result[app.config.mongo.defaultDB]['sos'];
+        if (result) {
+          //将救援状态置为取消
+          result.status = 2;
+          //从救援人的救援列表中删除本次救援
+          if (result.rescuer.length > 0) {
+            for (var i = 0; i < result.rescuer.length; i++) {
+              var rescuerId = result.rescuer[i];
+              var user = yield getUserById(rescuerId);
+              var index = user.helping.indexOf(result._id.toString());
+              if (index !== -1) {
+                user.helping.splice(index, 1);
+                yield saveUser(user);
+              }
+            }
           }
+          //清空救援人列表
+          result.rescuer = [];
+          delete result._id;
+          yield Mongo.request({
+            collection: 'sos',
+            id: helpId,
+            request: {
+              method: 'put',
+              json: result
+            }
+          });
+          me.help_id = '';
+          yield saveUser(me);
         }
       }
-      //清空救援人列表
-      result.rescuer = [];
-      delete result._id;
-      yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.mongo.defaultDB,
-        collection: 'sos',
-        id: helpId,
-        request: {
-          method: 'put',
-          json: result
-        }
-      });
-    }
-    this.result = {
-      code: 0
+      this.result = {
+        code: 0
+      }
+    } else {
+      this.result = app.Errors.USER_NOT_EXIST;
     }
   });
 
@@ -170,9 +166,6 @@ module.exports = function(app) {
     var helpId = this.request.body.help_id;
     var result =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.mongo.defaultDB,
         collection: 'sos',
         id: helpId
       });
@@ -196,9 +189,6 @@ module.exports = function(app) {
       result.rescuer = [];
       delete result._id;
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.mongo.defaultDB,
         collection: 'sos',
         id: helpId,
         request: {
@@ -206,6 +196,9 @@ module.exports = function(app) {
           json: result
         }
       });
+      user = yield getUserById(result.me);
+      user.help_id = '';
+      yield saveUser(user);
     }
     this.result = {
       code: 0
@@ -222,9 +215,6 @@ module.exports = function(app) {
       var helpId = this.request.body.help_id;
       var result =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.mongo.defaultDB,
           collection: 'sos',
           id: helpId
         });
@@ -234,9 +224,6 @@ module.exports = function(app) {
         user.helping.push(helpId);
         delete result._id;
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.mongo.defaultDB,
           collection: 'sos',
           id: helpId,
           request: {
@@ -265,9 +252,6 @@ module.exports = function(app) {
       var helpId = this.request.body.help_id;
       var result =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.mongo.defaultDB,
           collection: 'sos',
           id: helpId
         });
@@ -278,9 +262,6 @@ module.exports = function(app) {
           result.rescuer.splice(index, 1);
           delete result._id;
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
-            db: app.config.mongo.defaultDB,
             collection: 'sos',
             id: helpId,
             request: {
@@ -311,9 +292,6 @@ module.exports = function(app) {
     var helpId = this.request.query.help_id;
     var helpData =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.mongo.defaultDB,
         collection: 'sos',
         id: helpId
       });
@@ -322,10 +300,7 @@ module.exports = function(app) {
       fields: userDataStruct
     });
     var allHelpers = yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.user.db,
-      collection: app.config.user.collection,
+      collection: app.config.mongo.collections.user,
       request: {
         qs: {
           query: JSON.stringify({
@@ -337,7 +312,7 @@ module.exports = function(app) {
         }
       }
     });
-    allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
+    allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
     this.result = {
       code: 0,
       result: {
@@ -360,9 +335,6 @@ module.exports = function(app) {
     if (me) {
       var helpData =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.mongo.defaultDB,
           collection: 'sos',
           one: true,
           request: {
@@ -377,10 +349,7 @@ module.exports = function(app) {
       helpData = helpData[app.config.mongo.defaultDB]['sos'];
       if (helpData) {
         allHelpers = yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           request: {
             qs: {
               query: JSON.stringify({
@@ -392,12 +361,9 @@ module.exports = function(app) {
             }
           }
         });
-        allHelpers = allHelpers[app.config.user.db][app.config.user.collection];
+        allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
         aroundHelpers = yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           request: {
             qs: {
               query: JSON.stringify({
@@ -415,9 +381,7 @@ module.exports = function(app) {
             }
           }
         });
-        aroundHelpers = aroundHelpers[app.config.user.db][app.config.user
-          .collection
-        ];
+        aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
       }
       this.result = {
         code: 0,

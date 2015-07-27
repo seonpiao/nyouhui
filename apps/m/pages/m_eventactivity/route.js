@@ -5,7 +5,6 @@ var Mongo = require('../../../../libs/server/mongodb');
 global.moment = require('moment');
 
 module.exports = function(app) {
-  Mongo.init(app);
   app.route('/m_eventactivity/:id?').get(function*(next) {
     try {
       var id = this.request.params.id;

@@ -12,22 +12,16 @@ module.exports = function(app) {
 
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
 
-  var queryById = function*(db, collection, id) {
+  var queryById = function*(collection, id) {
     return yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: db,
       collection: collection,
       id: id
     });
   }
 
-  var queryByQuery = function*(db, collection, query) {
+  var queryByQuery = function*(collection, query) {
     var data =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: db,
         collection: collection,
         one: true,
         request: {
@@ -59,7 +53,7 @@ module.exports = function(app) {
       yield thunkify(client.hget.bind(client))(key, field);
     if (!reply) {
       var data =
-        yield queryByQuery(db, collection, query);
+        yield queryByQuery(collection, query);
       if (data) {
         Object.keys(data).forEach(function(field) {
           co(function*() {
@@ -83,9 +77,6 @@ module.exports = function(app) {
     if (!reply) {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: db,
           collection: collection,
           id: id
         });
@@ -101,11 +92,10 @@ module.exports = function(app) {
     var isTokenValid = false;
     var uid, userGroup, privilege = false;
     var permissibleGroup =
-      yield getHashCacheByQuery(app.config.privilege.db, app.config.privilege
-        .collection, {
-          db: db,
-          collection: collection
-        }, action);
+      yield getHashCacheByQuery(app.config.mongo.defaultDB, app.config.mongo.collections.privilege, {
+        db: db,
+        collection: collection
+      }, action);
     permissibleGroup = (permissibleGroup || '').split(',');
     if (permissibleGroup.indexOf('all') !== -1) {
       return true;
@@ -122,7 +112,7 @@ module.exports = function(app) {
     if (uid) {
       // 根据 db 和 query 进行查询该用户所在用户组
       userGroup =
-        yield getHashCacheByQuery(app.config.user.db, app.config.user.collection, {
+        yield getHashCacheByQuery(app.config.mongo.defaultDB, app.config.mongo.collections.user, {
           uid: uid
         }, 'group');
     }
@@ -156,8 +146,6 @@ module.exports = function(app) {
     //要显示的列表数据
     var data =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
         db: db,
         collection: collection,
         id: id,
@@ -233,8 +221,6 @@ module.exports = function(app) {
         body.modify_time = now;
         var data =
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
             db: db,
             collection: collection,
             request: {

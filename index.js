@@ -37,8 +37,6 @@ function init(app, options) {
   var pagePath = path.join(appPath, 'pages');
   var wwwPath = path.join(appPath, 'www');
 
-  app.config = appConfig;
-
   app.use(function*(next) {
     yield resetctx.call(this);
     yield next;
@@ -66,8 +64,8 @@ function init(app, options) {
   //default routing
   defaultRoute(app);
 
-  if (appConfig.middlewares) {
-    appConfig.middlewares.forEach(function(middleware) {
+  if (app.Middlewares) {
+    app.Middlewares.forEach(function(middleware) {
       app.use(middleware);
     });
   }
@@ -159,23 +157,26 @@ function isGeneratorFunction(obj) {
 }
 
 co(function*() {
+  var allConfig = require(path.join(APP_PATH, 'config.js'));
+  var appConfigs = allConfig.apps;
+  delete allConfig.apps;
   for (var i = 0; i < apps.length; i++) {
     var appName = apps[i];
     var app = koa();
     app.name = appName;
-    var appPath = path.join(APP_PATH, appName)
-    var appConfig = null;
+    var appPath = path.join(APP_PATH, appName);
+    var appConfig;
     try {
-      appConfig = require(path.join(appPath, 'config.js'));
-      if (isGeneratorFunction(appConfig)) {
-        appConfig =
-          yield appConfig(app);
-      } else if (_.isFunction(appConfig)) {
-        appConfig = appConfig(app);
+      appConfig = _.extend(allConfig, appConfigs[appName] || {});
+      app.config = appConfig;
+      var runScript = require(path.join(appPath, 'run.js'));
+      if (isGeneratorFunction(runScript)) {
+        yield runScript(app);
+      } else if (_.isFunction(runScript)) {
+        runScript(app);
       }
-    } catch (e) {}
-    if (!appConfig) {
-      appConfig = {}
+    } catch (e) {
+      logger.error(e.stack)
     }
     init(app, {
       appPath: appPath,

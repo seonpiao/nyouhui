@@ -26,13 +26,13 @@ module.exports = function(app) {
     };
     try {
       var result = yield uploader.call(this);
-      if (app.config.upload.db && app.config.upload.collection) {
+      if (app.config.upload.collection) {
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         result.help_id = helpId;
         var db = yield Mongo.get({
-          hosts: app.config.mongo.replset.split(','),
-          db: app.config.upload.db
+          hosts: app.config.mongo.hosts.split(','),
+          db: app.config.mongo.defaultDB
         });
         var collection = db.collection(app.config.upload.collection);
         var inserted = yield thunkify(collection.insert.bind(collection))

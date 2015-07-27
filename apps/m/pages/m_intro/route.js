@@ -10,8 +10,6 @@ module.exports = function(app) {
       var collection = 'beima_intro';
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           one: true

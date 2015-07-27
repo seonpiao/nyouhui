@@ -1,14 +1,14 @@
 var Mongo = require('carrier-mongo');
 
-Mongo.init = function(app) {
-  Mongo.host = app.config.mongo.host;
-  Mongo.hosts = app.config.mongo.replset.split(',');
-  Mongo.port = app.config.mongo.port;
-  Mongo.db = app.config.mongo.defaultDB;
-  Mongo.schemaDb = app.config.schema.db;
-  Mongo.schemaCollection = app.config.schema.collection;
-  Mongo.controlDb = app.config.control.db;
-  Mongo.controlCollection = app.config.control.collection;
+Mongo.init = function(config) {
+  Mongo.host = config.mongo.restHost;
+  Mongo.hosts = config.mongo.hosts.split(',');
+  Mongo.port = config.mongo.restPort;
+  Mongo.db = config.mongo.defaultDB;
+  Mongo.schemaDb = Mongo.db;
+  Mongo.schemaCollection = config.mongo.collections.schema;
+  Mongo.controlDb = Mongo.db;
+  Mongo.controlCollection = config.mongo.collections.control;
 };
 
 module.exports = Mongo;

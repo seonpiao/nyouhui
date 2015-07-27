@@ -31,8 +31,6 @@ module.exports = function(app) {
   var queryByQuery = function*(db, collection, query) {
     var data =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
         db: db,
         collection: collection,
         one: true,
@@ -89,8 +87,6 @@ module.exports = function(app) {
     if (!reply) {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -132,8 +128,6 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id,
@@ -141,18 +135,14 @@ module.exports = function(app) {
             qs: query
           }
         });
-      var dbconn =
-        yield Mongo.get({
-          db: db,
-          hosts: app.config.mongo.replset.split(',')
-        });
-      var coll = dbconn.collection(collection);
       var filter = {};
       try {
         filter = JSON.parse(query.query);
       } catch (e) {}
       var count =
-        yield thunkify(coll.count.bind(coll))(filter);
+        yield Mongo.exec({
+          collection: collection
+        }, 'count', filter);
       this.result = {
         code: 200,
         result: {
@@ -190,9 +180,9 @@ module.exports = function(app) {
     var body = this.request.body;
     try {
       //用户表要加密密码
-      if (body.password && ((db === app.config.admin.db && collection ===
-          app.config.admin.collection) || (db === app.config.user.db &&
-          collection === app.config.user.collection))) {
+      if (body.password && ((db === app.config.mongo.defaultDB && collection ===
+          app.config.mongo.collections.admin) || (db === app.config.mongo.defaultDB &&
+          collection === app.config.mongo.collections.user))) {
         body.password = sha1(body.password);
       }
       if (db === 'cl' && collection === 'sells') {
@@ -200,8 +190,6 @@ module.exports = function(app) {
         var count = body.count;
         var goods =
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
             db: 'cl',
             collection: 'goods',
             request: {
@@ -243,8 +231,6 @@ module.exports = function(app) {
               var goodsId = item._id + '';
               delete item._id;
               yield Mongo.request({
-                host: app.config.mongo.host,
-                port: app.config.mongo.port,
                 db: 'cl',
                 collection: 'goods',
                 id: goodsId,
@@ -262,8 +248,6 @@ module.exports = function(app) {
       body.modify_time = now;
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           request: {
@@ -273,24 +257,19 @@ module.exports = function(app) {
         });
       if (data[db][collection]['ok']) {
         //新增schema，要调整索引
-        if (db === app.config.schema.db && collection === app.config.schema
-          .collection) {
+        if (collection === app.config.mongo.collections.schema) {
           var fields = body.fields;
-          var dbconn =
-            yield Mongo.get({
-              db: body.db,
-              hosts: app.config.mongo.replset.split(',')
-            });
-          var collection = dbconn.collection(body.collection);
           for (var i = 0; i < fields.length; i++) {
             var field = fields[i];
             if (field.index !== 'no') {
               var indexes = {};
               indexes[field.name] = 1;
-              yield thunkify(collection.ensureIndex.bind(collection))(
-                indexes, {
-                  unique: field.index === 'unique'
-                });
+              yield Mongo.exec({
+                db: body.db,
+                collection: body.collection
+              }, 'ensureIndex', indexes, {
+                unique: field.index === 'unique'
+              });
             }
           }
         }
@@ -331,8 +310,6 @@ module.exports = function(app) {
       var saveData = {};
       var originData =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -350,8 +327,6 @@ module.exports = function(app) {
         var count = newData.count - originData.count;
         var goods =
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
             db: 'cl',
             collection: 'goods',
             request: {
@@ -391,8 +366,6 @@ module.exports = function(app) {
               var goodsId = item._id + '';
               delete item._id;
               yield Mongo.request({
-                host: app.config.mongo.host,
-                port: app.config.mongo.port,
                 db: 'cl',
                 collection: 'goods',
                 id: goodsId,
@@ -409,16 +382,14 @@ module.exports = function(app) {
       extend(saveData, newData);
       delete saveData._id;
       //用户表要加密密码
-      if (saveData.password && ((db === app.config.admin.db && collection ===
-          app.config.admin.collection) || (db === app.config.user.db &&
-          collection === app.config.user.collection))) {
+      if (saveData.password && ((db === app.config.mongo.defaultDB && collection ===
+          app.config.mongo.collections.admin) || (db === app.config.mongo.defaultDB &&
+          collection === app.config.mongo.collections.user))) {
         saveData.password = sha1(saveData.password);
       }
       saveData.modify_time = Date.now();
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id,
@@ -428,15 +399,14 @@ module.exports = function(app) {
           }
         });
       //修改schema，要调整索引
-      if (db === app.config.schema.db && collection === app.config.schema
-        .collection) {
+      if (collection === app.config.mongo.collections.schema) {
         var body = this.request.body;
         var fields = body.fields;
         var dropped = [];
         var dbconn =
           yield Mongo.get({
             db: body.db,
-            hosts: app.config.mongo.replset.split(',')
+            hosts: app.config.mongo.hosts.split(',')
           });
         var _collection = dbconn.collection(body.collection);
         for (var i = 0; i < fields.length; i++) {
@@ -444,21 +414,27 @@ module.exports = function(app) {
           if (field.index !== 'no') {
             var indexes = {};
             indexes[field.name] = 1;
-            yield thunkify(_collection.ensureIndex.bind(_collection))(
-              indexes, {
-                unique: field.index === 'unique'
-              });
+            yield Mongo.exec({
+              db: body.db,
+              collection: body.collection
+            }, 'ensureIndex', indexes, {
+              unique: field.index === 'unique'
+            });
           } else {
             dropped.push(field.name);
           }
         }
         for (var i = 0; i < dropped.length; i++) {
           var exist =
-            yield thunkify(_collection.indexExists.bind(_collection))(
-              dropped[i] + '_1');
+            yield Mongo.exec({
+              db: body.db,
+              collection: body.collection
+            }, 'indexExists', dropped[i] + '_1');
           if (exist) {
-            yield thunkify(_collection.dropIndex.bind(_collection))(
-              dropped[i] + '_1');
+            yield Mongo.exec({
+              db: body.db,
+              collection: body.collection
+            }, 'dropIndex', dropped[i] + '_1');
           }
         }
       }
@@ -467,23 +443,20 @@ module.exports = function(app) {
         result: data
       }
 
-      if (db === app.config.privilege.db && collection === app.config.privilege
-        .collection) {
+      if (collection === app.config.mongo.collections.privilege) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'privilege', {
             db: originData.db,
             collection: originData.collection
           });
-          console.log('del:' + key)
           yield thunkify(client.del.bind(client))(key);
         })();
       }
-      if (db === app.config.user.db && collection === app.config.user.collection) {
+      if (db === app.config.mongo.defaultDB && collection === app.config.mongo.collections.user) {
         co(function*() {
           var key = serializeKeyByQuery(db, 'user', {
             uid: originData.uid
           });
-          console.log('del:' + key)
           yield thunkify(client.del.bind(client))(key);
         })();
       }
@@ -513,8 +486,6 @@ module.exports = function(app) {
     try {
       var originData =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id
@@ -525,8 +496,6 @@ module.exports = function(app) {
         var count = originData.count;
         var goods =
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
             db: 'cl',
             collection: 'goods',
             request: {
@@ -546,8 +515,6 @@ module.exports = function(app) {
             var goodsId = item._id + '';
             delete item._id;
             yield Mongo.request({
-              host: app.config.mongo.host,
-              port: app.config.mongo.port,
               db: 'cl',
               collection: 'goods',
               id: goodsId,
@@ -562,8 +529,6 @@ module.exports = function(app) {
       }
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection,
           id: id,
@@ -577,18 +542,16 @@ module.exports = function(app) {
       };
 
       // 判断是否需要清空 redis 缓存
-      if (db === app.config.privilege.db && collection === app.config.privilege
-        .collection) {
+      if (collection === app.config.mongo.collections.privilege) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
             db: originData.db,
             collection: originData.collection
           });
-          console.log('del: ' + key);
           var result = yield thunkify(client.del.bind(client))(key);
         })();
       }
-      if (db === app.config.user.db && collection === app.config.user.collection) {
+      if (db === app.config.mongo.defaultDB && collection === app.config.mongo.collections.user) {
         co(function*() {
           var key = serializeKeyByQuery(db, collection, {
             uid: originData.uid
@@ -682,8 +645,8 @@ module.exports = function(app) {
     try {
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
+          host: app.config.mongo.restHost,
+          port: app.config.mongo.restPort,
           path: '/dbs'
         });
       this.result = {

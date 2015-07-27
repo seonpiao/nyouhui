@@ -5,10 +5,7 @@ var getUserById = function(app) {
     options = options || {};
     var result =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.user.db,
-        collection: app.config.user.collection,
+        collection: app.config.mongo.collections.user,
         one: true,
         request: {
           qs: {
@@ -19,7 +16,7 @@ var getUserById = function(app) {
           }
         }
       });
-    result = result[app.config.user.db][app.config.user.collection];
+    result = result[app.config.mongo.defaultDB][app.config.mongo.collections.user];
     return result;
   }
 }

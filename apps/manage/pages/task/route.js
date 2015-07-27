@@ -79,13 +79,10 @@ module.exports = function(app) {
     var start = Date.now();
     var data =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.task.db,
-        collection: app.config.task.collection,
+        collection: app.config.mongo.collectios.task,
         id: taskid
       });
-    data = (data[app.config.task.db][app.config.task.collection]);
+    data = (data[app.config.mongo.defaultDB][app.config.mongo.collections.task]);
     if (data) {
       var ids = data.steps;
       var flow = new Flow();
@@ -94,13 +91,10 @@ module.exports = function(app) {
         var id = ids[i];
         var originStep =
           yield Mongo.request({
-            host: app.config.mongo.host,
-            port: app.config.mongo.port,
-            db: app.config.step.db,
-            collection: app.config.step.collection,
+            collection: app.config.mongo.collections.step,
             id: id
           });
-        originStep = originStep[app.config.step.db][app.config.step.collection];
+        originStep = originStep[app.config.mongo.defaultDB][app.config.mongo.collections.step];
         var step = require(path.join(__dirname, 'steps', originStep.stepid +
           '.js'));
         step.id = originStep.stepid;
@@ -139,10 +133,7 @@ module.exports = function(app) {
     }
     var end = Date.now();
     yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.tasklog.db,
-      collection: app.config.tasklog.collection,
+      collection: app.config.mongo.collections.tasklog,
       request: {
         method: 'post',
         json: true,

@@ -10,8 +10,6 @@ module.exports = function(app) {
       var collection = 'beima_qualification';
       var data =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
           db: db,
           collection: collection
         });

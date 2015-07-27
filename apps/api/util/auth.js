@@ -20,17 +20,14 @@ var auth = function(app) {
     }
     var result =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.user.db,
-        collection: app.config.user.collection,
+        collection: app.config.mongo.collections.user,
         request: {
           qs: {
             query: JSON.stringify(query)
           }
         }
       });
-    result = result[app.config.user.db][app.config.user.collection];
+    result = result[app.config.mongo.defaultDB][app.config.mongo.collections.user];
     if (result && result.length === 1) {
       return result[0];
     } else {

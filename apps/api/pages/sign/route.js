@@ -30,10 +30,7 @@ module.exports = function(app) {
     source = source || 1;
     var result =
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.uid.db,
-        collection: app.config.uid.collection,
+        collection: app.config.mongo.collections.uid,
         one: true,
         request: {
           qs: {
@@ -43,13 +40,10 @@ module.exports = function(app) {
           }
         }
       });
-    result = result[app.config.uid.db][app.config.uid.collection];
+    result = result[app.config.mongo.defaultDB][app.config.mongo.collections.uid];
     if (!result) {
       yield Mongo.request({
-        host: app.config.mongo.host,
-        port: app.config.mongo.port,
-        db: app.config.uid.db,
-        collection: app.config.uid.collection,
+        collection: app.config.mongo.collections.uid,
         request: {
           method: 'post',
           json: {
@@ -60,10 +54,7 @@ module.exports = function(app) {
       });
       result =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.uid.db,
-          collection: app.config.uid.collection,
+          collection: app.config.mongo.collections.uid,
           one: true,
           request: {
             qs: {
@@ -73,15 +64,12 @@ module.exports = function(app) {
             }
           }
         });
-      result = result[app.config.uid.db][app.config.uid.collection];
+      result = result[app.config.mongo.defaultDB][app.config.mongo.collections.uid];
     }
     var uid = result.uid;
     uid = source + padnum(uid, 11);
     yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.user.db,
-      collection: app.config.user.collection,
+      collection: app.config.mongo.collections.user,
       request: {
         method: 'post',
         json: extend(userData, {
@@ -102,10 +90,7 @@ module.exports = function(app) {
     var objectId = result._id + '';
     delete result._id
     yield Mongo.request({
-      host: app.config.mongo.host,
-      port: app.config.mongo.port,
-      db: app.config.uid.db,
-      collection: app.config.uid.collection,
+      collection: app.config.mongo.collections.uid,
       id: objectId,
       request: {
         method: 'put',
@@ -186,10 +171,7 @@ module.exports = function(app) {
     if (isCaptchaValid) {
       var user =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           request: {
             qs: {
               query: JSON.stringify({
@@ -198,7 +180,7 @@ module.exports = function(app) {
             }
           }
         });
-      user = user[app.config.user.db][app.config.user.collection];
+      user = user[app.config.mongo.defaultDB][app.config.mongo.collections.user];
       if (user && user.length === 1) {
         this.result = app.Errors.SIGN_PHONE_DUPLICATE;
       } else {
@@ -297,10 +279,7 @@ module.exports = function(app) {
     if (valid) {
       var user =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           request: {
             qs: {
               query: JSON.stringify({
@@ -309,7 +288,7 @@ module.exports = function(app) {
             }
           }
         });
-      user = user[app.config.user.db][app.config.user.collection];
+      user = user[app.config.mongo.defaultDB][app.config.mongo.collections.user];
       var uid;
       if (user && user.length === 1) {
         uid = user[0].uid;
@@ -343,10 +322,7 @@ module.exports = function(app) {
     if (isCaptchaValid) {
       var user =
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           one: true,
           request: {
             qs: {
@@ -356,16 +332,13 @@ module.exports = function(app) {
             }
           }
         });
-      user = user[app.config.user.db][app.config.user.collection];
+      user = user[app.config.mongo.defaultDB][app.config.mongo.collections.user];
       if (user) {
         var id = user._id;
         user.password = password;
         delete user._id;
         yield Mongo.request({
-          host: app.config.mongo.host,
-          port: app.config.mongo.port,
-          db: app.config.user.db,
-          collection: app.config.user.collection,
+          collection: app.config.mongo.collections.user,
           id: id,
           request: {
             method: 'put',
