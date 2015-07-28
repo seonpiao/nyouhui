@@ -24,16 +24,17 @@ module.exports = function(app) {
       '.mp4': 3
     };
     try {
-      logger.info(1);
       var part = yield parts;
       var token = parts.field.token;
       var helpId = parts.field.help_id;
       var uid = yield checkLogin.call(this, token);
       if (!uid) return;
+      if (!helpId) {
+        this.result = app.Errors.MISSING_PARAMS;
+        return;
+      }
       var result = yield uploader.call(this, part, parts.field);
-      logger.info(2);
       if (app.config.upload.collection) {
-        logger.info(3);
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         result.help_id = helpId;
@@ -45,7 +46,6 @@ module.exports = function(app) {
         var inserted = yield thunkify(collection.insert.bind(collection))(result, {
           fullResult: true
         });
-        logger.info(4);
         this.result = {
           code: 0,
           result: inserted.ops[0]
