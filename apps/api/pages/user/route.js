@@ -120,6 +120,12 @@ module.exports = function(app) {
     if (!uid) return;
     var password = this.request.body.password;
     var newPassword = this.request.body.new_password;
+    var err = verifyPassword(newPassword);
+    if (err) {
+      app.Errors.SIGN_INVALID_PASSWORD.message = err.message;
+      this.result = app.Errors.SIGN_INVALID_PASSWORD;
+      return;
+    }
     var user =
       yield auth(uid, password);
     if (user) {

@@ -54,6 +54,10 @@ module.exports = function(app, config) {
       code: 2006,
       message: '验证码发送失败'
     },
+    'SIGN_INVALID_PASSWORD': {
+      code: 2007,
+      message: '密码不符合要求'
+    },
     //user
     'USER_INCORRECT_PASSWORD': {
       code: 3000,

@@ -11,6 +11,7 @@ var extend = require('node.extend');
 var captcha = require('../../util/captcha');
 var redis = require("redis");
 var request = require('request');
+var verifyPassword = require('carrier-verify-password');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -166,6 +167,12 @@ module.exports = function(app) {
     var phone = this.request.body.phone;
     var captchaCode = this.request.body.captcha;
     var password = this.request.body.password;
+    var err = verifyPassword(password);
+    if (err) {
+      app.Errors.SIGN_INVALID_PASSWORD.message = err.message;
+      this.result = app.Errors.SIGN_INVALID_PASSWORD;
+      return;
+    }
     var source = 1; //1为本站，其他为外站
     var isCaptchaValid = captcha.verifyCaptcha(phone, captchaCode);
     if (isCaptchaValid) {
@@ -316,6 +323,12 @@ module.exports = function(app) {
     this.json = true;
     var phone = this.request.body.phone;
     var password = this.request.body.password;
+    var err = verifyPassword(password);
+    if (err) {
+      app.Errors.SIGN_INVALID_PASSWORD.message = err.message;
+      this.result = app.Errors.SIGN_INVALID_PASSWORD;
+      return;
+    }
     password = sha1(password);
     var captchaCode = this.request.body.captcha;
     var isCaptchaValid = captcha.verifyCaptcha(phone, captchaCode);

@@ -6,6 +6,7 @@
     "async": "^0.7.0",
     "captchapng": "0.0.1",
     "carrier-mongo": "~0.0.2",
+    "carrier-verify-password": "~0.0.1",
     "co": "3.1.0",
     "co-busboy": "^1.0.2",
     "flow-js": "^0.6.0",
