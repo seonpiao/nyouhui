@@ -51,7 +51,6 @@ module.exports = function(app) {
           result: inserted.ops[0]
         }
       } else {
-        logger.info(5);
         this.result = {
           code: 0,
           result: result

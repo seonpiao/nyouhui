@@ -80,7 +80,7 @@ module.exports = function(app) {
           group: ['normal'], // 默认用户组
           reg_ip: this.ip,
           helping: [],
-          level: 1,
+          level: '-1',
           avatar: '',
           qualification: [],
           create_time: Date.now()
@@ -193,7 +193,7 @@ module.exports = function(app) {
       } else {
         password = sha1(password);
         var uid =
-          yield addUser({
+          yield addUser.call(this, {
             phone: phone,
             password: password
           });
@@ -301,7 +301,7 @@ module.exports = function(app) {
         uid = user[0].uid;
       } else {
         var uid =
-          yield addUser({
+          yield addUser.call(this, {
             oauth_uid: oauthUid,
             nickname: nickname,
             oauth_from: from
