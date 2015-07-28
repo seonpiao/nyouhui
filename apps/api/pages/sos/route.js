@@ -19,6 +19,7 @@ module.exports = function(app) {
   var checkLogin = require('../../util/checkLogin')(app);
   var getUserById = require('../../util/getUserById')(app);
   var saveUser = require('../../util/saveUser')(app);
+  var save = require('../../util/save')(app);
 
   var userDataStruct = {
     uid: 1,
@@ -110,6 +111,7 @@ module.exports = function(app) {
       yield checkLogin.call(this);
     if (!uid) return;
     var me = yield getUserById(uid);
+    console.log(uid)
     if (me) {
       var helpId = me.help_id;
       if (helpId) {
@@ -126,28 +128,24 @@ module.exports = function(app) {
           if (result.rescuer.length > 0) {
             for (var i = 0; i < result.rescuer.length; i++) {
               var rescuerId = result.rescuer[i];
+              console.log(rescuerId)
               var user = yield getUserById(rescuerId);
-              var index = user.helping.indexOf(result._id.toString());
+              var index = user.helping.indexOf(helpId);
+              console.log(index);
               if (index !== -1) {
+                console.log(user.helping);
                 user.helping.splice(index, 1);
+                console.log(user.helping);
                 yield saveUser(user);
               }
             }
           }
           //清空救援人列表
           result.rescuer = [];
-          delete result._id;
-          yield Mongo.request({
-            collection: 'sos',
-            id: helpId,
-            request: {
-              method: 'put',
-              json: result
-            }
-          });
-          me.help_id = '';
-          yield saveUser(me);
+          yield save('sos', result);
         }
+        me.help_id = '';
+        yield saveUser(me);
       }
       this.result = {
         code: 0
@@ -220,6 +218,14 @@ module.exports = function(app) {
         });
       result = result[app.config.mongo.defaultDB]['sos'];
       if (result) {
+        if (result.rescuer.indexOf(user.uid) !== -1) {
+          this.result = app.Errors.SOS_IN_RESCUR;
+          return;
+        }
+        if (result.me === uid) {
+          this.result = app.Errors.SOS_CANNOT_HELP_SELF;
+          return;
+        }
         result.rescuer.push(user.uid);
         user.helping.push(helpId);
         delete result._id;

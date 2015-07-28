@@ -93,6 +93,14 @@ module.exports = function(app, config) {
     'SOS_MORE_THEN_ONCE': {
       code: 6000,
       message: '当前有呼救正在进行'
+    },
+    'SOS_IN_RESCUR': {
+      code: 6001,
+      message: '您已参加本次救援'
+    },
+    'SOS_CANNOT_HELP_SELF': {
+      code: 6002,
+      message: '不能应答自己的救援'
     }
   };
 
