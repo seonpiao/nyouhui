@@ -620,9 +620,13 @@ module.exports = function(app) {
 
   app.route('/api/upload$').post(function*(next) {
     this.json = true;
-    var from = this.request.query.from;
-    try {
-      var result = yield uploader.call(this);
+    var parts = parse(this, {
+      autoFields: true
+    });
+    var part = yield parts;
+    try {;
+      var from = this.request.query.from || parts.field.from;
+      var result = yield uploader.call(this, part, parts.field);
       if (from === 'editor') {
         result.state = 'SUCCESS';
         this.result = result;

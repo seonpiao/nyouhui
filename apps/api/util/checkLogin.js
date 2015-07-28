@@ -4,8 +4,8 @@ var thunkify = require('thunkify');
 
 var checkLogin = function(app) {
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
-  return function*() {
-    var token = this.request.query.token || this.request.body.token || (this.parts && this.parts.field.token);
+  return function*(token) {
+    token = token || this.request.query.token || this.request.body.token;
     var isTokenValid = false,
       decoded = {};
     try {

@@ -47,15 +47,6 @@ function init(app, options) {
     cache: process.env.NODE_ENV === 'production' ? true : false
   }));
 
-  app.use(function*(next) {
-    if (!this.request.is('multipart/*')) return yield next;
-    var parts = parse(this, {
-      autoFields: true
-    });
-    this.parts = parts;
-    yield next;
-  });
-
   //parse body
   app.use(body({
     jsonLimit: '100mb'

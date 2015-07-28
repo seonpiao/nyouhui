@@ -1,6 +1,7 @@
 var Mongo = require('../../../../libs/server/mongodb');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('resource');
+var parse = require('co-busboy');
 
 module.exports = function(app) {
 
@@ -11,11 +12,9 @@ module.exports = function(app) {
 
   route.nested('/upload').post(function*(next) {
     this.json = true;
-    var uid =
-      yield checkLogin.call(this);
-    if (!uid) return;
-    var parts = this.parts;
-    var helpId = parts.field.help_id;
+    var parts = parse(this, {
+      autoFields: true
+    });
     //1是图片，2是语音，3是视频，0是未知类型
     var typeMap = {
       '.jpg': 1,
@@ -26,7 +25,12 @@ module.exports = function(app) {
     };
     try {
       logger.info(1);
-      var result = yield uploader.call(this);
+      var part = yield parts;
+      var token = parts.field.token;
+      var helpId = parts.field.help_id;
+      var uid = yield checkLogin.call(this, token);
+      if (!uid) return;
+      var result = yield uploader.call(this, part, parts.field);
       logger.info(2);
       if (app.config.upload.collection) {
         logger.info(3);
@@ -38,10 +42,9 @@ module.exports = function(app) {
           db: app.config.mongo.defaultDB
         });
         var collection = db.collection(app.config.upload.collection);
-        var inserted = yield thunkify(collection.insert.bind(collection))
-          (result, {
-            fullResult: true
-          });
+        var inserted = yield thunkify(collection.insert.bind(collection))(result, {
+          fullResult: true
+        });
         logger.info(4);
         this.result = {
           code: 0,
