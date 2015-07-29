@@ -79,7 +79,7 @@ module.exports = function(app) {
     var start = Date.now();
     var data =
       yield Mongo.request({
-        collection: app.config.mongo.collectios.task,
+        collection: app.config.mongo.collections.task,
         id: taskid
       });
     data = (data[app.config.mongo.defaultDB][app.config.mongo.collections.task]);
@@ -202,6 +202,7 @@ module.exports = function(app) {
         code: 200
       };
     } catch (e) {
+      logger.error(e.stack);
       this.result = e;
     }
     if (!this.result) {

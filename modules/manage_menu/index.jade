@@ -37,12 +37,12 @@ ul.sidebar-menu
   - var privilege = JSON.parse(__global.user.privilege || 'null');
   each item in menus
     - var hasPermission = true;
-    - var crud = item.url.match(/\/crud\/([^\/]+)\/([^\/]+)(\/|$)/);
+    - var crud = item.url.match(/\/crud\/([^\/]+)\/([^\/]+)/);
     - var db,collection;
     if crud
       - db = crud[1];
       - collection = crud[2];
-    if db && collection && privilege && !privilege[db][collection].read
+    if db && collection && privilege && (!privilege[db][collection] || !privilege[db][collection].read)
       - hasPermission = false
     if item.url.match(/^\/schema$/) && __global.user.username != 'root'
       - hasPermission = false

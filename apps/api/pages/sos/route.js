@@ -35,7 +35,39 @@ module.exports = function(app) {
   var route = app.route('/sos');
 
   var callForHelp = function*(user) {
-
+    //通知附近10公里的救援者
+    var distance = 10000;
+    var aroundHelpers = yield Mongo.request({
+      collection: app.config.mongo.collections.user,
+      request: {
+        qs: {
+          query: JSON.stringify({
+            loc: {
+              $near: {
+                $geometry: user.loc,
+                $maxDistance: distance
+              }
+            },
+            //仅通知pro用户
+            level: {
+              $in: ['0', '1', '2', '3', '4', '5']
+            },
+            pushid: {
+              $exists: true
+            },
+            uid: {
+              $ne: user.uid
+            }
+          }),
+          fields: JSON.stringify({
+            device: 1,
+            pushid: 1
+          })
+        }
+      }
+    });
+    aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
+    console.log(aroundHelpers);
   };
 
   var recordHelp = function*(helpData) {

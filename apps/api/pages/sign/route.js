@@ -201,7 +201,8 @@ module.exports = function(app) {
         this.result = {
           code: 0,
           result: {
-            token: token
+            token: token,
+            uid: uid
           }
         }
       }
@@ -222,7 +223,8 @@ module.exports = function(app) {
       this.result = {
         code: 0,
         result: {
-          token: token
+          token: token,
+          uid: result.uid
         }
       }
     } else {
@@ -311,7 +313,8 @@ module.exports = function(app) {
       this.result = {
         code: 0,
         result: {
-          token: token
+          token: token,
+          uid: uid
         }
       }
     } else {
