@@ -111,7 +111,6 @@ module.exports = function(app) {
       yield checkLogin.call(this);
     if (!uid) return;
     var me = yield getUserById(uid);
-    console.log(uid)
     if (me) {
       var helpId = me.help_id;
       if (helpId) {
@@ -128,14 +127,10 @@ module.exports = function(app) {
           if (result.rescuer.length > 0) {
             for (var i = 0; i < result.rescuer.length; i++) {
               var rescuerId = result.rescuer[i];
-              console.log(rescuerId)
               var user = yield getUserById(rescuerId);
               var index = user.helping.indexOf(helpId);
-              console.log(index);
               if (index !== -1) {
-                console.log(user.helping);
                 user.helping.splice(index, 1);
-                console.log(user.helping);
                 yield saveUser(user);
               }
             }
