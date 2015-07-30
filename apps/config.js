@@ -17,7 +17,8 @@ var config = {
       step: 'step',
       task: 'task',
       tasklog: 'tasklog',
-      control: 'control'
+      control: 'control',
+      customsort: 'customsort'
     }
   },
   upload: {

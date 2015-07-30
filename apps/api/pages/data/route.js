@@ -19,7 +19,7 @@ module.exports = function(app) {
     });
   }
 
-  var queryByQuery = function*(collection, query) {
+  var queryByQuery = function*(db, collection, query) {
     var data =
       yield Mongo.request({
         collection: collection,
@@ -34,11 +34,16 @@ module.exports = function(app) {
     return data;
   }
 
-  var serializeKeyByQuery = function(db, collection, query) {
+  var sortQuery = function(query) {
     var sortedQuery = {};
     Object.keys(query).sort().forEach(function(key) {
       sortedQuery[key] = query[key];
     });
+    return sortedQuery;
+  };
+
+  var serializeKeyByQuery = function(db, collection, query) {
+    var sortedQuery = sortQuery(query);
     var key = db + '|' + collection + '|' + JSON.stringify(sortedQuery);
     return key;
   };
@@ -53,7 +58,7 @@ module.exports = function(app) {
       yield thunkify(client.hget.bind(client))(key, field);
     if (!reply) {
       var data =
-        yield queryByQuery(collection, query);
+        yield queryByQuery(db, collection, query);
       if (data) {
         Object.keys(data).forEach(function(field) {
           co(function*() {
@@ -133,7 +138,10 @@ module.exports = function(app) {
     var collection = this.request.params.collection;
     var id = this.request.params.id;
     var query = this.request.query;
+    var customSort = query.custom_sort;
+    delete query.custom_sort;
     var pagesize = query.pagesize || Infinity;
+    var cus
     var page = 1;
     if (query.page >= 1) {
       page = parseInt(query.page, 10);
@@ -154,6 +162,37 @@ module.exports = function(app) {
         }
       });
     var list = data[db][collection];
+    if (customSort === '1') {
+      try {
+        var filter;
+        if (query.query) {
+          filter = JSON.parse(query.query || '{}')
+          filter = JSON.stringify(sortQuery(filter));
+        }
+        var seq = yield Mongo.request({
+          collection: app.config.mongo.collections.customsort,
+          one: true,
+          request: {
+            qs: {
+              query: JSON.stringify({
+                db: db,
+                collection: collection,
+                filter: filter
+              })
+            }
+          }
+        });
+        seq = seq[app.config.mongo.defaultDB][app.config.mongo.collections.customsort];
+        if (seq) {
+          seq = seq.seq;
+          list.sort(function(a, b) {
+            return seq.indexOf(a.id || a._id.toString()) - seq.indexOf(b.id || b._id.toString());
+          });
+        }
+      } catch (e) {
+        console.log(e.stack)
+      }
+    }
     var extDatas = yield Mongo.getExtData({
       collection: collection,
       withoutSchema: true

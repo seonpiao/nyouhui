@@ -83,8 +83,8 @@ block append content
               +manage_ctrl_saishiurl(params)
             else if field.base === 'fileuploader'
               +manage_ctrl_fileuploader(params)
-            else if field.base === 'sortable'
-              +manage_ctrl_sortable(params)
+            else if field.base === 'customsort'
+              +manage_ctrl_customsort(params)
             else if field.base === 'won2yuan'
               -params.unitWon = data ? data.unit_won : '';
               -params.unitYuan = data ? data.unit_yuan : '';

@@ -1,0 +1,8 @@
+mixin manage_ctrl_customsort(options)
+  .form-group(data-module="manage_ctrl_customsort",data-form-control="customsort",data-db=options.db,data-collection=options.collection,data-filter=options.filter)
+    if options.label
+      div
+        label(style="clear:both;")= options.label
+        if options.editable === 'required'
+          span.text-red *
+    ul.list-unstyled(data-name=options.name,data-value=options.value,style="min-height:100px;padding:10px;border:1px solid rgba(0, 166, 90, 0.4);border-radius:3px;")
