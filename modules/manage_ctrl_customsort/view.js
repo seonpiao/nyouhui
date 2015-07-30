@@ -4,15 +4,17 @@ define(["libs/client/views/base"], function(Base) {
     init: function() {
       this.model.db = $('input[name=db]').val();
       this.model.collection = $('input[name=collection]').val();
-      this.model.filter = JSON.parse($('input[name=filter]').val() || '{}');
+      var filter = JSON.parse($('input[name=filter]').val() || '{}');
+      var display = $('input[name=display]').val() || 'name';
+      this.model.display = display;
       this.$list = this.$('ul');
       this.$list.sortable().disableSelection();
       this.listenTo(this.model, 'sync', this.initSortable.bind(this));
-      $('input[name="db"],input[name="collection"],input[name=filter]').on('input', this.changeDataSource.bind(this));
+      $('input[name="db"],input[name="collection"],input[name=filter],input[name=display]').on('input', this.changeDataSource.bind(this));
       if (this.model.db && this.model.collection) {
         this.model.fetch({
           data: {
-            query: JSON.stringify(this.model.filter)
+            query: JSON.stringify(filter)
           }
         });
       }
@@ -23,11 +25,13 @@ define(["libs/client/views/base"], function(Base) {
       this._fetchTimer = setTimeout(function() {
         self.model.db = $('input[name=db]').val();
         self.model.collection = $('input[name=collection]').val();
-        self.model.filter = JSON.parse($('input[name=filter]').val() || '{}');
+        var filter = JSON.parse($('input[name=filter]').val() || '{}');
+        var display = $('input[name=display]').val() || 'name';
+        self.model.display = display
         if (self.model.db && self.model.collection) {
           self.model.fetch({
             data: {
-              query: JSON.stringify(self.model.filter)
+              query: JSON.stringify(filter)
             }
           });
         }
@@ -58,7 +62,8 @@ define(["libs/client/views/base"], function(Base) {
           } catch (e) {}
         }
         var html = template({
-          list: list
+          list: list,
+          display: self.model.display
         });
         self.$list.html(html);
       });
