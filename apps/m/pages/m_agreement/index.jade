@@ -11,7 +11,7 @@ block append headjs
   script(type="text/javascript",src="/dist/js/m/common.min.1234567890abcdef.js")
 
 block append body
-  div= result.content
+  div!= result.content
 
 block append footjs
   script(type="text/javascript",src="/dist/js/m/m_agreement.min.1234567890abcdef.js")
