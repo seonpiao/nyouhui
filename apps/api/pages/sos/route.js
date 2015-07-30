@@ -320,7 +320,6 @@ module.exports = function(app) {
   });
 
   route.nested('/detail').get(function*(next) {
-    console.log(11)
     this.json = true;
     var uid =
       yield checkLogin.call(this);
