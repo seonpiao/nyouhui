@@ -46,11 +46,10 @@ define(["libs/client/views/base"], function(Base) {
       }
       var objs = {};
       var list = _.map(data || [], function(item) {
-        objs[(item.id || item._id)] = {
-          id: (item.id || item._id),
-          name: item.name
-        };
-        return objs[(item.id || item._id)];
+        _.extend(item, {
+          id: (item.id || item._id)
+        })
+        return item;
       });
       this.loadTemplate('li', function(template) {
         var seqIDs = self.$list.attr('data-value') || '';
