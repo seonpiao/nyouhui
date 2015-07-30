@@ -7,6 +7,6 @@ if types
 	p.event_acttime
 		if type
 			span= "["+type.name+"]"
-		span= moment(res.create_time).format('YYYY-MM-DD')
+		span.date= moment(res.create_time).format('YYYY-MM-DD')
 	article.event_con!= res.content
 	img.event_actimg.mb33(width="100%",src=res.pic)
