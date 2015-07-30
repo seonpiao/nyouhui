@@ -110,7 +110,7 @@ module.exports = function(app) {
       }
       user.loc = {
         type: 'Point',
-        coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]
+        coordinates: [x * 1, y * 1]
       };
       yield Mongo.exec({
         hosts: app.config.mongo.hosts.split(','),

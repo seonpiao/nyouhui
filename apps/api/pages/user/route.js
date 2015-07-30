@@ -55,7 +55,7 @@ module.exports = function(app) {
     var accessId = 2200133274;
     var secretKey = '20c9f72b3c5cc2ec5777befbd3ed7167';
     var xinge = new Xinge.XingeApp(accessId, secretKey);
-    var pushid = this.request.query.uid;
+    var pushid = [this.request.query.uid];
     var iOSMessage = new Xinge.IOSMessage();
     iOSMessage.alert = 'av';
     iOSMessage.badge = 22;
@@ -71,11 +71,12 @@ module.exports = function(app) {
       }
     };
     try {
-      var result = yield thunkify(xinge.pushToSingleDevice.bind(xinge))(
+      var result = yield thunkify(xinge.pushByAccounts.bind(xinge))(
         pushid,
         iOSMessage, Xinge.IOS_ENV_DEV);
       if (result) {
         result = JSON.parse(result);
+        console.log(result);
         if (result.ret_code === 0) {
           this.result = {
             code: 0
@@ -220,7 +221,7 @@ module.exports = function(app) {
       });
       user.loc = {
         type: 'Point',
-        coordinates: [x.toFixed(1) * 1, y.toFixed(1) * 1]
+        coordinates: [x * 1, y * 1]
       };
       yield saveUser(user);
       this.result = {
