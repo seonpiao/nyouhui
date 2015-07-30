@@ -1,1 +1,1 @@
-require([ "apps/m/pages/m_eventactivity/modules" ], function() {});
+require(["apps/m/pages/m_article/modules"], function() {});
