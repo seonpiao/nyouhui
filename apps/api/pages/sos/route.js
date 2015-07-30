@@ -320,6 +320,7 @@ module.exports = function(app) {
   });
 
   route.nested('/detail').get(function*(next) {
+    console.log(11)
     this.json = true;
     var uid =
       yield checkLogin.call(this);
@@ -331,29 +332,33 @@ module.exports = function(app) {
         id: helpId
       });
     helpData = helpData[app.config.mongo.defaultDB]['sos'];
-    var wounded = yield getUserById(helpData.me, {
-      fields: userDataStruct
-    });
-    var allHelpers = yield Mongo.request({
-      collection: app.config.mongo.collections.user,
-      request: {
-        qs: {
-          query: JSON.stringify({
-            uid: {
-              $in: helpData.rescuer
-            }
-          }),
-          fields: JSON.stringify(userDataStruct)
+    if (helpData) {
+      var wounded = yield getUserById(helpData.me, {
+        fields: userDataStruct
+      });
+      var allHelpers = yield Mongo.request({
+        collection: app.config.mongo.collections.user,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              uid: {
+                $in: helpData.rescuer
+              }
+            }),
+            fields: JSON.stringify(userDataStruct)
+          }
+        }
+      });
+      allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
+      this.result = {
+        code: 0,
+        result: {
+          wounded: wounded,
+          all: allHelpers
         }
       }
-    });
-    allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    this.result = {
-      code: 0,
-      result: {
-        wounded: wounded,
-        all: allHelpers
-      }
+    } else {
+      this.result = app.Errors.SOS_HELP_NOT_FOUND;
     }
   });
   route.nested('/around').get(function*(next) {

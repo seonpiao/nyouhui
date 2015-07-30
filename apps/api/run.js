@@ -101,6 +101,10 @@ module.exports = function(app, config) {
     'SOS_CANNOT_HELP_SELF': {
       code: 6002,
       message: '不能应答自己的救援'
+    },
+    'SOS_HELP_NOT_FOUND': {
+      code: 6003,
+      message: '不存在这次救援'
     }
   };
 
