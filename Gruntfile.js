@@ -111,7 +111,7 @@ module.exports = function(grunt) {
           }, {
             name: "apps/m/pages/kangbao_show/main"
           }, {
-            name: "apps/m/pages/m_eventactivity/main"
+            name: "apps/m/pages/m_article/main"
           }, {
             name: "apps/m/pages/m_intro/main"
           }, {
