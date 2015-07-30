@@ -105,10 +105,9 @@ module.exports = function(app) {
     var token = jwt.sign({
       uid: uid
     }, app.jwt_secret);
-    yield thunkify(client.set.bind(client))('app_session_' + uid, Date.now());
+    yield thunkify(client.set.bind(client))('app_session_' + uid, token);
     //设置一个月的有效期
-    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 *
-      60 * 24 * 30);
+    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 * 60 * 24 * 30);
     return token;
   };
 

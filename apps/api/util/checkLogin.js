@@ -15,7 +15,7 @@ var checkLogin = function(app) {
     if (isTokenValid || this.path.match(/^\/login|bootstrap|css|fonts|img|js|plugins/)) {
       var reply =
         yield thunkify(client.get.bind(client))('app_session_' + decoded.uid);
-      if (reply) {
+      if (reply && token === reply) {
         return decoded.uid;
       }
     }
