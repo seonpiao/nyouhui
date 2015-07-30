@@ -6,6 +6,7 @@ var logger = require('log4js').getLogger('api/user');
 var extend = require('node.extend');
 var captcha = require('../../util/captcha');
 var thunkify = require('thunkify');
+var FirstrePush = require('carrier-firstre-push');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -61,13 +62,14 @@ module.exports = function(app) {
           }),
           fields: JSON.stringify({
             device: 1,
-            pushid: 1
+            pushid: 1,
+            uid: 1
           })
         }
       }
     });
     aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    console.log(aroundHelpers);
+    yield FirstrePush.pushToPro(aroundHelpers);
   };
 
   var recordHelp = function*(helpData) {
