@@ -158,8 +158,9 @@ module.exports = function(app) {
       delete query.iDisplayLength;
     }
     var columns = query.sColumns.split(',');
+    var filter;
     if (query.sSearch) {
-      var filter = columns.map(function(col, index) {
+      filter = columns.map(function(col, index) {
         var obj = {};
         obj[col] = {
           $regex: sanitize(query.sSearch)
@@ -169,6 +170,17 @@ module.exports = function(app) {
       filter = {
         $or: filter
       }
+    }
+    if (query.query) {
+      try {
+        query.query = JSON.parse(query.query);
+      } catch (e) {
+        query.query = {};
+      }
+      filter = filter || {};
+      extend(filter, query.query);
+    }
+    if (filter) {
       query.query = JSON.stringify(filter);
     }
     var sortCol = columns[query.iSortCol_0 || -1];
