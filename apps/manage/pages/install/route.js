@@ -11,9 +11,7 @@ var sha1 = function(str) {
   return shasum.digest('hex')
 }
 
-var dbs = ['schema', 'admin', 'privilege', 'user', 'usergroup', 'uid', 'menu',
-  'step', 'task', 'tasklog', 'control'
-];
+var dbs = ['schema', 'admin', 'privilege', 'user', 'usergroup', 'uid', 'menu', 'step', 'task', 'tasklog', 'control'];
 
 module.exports = function(app) {
   app.route('/install').get(function*(next) {

@@ -85,9 +85,13 @@ module.exports = function(app, config) {
       message: '读取数据库失败'
     },
     //resource
-    'UPLOAD_FAILED': {
+    'RESOURCE_UPLOAD_FAILED': {
       code: 5000,
       message: '资源上传失败'
+    },
+    'RESOURCE_DUPLICATE': {
+      code: 5001,
+      message: '资源已存在'
     },
     //sos
     'SOS_MORE_THEN_ONCE': {

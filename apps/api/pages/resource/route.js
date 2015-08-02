@@ -2,11 +2,13 @@ var Mongo = require('../../../../libs/server/mongodb');
 var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('resource');
 var parse = require('co-busboy');
+var path = require('path');
 
 module.exports = function(app) {
 
   var checkLogin = require('../../util/checkLogin')(app);
-  var uploader = require('koa-bylh-upload')(app.config.upload);
+  var uploader = require('koa-bylh-upload')(app.config.resource);
+  var save = require('../../util/save')(app);
 
   var route = app.route('/resource');
 
@@ -27,17 +29,35 @@ module.exports = function(app) {
       var part = yield parts;
       var token = parts.field.token;
       var helpId = parts.field.help_id;
+      var overwrite = parts.field.overwrite;
       var uid = yield checkLogin.call(this, token);
       if (!uid) return;
       if (!helpId) {
         this.result = app.Errors.MISSING_PARAMS;
         return;
       }
+      var filename = part.filename;
+      var dir = parts.field.dir;
+      var relPath = path.join(dir, filename);
+      if (app.config.upload.collection && overwrite !== '1') {
+        var resourceCount = yield Mongo.exec({
+          collection: app.config.upload.collection
+        }, 'count', {
+          path: relPath,
+          owner: uid
+        });
+        if (resourceCount > 0) {
+          this.result = app.Errors.RESOURCE_DUPLICATE;
+          return;
+        }
+      }
       var result = yield uploader.call(this, part, parts.field);
       if (app.config.upload.collection) {
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         result.help_id = helpId;
+        //资源不存储url
+        delete result.url;
         var db = yield Mongo.get({
           hosts: app.config.mongo.hosts.split(','),
           db: app.config.mongo.defaultDB
@@ -46,9 +66,28 @@ module.exports = function(app) {
         var inserted = yield thunkify(collection.insert.bind(collection))(result, {
           fullResult: true
         });
+        inserted = inserted.ops[0];
+        var helpData = yield Mongo.request({
+          collection: 'sos',
+          id: helpId
+        });
+        helpData = helpData[app.config.mongo.defaultDB]['sos'];
+        if (!helpData.videos) {
+          helpData.videos = [];
+        }
+        var exist = helpData.videos.filter(function(item) {
+          return item.resource_id === inserted._id.toString()
+        }).length > 0;
+        if (!exist) {
+          helpData.videos.push({
+            resource_id: inserted._id.toString(),
+            filename: filename
+          });
+        }
+        yield save('sos', helpData);
         this.result = {
           code: 0,
-          result: inserted.ops[0]
+          result: inserted
         }
       } else {
         this.result = {
@@ -58,7 +97,7 @@ module.exports = function(app) {
       }
     } catch (e) {
       logger.error(e.stack);
-      this.result = app.Errors.UPLOAD_FAILED;
+      this.result = app.Errors.RESOURCE_UPLOAD_FAILED;
     }
   });
 };

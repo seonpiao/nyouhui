@@ -21,9 +21,15 @@ var config = {
       customsort: 'customsort'
     }
   },
+  resource: {
+    host: 'localhost',
+    path: '/data/resource/video/',
+    user: 'seon'
+  },
   upload: {
     host: 'static.test.bylh.tv',
-    path: '/usr/share/nginx/html/'
+    path: '/usr/share/nginx/html/',
+    uploadDir: 'upload'
   },
   redis: {
     host: 'localhost',

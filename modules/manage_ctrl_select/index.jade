@@ -4,6 +4,6 @@ mixin manage_ctrl_select(options)
       label= options.label
     if options.editable === 'required'
       span.text-red *
-    select.form-control(name=options.name,data-value=options.value)
+    select.form-control(name=options.name,data-value=options.value,required=(options.editable === 'required'))
       if options.none
         option(value="")= options.none
