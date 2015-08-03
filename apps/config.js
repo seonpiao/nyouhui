@@ -23,8 +23,8 @@ var config = {
   },
   resource: {
     host: 'localhost',
-    path: '/data/resource/video/',
-    user: 'seon'
+    path: '/data/resource/',
+    user: 'root'
   },
   upload: {
     host: 'static.test.bylh.tv',
