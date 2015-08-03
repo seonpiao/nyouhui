@@ -127,5 +127,9 @@ module.exports = function(app, config) {
       path: '/',
       maxage: 1000 * 60 * 60 * 24 * 30
     }
-  }), cors()];
+  }), cors({
+    origin: function(req) {
+      return !req.is('image/*');
+    }
+  })];
 };
