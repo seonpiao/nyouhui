@@ -93,6 +93,10 @@ module.exports = function(app, config) {
       code: 5001,
       message: '资源已存在'
     },
+    'RESOURCE_NOT_FOUND': {
+      code: 5002,
+      message: '资源不存在'
+    },
     //sos
     'SOS_MORE_THEN_ONCE': {
       code: 6000,

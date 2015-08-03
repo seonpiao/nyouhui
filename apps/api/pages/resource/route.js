@@ -3,6 +3,7 @@ var thunkify = require('thunkify');
 var logger = require('log4js').getLogger('resource');
 var parse = require('co-busboy');
 var path = require('path');
+var fs = require('fs');
 
 module.exports = function(app) {
 
@@ -71,14 +72,14 @@ module.exports = function(app) {
             id: helpId
           });
           helpData = helpData[app.config.mongo.defaultDB]['sos'];
-          if (!helpData.videos) {
-            helpData.videos = [];
+          if (!helpData.resources) {
+            helpData.resources = [];
           }
-          var exist = helpData.videos.filter(function(item) {
+          var exist = helpData.resources.filter(function(item) {
             return item.resource_id === inserted._id.toString()
           }).length > 0;
           if (!exist) {
-            helpData.videos.push({
+            helpData.resources.push({
               resource_id: inserted._id.toString(),
               filename: filename
             });
@@ -98,6 +99,28 @@ module.exports = function(app) {
     } catch (e) {
       logger.error(e.stack);
       this.result = app.Errors.RESOURCE_UPLOAD_FAILED;
+    }
+  });
+  route.nested('/get').get(function*(next) {
+    var token = this.request.query.token;
+    var uid = yield checkLogin.call(this, token);
+    if (!uid) {
+      this.json = true;
+      return;
+    }
+    var resourceId = this.request.query.resource_id;
+    var resource = yield Mongo.request({
+      collection: app.config.upload.collection,
+      id: resourceId
+    });
+    resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
+    if (resource && resource.owner === uid) {
+      this.raw = true;
+      this.attachment(resource.name);
+      this.body = fs.createReadStream(path.join(app.config.resource.path, resource.path));
+    } else {
+      this.json = true;
+      this.result = app.Errors.RESOURCE_NOT_FOUND;
     }
   });
 };
