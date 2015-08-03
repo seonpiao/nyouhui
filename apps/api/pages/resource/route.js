@@ -120,7 +120,7 @@ module.exports = function(app) {
     });
     resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
     if (resource) {
-      if (!this.is('image/*')) {
+      if (this.is('image/*')) {
         this.type = resource.type;
       } else {
         this.attachment(resource.name);
