@@ -127,7 +127,9 @@ module.exports = function(app) {
       } else {
         this.attachment(resource.name);
       }
-      this.body = fs.createReadStream(path.join(app.config.resource.path, resource.path));
+      var resourcePath = path.join(app.config.resource.path, resource.path);
+      this.length = fs.statSync(path.join(app.config.resource.path, resource.path)).size;
+      this.body = fs.createReadStream(resourcePath);
     } else {
       this.json = true;
       this.result = app.Errors.RESOURCE_NOT_FOUND;
