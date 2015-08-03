@@ -122,7 +122,6 @@ module.exports = function(app) {
     resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
     if (resource) {
       var mimeType = mime.lookup(resource.type);
-      console.log(mimeType);
       if (mimeType && mimeType.match(/^image\//)) {
         this.type = resource.type;
       } else {
