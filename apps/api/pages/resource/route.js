@@ -119,7 +119,11 @@ module.exports = function(app) {
     });
     resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
     if (resource) {
-      this.attachment(resource.name);
+      if (!this.is('image/*')) {
+        this.type = resource.type;
+      } else {
+        this.attachment(resource.name);
+      }
       this.body = fs.createReadStream(path.join(app.config.resource.path, resource.path));
     } else {
       this.json = true;
