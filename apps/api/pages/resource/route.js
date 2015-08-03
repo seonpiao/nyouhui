@@ -35,6 +35,7 @@ module.exports = function(app) {
       if (!uid) return;
       var filename = part.filename;
       var dir = parts.field.dir || '';
+      dir = path.join(dir, uid);
       var relPath = path.join(dir, filename);
       if (app.config.upload.collection && overwrite !== '1') {
         var resourceCount = yield Mongo.exec({
