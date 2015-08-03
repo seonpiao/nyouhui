@@ -72,6 +72,10 @@ module.exports = function(app) {
             id: helpId
           });
           helpData = helpData[app.config.mongo.defaultDB]['sos'];
+          if (!helpData) {
+            this.result = app.Errors.RESOURCE_INVALID_HELPID;
+            return;
+          }
           if (!helpData.resources) {
             helpData.resources = [];
           }

@@ -97,6 +97,10 @@ module.exports = function(app, config) {
       code: 5002,
       message: '资源不存在'
     },
+    'RESOURCE_INVALID_HELPID': {
+      code: 5003,
+      message: '呼救id错误'
+    },
     //sos
     'SOS_MORE_THEN_ONCE': {
       code: 6000,
