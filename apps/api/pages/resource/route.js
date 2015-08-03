@@ -119,7 +119,6 @@ module.exports = function(app) {
     });
     resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
     if (resource && resource.owner === uid) {
-      this.raw = true;
       this.attachment(resource.name);
       this.body = fs.createReadStream(path.join(app.config.resource.path, resource.path));
     } else {
