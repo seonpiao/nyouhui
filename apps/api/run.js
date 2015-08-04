@@ -1,4 +1,4 @@
-var cors = require('koa-cors');
+var cors = require('kcors');
 var session = require('koa-generic-session');
 var redisStore = require('koa-redis');
 
