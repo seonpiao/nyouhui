@@ -433,6 +433,7 @@ module.exports = function(app) {
       this.result = {
         code: 0,
         result: {
+          status: helpData.status,
           wounded: me,
           around: aroundHelpers,
           all: allHelpers,
