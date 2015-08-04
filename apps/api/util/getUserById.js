@@ -25,7 +25,14 @@ var getUserById = function(app) {
     extDatas.forEach(function(extData) {
       for (var db in extData) {
         for (var collection in extData[db]) {
-          result[collection] = extData[db][collection];
+          if (extData[db][collection]) {
+            extData[db][collection].forEach(function(item) {
+              delete item._id;
+              delete item.create_time;
+              delete item.modify_time;
+            });
+            result[collection] = extData[db][collection];
+          }
         }
       }
     });
