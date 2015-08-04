@@ -1,0 +1,15 @@
+#!/bin/bash
+
+pkg_name=$1
+pkg_type=$2
+npm_pkg_name="carrier_${pkg_name}"
+
+if [ "$pkg_type" = "" ]; then
+  pkg_type="module"
+fi
+
+move_to="${pkg_type}s"
+
+npm install $npm_pkg_name
+
+mv node_modules/$npm_pkg_name $move_to
