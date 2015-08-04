@@ -160,6 +160,7 @@ module.exports = function(app) {
     }
     if (user) {
       extend(user, {
+        avatar: body.avatar,
         nickname: body.nickname,
         name: body.name,
         gender: body.gender,
