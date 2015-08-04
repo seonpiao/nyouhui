@@ -129,7 +129,10 @@ module.exports = function(app, config) {
     }
   }), cors({
     origin: function(req) {
-      return !req.is('image/*');
+      if (req.headers['x-cors']) {
+        return req.headers.origin;
+      }
+      return false;
     }
   })];
 };
