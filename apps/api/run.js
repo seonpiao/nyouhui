@@ -75,6 +75,10 @@ module.exports = function(app, config) {
       code: 3003,
       message: '请求信鸽服务器失败'
     },
+    'USER_INVALID_NICKNAME': {
+      code: 3004,
+      message: '用户名不可用'
+    },
     //data
     'DATA_INSERT_ERROR': {
       code: 4000,

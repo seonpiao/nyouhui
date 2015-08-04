@@ -6,6 +6,7 @@ var logger = require('log4js').getLogger('api/user');
 var extend = require('node.extend');
 var captcha = require('../../util/captcha');
 var thunkify = require('thunkify');
+var SensitiveWord = require('carrier-sensitive-word');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -147,10 +148,15 @@ module.exports = function(app) {
     var body = this.request.body;
     var user =
       yield getUserById.call(this, uid);
+    if (body.nickname && !SensitiveWord.check(body.nickname)) {
+      this.result = app.Errors.USER_INVALID_NICKNAME;
+      return;
+    }
     if (user) {
       extend(user, {
+        nickname: body.nickname,
         name: body.name,
-        sex: body.sex,
+        gender: body.gender,
         country: body.country,
         birth: body.birth,
         id_type: body.id_type,
@@ -165,8 +171,10 @@ module.exports = function(app) {
         emergency_contact: body.emergency_contact
       });
       yield saveUser(user);
+      delete user.password;
       this.result = {
-        code: 0
+        code: 0,
+        result: user
       }
     } else {
       this.result = app.Errors.USER_NOT_EXIST;
