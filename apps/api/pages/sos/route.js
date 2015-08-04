@@ -75,6 +75,7 @@ module.exports = function(app) {
         help_id: user.help_id
       }
     });
+    return aroundHelpers;
   };
 
   var recordHelp = function*(helpData) {
@@ -132,11 +133,12 @@ module.exports = function(app) {
       });
       user.help_id = helpResult._id.toString();
       yield saveUser(user);
-      yield callForHelp(user);
+      var aroundHelpers = yield callForHelp(user);
       this.result = {
         code: 0,
         result: {
-          id: helpResult._id.toString()
+          id: helpResult._id.toString(),
+          around_helpers: aroundHelpers
         }
       }
     } else {
