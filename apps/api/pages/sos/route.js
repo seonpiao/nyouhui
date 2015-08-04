@@ -69,7 +69,12 @@ module.exports = function(app) {
       }
     });
     aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    yield FirstrePush.pushToPro(aroundHelpers);
+    yield FirstrePush.pushToPro(aroundHelpers, {
+      type: 'newhelp',
+      data: {
+        help_id: user.help_id
+      }
+    });
   };
 
   var recordHelp = function*(helpData) {
