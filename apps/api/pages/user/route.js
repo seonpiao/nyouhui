@@ -148,7 +148,13 @@ module.exports = function(app) {
     var body = this.request.body;
     var user =
       yield getUserById.call(this, uid);
-    if (body.nickname && !SensitiveWord.check(body.nickname)) {
+    var sensitiveFields = ['nickname', 'name'];
+    if (sensitiveFields.some(function(field) {
+        if (body[field] && !SensitiveWord.check(body[field])) {
+          return true;
+        }
+        return false;
+      })) {
       this.result = app.Errors.USER_INVALID_NICKNAME;
       return;
     }

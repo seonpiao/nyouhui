@@ -77,7 +77,7 @@ module.exports = function(app, config) {
     },
     'USER_INVALID_NICKNAME': {
       code: 3004,
-      message: '用户名不可用'
+      message: '名称包含敏感词'
     },
     //data
     'DATA_INSERT_ERROR': {
