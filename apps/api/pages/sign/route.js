@@ -371,7 +371,7 @@ module.exports = function(app) {
     }
   });
 
-  route.nested('/destroyAccessToken').get(function*(next) {
+  route.nested('/destroyAccessToken').post(function*(next) {
     this.json = true;
     var uid =
       yield checkLogin.call(this);
