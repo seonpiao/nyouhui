@@ -356,13 +356,13 @@ module.exports = function(app) {
         }
       });
       allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
+      extend(helpData, {
+        me: wounded,
+        rescuer: allHelpers
+      });
       this.result = {
         code: 0,
-        result: {
-          status: helpData.status,
-          wounded: wounded,
-          all: allHelpers
-        }
+        result: helpData
       }
     } else {
       this.result = app.Errors.SOS_HELP_NOT_FOUND;
