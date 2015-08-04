@@ -128,11 +128,8 @@ module.exports = function(app, config) {
       maxage: 1000 * 60 * 60 * 24 * 30
     }
   }), cors({
-    origin: function(req) {
-      if (req.headers['x-cors']) {
-        return req.headers.origin;
-      }
-      return false;
+    origin: function(ctx) {
+      return ctx.headers.origin;
     }
   })];
 };
