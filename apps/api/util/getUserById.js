@@ -9,15 +9,18 @@ var getUserById = function(app) {
         $in: uid
       }
     }
+    var query = {
+      uid: uid
+    };
+    if (options.filter) {
+      extend(true, query, options.filter);
+    }
     var result =
       yield Mongo.request({
         collection: app.config.mongo.collections.user,
-        one: true,
         request: {
           qs: {
-            query: JSON.stringify({
-              uid: uid
-            }),
+            query: JSON.stringify(query),
             fields: JSON.stringify(options.fields || {})
           }
         }
@@ -40,9 +43,6 @@ var getUserById = function(app) {
       }
 
       var users = result;
-      if (!Array.isArray(result)) {
-        users = [result];
-      }
 
       for (var fieldName in extMap) {
         var extInfo = extMap[fieldName];
@@ -51,10 +51,13 @@ var getUserById = function(app) {
           if (Array.isArray(user[fieldName])) {
             user[fieldName] = extData.filter(function(item) {
               var id = (item.id || item._id).toString();
+              return user[fieldName].indexOf(id) !== -1;
+            }).map(function(item) {
+              item = extend({}, item);
               delete item._id;
               delete item.create_time;
               delete item.modify_time;
-              return user[fieldName].indexOf(id) !== -1;
+              return item;
             });
           } else {
             user[fieldName] = extData.filter(function(item) {
@@ -63,15 +66,19 @@ var getUserById = function(app) {
               delete item.create_time;
               delete item.modify_time;
               return user[fieldName] === id;
+            }).map(function(item) {
+              item = extend({}, item);
+              delete item._id;
+              delete item.create_time;
+              delete item.modify_time;
+              return item;
             })[0];
           }
         });
       }
-      if (Array.isArray(result)) {
-        result = users;
-      } else {
-        result = users[0];
-      }
+    }
+    if (!Array.isArray(uid)) {
+      result = result[0];
     }
 
     return result;

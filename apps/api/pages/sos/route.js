@@ -69,12 +69,14 @@ module.exports = function(app) {
       }
     });
     aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    yield FirstrePush.pushToPro(aroundHelpers, {
-      type: 'newhelp',
-      data: {
-        help_id: user.help_id
-      }
-    });
+    if (aroundHelpers) {
+      yield FirstrePush.pushToPro(aroundHelpers, {
+        type: 'newhelp',
+        data: {
+          help_id: user.help_id
+        }
+      });
+    }
     return aroundHelpers;
   };
 
@@ -161,7 +163,7 @@ module.exports = function(app) {
             id: helpId
           });
         result = result[app.config.mongo.defaultDB]['sos'];
-        if (result) {
+        if (result && result.length > 0) {
           //将救援状态置为取消
           result.status = 2;
           //从救援人的救援列表中删除本次救援
@@ -179,12 +181,16 @@ module.exports = function(app) {
           //清空救援人列表
           result.rescuer = [];
           yield save('sos', result);
+          me.help_id = '';
+          yield saveUser(me);
+          this.result = {
+            code: 0
+          }
+        } else {
+          this.result = app.Errors.SOS_HELP_NOT_FOUND;
         }
-        me.help_id = '';
-        yield saveUser(me);
-      }
-      this.result = {
-        code: 0
+      } else {
+        this.result = app.Errors.SOS_NOT_IN_HELP;
       }
     } else {
       this.result = app.Errors.USER_NOT_EXIST;
@@ -233,9 +239,11 @@ module.exports = function(app) {
       user = yield getUserById(result.me);
       user.help_id = '';
       yield saveUser(user);
-    }
-    this.result = {
-      code: 0
+      this.result = {
+        code: 0
+      }
+    } else {
+      this.result = app.Errors.SOS_HELP_NOT_FOUND;
     }
   });
   route.nested('/coming').post(function*() {
@@ -274,9 +282,11 @@ module.exports = function(app) {
           }
         });
         yield saveUser(user);
-      }
-      this.result = {
-        code: 0
+        this.result = {
+          code: 0
+        }
+      } else {
+        this.result = app.Errors.SOS_HELP_NOT_FOUND
       }
     } else {
       this.result = app.Errors.USER_NOT_EXIST
@@ -317,9 +327,11 @@ module.exports = function(app) {
           user.helping.splice(index, 1);
           yield saveUser(user);
         }
-      }
-      this.result = {
-        code: 0
+        this.result = {
+          code: 0
+        }
+      } else {
+        this.result = app.Errors.SOS_HELP_NOT_FOUND;
       }
     } else {
       this.result = app.Errors.USER_NOT_EXIST
@@ -396,44 +408,22 @@ module.exports = function(app) {
         });
       helpData = helpData[app.config.mongo.defaultDB]['sos'];
       if (helpData) {
-        var allHelpers = yield getUserById(uid, {
+        allHelpers = yield getUserById(helpData.rescuer, {
           fields: userDataStruct,
           withExtData: true
         });
-        allHelpers = yield Mongo.request({
-          collection: app.config.mongo.collections.user,
-          request: {
-            qs: {
-              query: JSON.stringify({
-                uid: {
-                  $in: helpData.rescuer
-                }
-              }),
-              fields: JSON.stringify(userDataStruct)
+        aroundHelpers = yield getUserById(helpData.rescuer, {
+          fields: userDataStruct,
+          withExtData: true,
+          filter: {
+            loc: {
+              $near: {
+                $geometry: me.loc,
+                $maxDistance: distance
+              }
             }
           }
         });
-        allHelpers = allHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-        aroundHelpers = yield Mongo.request({
-          collection: app.config.mongo.collections.user,
-          request: {
-            qs: {
-              query: JSON.stringify({
-                loc: {
-                  $near: {
-                    $geometry: me.loc,
-                    $maxDistance: distance
-                  }
-                },
-                uid: {
-                  $in: helpData.rescuer
-                }
-              }),
-              fields: JSON.stringify(userDataStruct)
-            }
-          }
-        });
-        aroundHelpers = aroundHelpers[app.config.mongo.defaultDB][app.config.mongo.collections.user];
       }
       this.result = {
         code: 0,

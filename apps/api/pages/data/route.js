@@ -152,15 +152,15 @@ module.exports = function(app) {
     delete query.page;
     delete query.pagesize;
     //要显示的列表数据
-    var data =
-      yield Mongo.request({
-        db: db,
-        collection: collection,
-        id: id,
-        request: {
-          qs: query
-        }
-      });
+    var data = yield Mongo.request({
+      db: db,
+      collection: collection,
+      id: id,
+      request: {
+        qs: query
+      }
+    });
+    data[db][collection] = data[db][collection] || [];
     var list = data[db][collection];
     if (customSort === '1') {
       try {

@@ -121,7 +121,11 @@ module.exports = function(app, config) {
     'SOS_HELP_NOT_FOUND': {
       code: 6003,
       message: '不存在这次救援'
-    }
+    },
+    'SOS_NOT_IN_HELP': {
+      code: 6004,
+      message: '您当前没有进行过呼救'
+    },
   };
 
   app.Middlewares = [session({
