@@ -7,8 +7,6 @@ module.exports = function(app) {
     this.result = {};
     this.view = 'modifyPwd';
   }).put(function*() {
-    console.log(this.request.params.id);
-    console.log(this.request.body);
     this.json = true;
     this.result = {
       code: 200

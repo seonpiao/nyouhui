@@ -78,7 +78,6 @@ module.exports = function(app) {
         iOSMessage, Xinge.IOS_ENV_DEV);
       if (result) {
         result = JSON.parse(result);
-        console.log(result);
         if (result.ret_code === 0) {
           this.result = {
             code: 0

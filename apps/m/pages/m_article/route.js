@@ -16,7 +16,6 @@ module.exports = function(app) {
         }, {
           collection: collection + '_type'
         }]);
-      console.log(data);
       this.result = {
         result: data,
         db: app.config.mongo.defaultDB,
