@@ -35,15 +35,18 @@ var getUserById = function(app) {
     for (var fieldName in extMap) {
       var extInfo = extMap[fieldName];
       var extData = concatedExtDatas[extInfo.db][extInfo.collection];
-      delete extData._id;
-      delete extData.create_time;
-      delete extData.modify_time;
       if (Array.isArray(result[fieldName])) {
         result[fieldName] = extData.filter(function(item) {
+          delete item._id;
+          delete item.create_time;
+          delete item.modify_time;
           return result[fieldName].indexOf((item.id || item._id).toString()) !== -1;
         });
       } else {
         result[fieldName] = extData.filter(function(item) {
+          delete item._id;
+          delete item.create_time;
+          delete item.modify_time;
           return result[fieldName] === (item.id || item._id).toString();
         })[0];
       }
