@@ -424,16 +424,18 @@ module.exports = function(app) {
             }
           }
         });
-      }
-      this.result = {
-        code: 0,
-        result: {
-          status: helpData.status,
-          wounded: me,
-          around: aroundHelpers,
-          all: allHelpers,
-          distance: distance
+        this.result = {
+          code: 0,
+          result: {
+            status: helpData.status,
+            wounded: me,
+            around: aroundHelpers,
+            all: allHelpers,
+            distance: distance
+          }
         }
+      } else {
+        this.result = app.Errors.SOS_NOT_IN_HELP;
       }
     } else {
       this.result = app.Errors.USER_NOT_EXIST
