@@ -37,17 +37,19 @@ var getUserById = function(app) {
       var extData = concatedExtDatas[extInfo.db][extInfo.collection];
       if (Array.isArray(result[fieldName])) {
         result[fieldName] = extData.filter(function(item) {
+          var id = (item.id || item._id).toString();
           delete item._id;
           delete item.create_time;
           delete item.modify_time;
-          return result[fieldName].indexOf((item.id || item._id).toString()) !== -1;
+          return result[fieldName].indexOf(id) !== -1;
         });
       } else {
         result[fieldName] = extData.filter(function(item) {
+          var id = (item.id || item._id).toString();
           delete item._id;
           delete item.create_time;
           delete item.modify_time;
-          return result[fieldName] === (item.id || item._id).toString();
+          return result[fieldName] === id;
         })[0];
       }
     }
