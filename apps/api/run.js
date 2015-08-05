@@ -58,6 +58,10 @@ module.exports = function(app, config) {
       code: 2007,
       message: '密码不符合要求'
     },
+    'SIGN_PROUSER_ONLY': {
+      code: 2008,
+      message: '普通用户不能登录Pro版'
+    },
     //user
     'USER_INCORRECT_PASSWORD': {
       code: 3000,

@@ -214,16 +214,21 @@ module.exports = function(app) {
     this.json = true;
     var phone = this.request.body.phone;
     var password = this.request.body.password;
+    var appType = this.request.body.app || 'normal';
     var result =
       yield auth(phone, password);
     if (result) {
-      var token = yield createSession(result.uid);
-      errorCount[phone] = 0;
-      this.result = {
-        code: 0,
-        result: {
-          token: token,
-          uid: result.uid
+      if (appType === 'pro' && result.level === '-1') {
+        this.result = app.Errors.SIGN_PROUSER_ONLY;
+      } else {
+        var token = yield createSession(result.uid);
+        errorCount[phone] = 0;
+        this.result = {
+          code: 0,
+          result: {
+            token: token,
+            uid: result.uid
+          }
         }
       }
     } else {
