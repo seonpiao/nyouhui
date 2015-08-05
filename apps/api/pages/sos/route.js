@@ -163,7 +163,7 @@ module.exports = function(app) {
             id: helpId
           });
         result = result[app.config.mongo.defaultDB]['sos'];
-        if (result && result.length > 0) {
+        if (result) {
           //将救援状态置为取消
           result.status = 2;
           //从救援人的救援列表中删除本次救援
