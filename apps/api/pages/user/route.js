@@ -7,6 +7,7 @@ var extend = require('node.extend');
 var captcha = require('../../util/captcha');
 var thunkify = require('thunkify');
 var SensitiveWord = require('carrier-sensitive-word');
+var verifyPassword = require('carrier-verify-password');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
