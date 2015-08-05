@@ -102,7 +102,9 @@ module.exports = function(app) {
     if (!uid) return;
     uid = this.request.query.uid || uid;
     var user =
-      yield getUserById.call(this, uid);
+      yield getUserById.call(this, uid, {
+        withExtData: true
+      });
     if (user) {
       delete user._id;
       delete user.password;

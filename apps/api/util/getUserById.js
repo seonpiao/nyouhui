@@ -18,39 +18,42 @@ var getUserById = function(app) {
         }
       });
     result = result[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    var ext = yield Mongo.getExtData({
-      collection: app.config.mongo.collections.user,
-      withoutSchema: true
-    });
 
-    var extDatas = ext.extDatas;
-    var extMap = ext.extMap;
+    if (options.withExtData) {
+      var ext = yield Mongo.getExtData({
+        collection: app.config.mongo.collections.user,
+        withoutSchema: true
+      });
 
-    var concatedExtDatas = {};
+      var extDatas = ext.extDatas;
+      var extMap = ext.extMap;
 
-    for (var i = 0; i < extDatas.length; i++) {
-      extend(true, concatedExtDatas, extDatas[i]);
-    }
+      var concatedExtDatas = {};
 
-    for (var fieldName in extMap) {
-      var extInfo = extMap[fieldName];
-      var extData = concatedExtDatas[extInfo.db][extInfo.collection];
-      if (Array.isArray(result[fieldName])) {
-        result[fieldName] = extData.filter(function(item) {
-          var id = (item.id || item._id).toString();
-          delete item._id;
-          delete item.create_time;
-          delete item.modify_time;
-          return result[fieldName].indexOf(id) !== -1;
-        });
-      } else {
-        result[fieldName] = extData.filter(function(item) {
-          var id = (item.id || item._id).toString();
-          delete item._id;
-          delete item.create_time;
-          delete item.modify_time;
-          return result[fieldName] === id;
-        })[0];
+      for (var i = 0; i < extDatas.length; i++) {
+        extend(true, concatedExtDatas, extDatas[i]);
+      }
+
+      for (var fieldName in extMap) {
+        var extInfo = extMap[fieldName];
+        var extData = concatedExtDatas[extInfo.db][extInfo.collection];
+        if (Array.isArray(result[fieldName])) {
+          result[fieldName] = extData.filter(function(item) {
+            var id = (item.id || item._id).toString();
+            delete item._id;
+            delete item.create_time;
+            delete item.modify_time;
+            return result[fieldName].indexOf(id) !== -1;
+          });
+        } else {
+          result[fieldName] = extData.filter(function(item) {
+            var id = (item.id || item._id).toString();
+            delete item._id;
+            delete item.create_time;
+            delete item.modify_time;
+            return result[fieldName] === id;
+          })[0];
+        }
       }
     }
 

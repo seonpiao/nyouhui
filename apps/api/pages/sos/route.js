@@ -377,7 +377,8 @@ module.exports = function(app) {
       yield checkLogin.call(this);
     if (!uid) return;
     var me = yield getUserById(uid, {
-      fields: userDataStruct
+      fields: userDataStruct,
+      withExtData: true
     });
     if (me) {
       var helpData =
