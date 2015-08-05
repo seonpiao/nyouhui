@@ -107,6 +107,7 @@ module.exports = function(app) {
     if (!uid) return;
     var x = parseFloat(this.request.body.x);
     var y = parseFloat(this.request.body.y);
+    var addr = this.request.body.addr;
     if (!x || !y) {
       this.result = app.Errors.MISSING_PARAMS;
       return;
@@ -131,6 +132,7 @@ module.exports = function(app) {
       });
       var helpResult = yield recordHelp({
         me: uid,
+        addr: addr,
         loc: user.loc
       });
       user.help_id = helpResult._id.toString();
@@ -211,34 +213,36 @@ module.exports = function(app) {
       });
     result = result[app.config.mongo.defaultDB]['sos'];
     if (result) {
-      //将救援状态置为完成
-      result.status = status // 3为救助成功，4为救助失败，5为转移至医院;
-        //从救援人的救援列表中删除本次救援
-      if (result.rescuer.length > 0) {
-        for (var i = 0; i < result.rescuer.length; i++) {
-          var rescuerId = result.rescuer[i];
-          var user = yield getUserById(rescuerId);
-          var index = user.helping.indexOf(result._id.toString());
-          if (index !== -1) {
-            user.helping.splice(index, 1);
-            yield saveUser(user);
+      if (result.status === 1) {
+        //将救援状态置为完成
+        result.status = status // 3为救助成功，4为救助失败，5为转移至医院;
+          //从救援人的救援列表中删除本次救援
+        if (result.rescuer.length > 0) {
+          for (var i = 0; i < result.rescuer.length; i++) {
+            var rescuerId = result.rescuer[i];
+            var user = yield getUserById(rescuerId);
+            var index = user.helping.indexOf(result._id.toString());
+            if (index !== -1) {
+              user.helping.splice(index, 1);
+              yield saveUser(user);
+            }
           }
         }
+        //清空救援人列表
+        result.rescuer = [];
+        delete result._id;
+        yield Mongo.request({
+          collection: 'sos',
+          id: helpId,
+          request: {
+            method: 'put',
+            json: result
+          }
+        });
+        user = yield getUserById(result.me);
+        user.help_id = '';
+        yield saveUser(user);
       }
-      //清空救援人列表
-      result.rescuer = [];
-      delete result._id;
-      yield Mongo.request({
-        collection: 'sos',
-        id: helpId,
-        request: {
-          method: 'put',
-          json: result
-        }
-      });
-      user = yield getUserById(result.me);
-      user.help_id = '';
-      yield saveUser(user);
       this.result = {
         code: 0
       }
