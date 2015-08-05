@@ -114,7 +114,7 @@ module.exports = function(app, config) {
       code: 6000,
       message: '当前有呼救正在进行'
     },
-    'SOS_IN_RESCUR': {
+    'SOS_IN_RESCUE': {
       code: 6001,
       message: '您已参加本次救援'
     },
@@ -130,6 +130,10 @@ module.exports = function(app, config) {
       code: 6004,
       message: '您当前没有进行过呼救'
     },
+    'SOS_NOT_IN_RESCUE': {
+      code: 6005,
+      message: '您没有参加本次救援'
+    }
   };
 
   app.Middlewares = [session({

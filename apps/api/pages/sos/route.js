@@ -206,11 +206,10 @@ module.exports = function(app) {
     if (!uid) return;
     var status = (this.request.body.status || 3) * 1;
     var helpId = this.request.body.help_id;
-    var result =
-      yield Mongo.request({
-        collection: 'sos',
-        id: helpId
-      });
+    var result = yield Mongo.request({
+      collection: 'sos',
+      id: helpId
+    });
     result = result[app.config.mongo.defaultDB]['sos'];
     if (result) {
       if (result.status === 1) {
@@ -250,6 +249,38 @@ module.exports = function(app) {
       this.result = app.Errors.SOS_HELP_NOT_FOUND;
     }
   });
+  route.nested('/result').post(function*() {
+    this.json = true;
+    var uid =
+      yield checkLogin.call(this);
+    if (!uid) return;
+    var helpId = this.request.body.help_id;
+    var helpData = yield Mongo.request({
+      collection: 'sos',
+      id: helpId
+    });
+    helpData = helpData[app.config.mongo.defaultDB]['sos'];
+    if (helpData) {
+      var symptom = this.request.body.symptom;
+      var process = this.request.body.process;
+      if (!symptom || !process) {
+        this.result = app.Errors.MISSING_PARAMS;
+        return;
+      }
+      if (helpData.rescuer.indexOf(uid) === -1) {
+        this.result = app.Errors.SOS_NOT_IN_RESCUE;
+        return;
+      }
+      helpData.symptom = symptom;
+      helpData.process = process;
+      yield save('sos', helpData);
+      this.result = {
+        code: 0
+      }
+    } else {
+      this.result = app.Errors.SOS_HELP_NOT_FOUND;
+    }
+  });
   route.nested('/coming').post(function*() {
     this.json = true;
     var uid =
@@ -267,7 +298,7 @@ module.exports = function(app) {
       result = result[app.config.mongo.defaultDB]['sos'];
       if (result) {
         if (result.rescuer.indexOf(user.uid) !== -1) {
-          this.result = app.Errors.SOS_IN_RESCUR;
+          this.result = app.Errors.SOS_IN_RESCUE;
           return;
         }
         if (result.me === uid) {
