@@ -62,7 +62,7 @@ module.exports = function(app, config) {
       code: 2008,
       message: '普通用户不能登录Pro版'
     },
-    'SIGN_LOGIN_FAILED': {
+    'SIGN_LOGIN_WRONG': {
       code: 2009,
       message: '用户名或密码错误'
     },

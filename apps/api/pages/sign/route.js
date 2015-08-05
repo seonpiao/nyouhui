@@ -236,7 +236,7 @@ module.exports = function(app) {
         errorCount[phone] = 0;
       }
       errorCount[phone]++;
-      this.result = app.Errors.SIGN_LOGIN_FAILED
+      this.result = app.Errors.SIGN_LOGIN_WRONG
     }
   });
 
