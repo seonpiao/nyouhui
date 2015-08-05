@@ -4,6 +4,11 @@ var extend = require('node.extend');
 var getUserById = function(app) {
   return function*(uid, options) {
     options = options || {};
+    if (Array.isArray(uid)) {
+      uid = {
+        $in: uid
+      }
+    }
     var result =
       yield Mongo.request({
         collection: app.config.mongo.collections.user,
@@ -34,26 +39,38 @@ var getUserById = function(app) {
         extend(true, concatedExtDatas, extDatas[i]);
       }
 
+      var users = result;
+      if (!Array.isArray(result)) {
+        users = [result];
+      }
+
       for (var fieldName in extMap) {
         var extInfo = extMap[fieldName];
         var extData = concatedExtDatas[extInfo.db][extInfo.collection];
-        if (Array.isArray(result[fieldName])) {
-          result[fieldName] = extData.filter(function(item) {
-            var id = (item.id || item._id).toString();
-            delete item._id;
-            delete item.create_time;
-            delete item.modify_time;
-            return result[fieldName].indexOf(id) !== -1;
-          });
-        } else {
-          result[fieldName] = extData.filter(function(item) {
-            var id = (item.id || item._id).toString();
-            delete item._id;
-            delete item.create_time;
-            delete item.modify_time;
-            return result[fieldName] === id;
-          })[0];
-        }
+        users.forEach(function(user) {
+          if (Array.isArray(user[fieldName])) {
+            user[fieldName] = extData.filter(function(item) {
+              var id = (item.id || item._id).toString();
+              delete item._id;
+              delete item.create_time;
+              delete item.modify_time;
+              return user[fieldName].indexOf(id) !== -1;
+            });
+          } else {
+            user[fieldName] = extData.filter(function(item) {
+              var id = (item.id || item._id).toString();
+              delete item._id;
+              delete item.create_time;
+              delete item.modify_time;
+              return user[fieldName] === id;
+            })[0];
+          }
+        });
+      }
+      if (Array.isArray(result)) {
+        result = users;
+      } else {
+        result = users[0];
       }
     }
 

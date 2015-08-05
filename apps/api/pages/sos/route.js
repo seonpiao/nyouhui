@@ -396,6 +396,10 @@ module.exports = function(app) {
         });
       helpData = helpData[app.config.mongo.defaultDB]['sos'];
       if (helpData) {
+        var allHelpers = yield getUserById(uid, {
+          fields: userDataStruct,
+          withExtData: true
+        });
         allHelpers = yield Mongo.request({
           collection: app.config.mongo.collections.user,
           request: {
