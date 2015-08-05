@@ -154,7 +154,7 @@ module.exports = function(app) {
         }
       } catch (e) {
         logger.error(e.stack);
-        // this.result = app.Errors.SIGN_SEND_SMS_FAILED;
+        this.result = app.Errors.SIGN_SEND_SMS_FAILED;
       }
     } else {
       this.result = app.Errors.SIGN_MISSING_PHONE;
