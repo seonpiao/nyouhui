@@ -1,4 +1,5 @@
 var Mongo = require('../../../libs/server/mongodb');
+var extend = require('node.extend');
 
 var getUserById = function(app) {
   return function*(uid, options) {
@@ -17,25 +18,37 @@ var getUserById = function(app) {
         }
       });
     result = result[app.config.mongo.defaultDB][app.config.mongo.collections.user];
-    var extDatas = yield Mongo.getExtData({
+    var ext = yield Mongo.getExtData({
       collection: app.config.mongo.collections.user,
       withoutSchema: true
     });
-    //外部数据的collection名需要跟用户字段名一致
-    extDatas.forEach(function(extData) {
-      for (var db in extData) {
-        for (var collection in extData[db]) {
-          if (extData[db][collection]) {
-            extData[db][collection].forEach(function(item) {
-              delete item._id;
-              delete item.create_time;
-              delete item.modify_time;
-            });
-            result[collection] = extData[db][collection];
-          }
-        }
+
+    var extDatas = ext.extDatas;
+    var extMap = ext.extMap;
+
+    var concatedExtDatas = {};
+
+    for (var i = 0; i < extDatas.length; i++) {
+      extend(true, concatedExtDatas, extDatas[i]);
+    }
+
+    for (var fieldName in extMap) {
+      var extInfo = extMap[fieldName];
+      var extData = concatedExtDatas[extInfo.db][extInfo.collection];
+      delete extData._id;
+      delete extData.create_time;
+      delete extData.modify_time;
+      if (Array.isArray(result[fieldName])) {
+        result[fieldName] = extData.filter(function(item) {
+          return result[fieldName].indexOf((item.id || item._id).toString()) !== -1;
+        });
+      } else {
+        result[fieldName] = extData.filter(function(item) {
+          return result[fieldName] === (item.id || item._id).toString();
+        })[0];
       }
-    });
+    }
+
     return result;
   }
 }

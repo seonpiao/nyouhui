@@ -74,9 +74,9 @@ module.exports = function(app) {
     var list = data[db][collection];
     //列表的字段定义数据
     var _data = {};
-    var extDatas = yield Mongo.getExtData({
+    var extDatas = (yield Mongo.getExtData({
       collection: collection
-    });
+    })).extDatas;
     for (var i = 0; i < extDatas.length; i++) {
       extend(true, _data, extDatas[i]);
     }
@@ -254,9 +254,9 @@ module.exports = function(app) {
         });
       var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
       var fields = schemaData.fields;
-      var extDatas = yield Mongo.getExtData({
+      var extDatas = (yield Mongo.getExtData({
         collection: collection
-      });
+      })).extDatas;
       extDatas.forEach(function(extData) {
         extend(true, _data, extData);
       });
@@ -346,9 +346,9 @@ module.exports = function(app) {
         });
       var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
       var fields = schemaData.fields;
-      var extDatas = yield Mongo.getExtData({
+      var extDatas = (yield Mongo.getExtData({
         collection: collection
-      });
+      })).extDatas;
       extDatas.forEach(function(extData) {
         extend(true, _data, extData);
       });

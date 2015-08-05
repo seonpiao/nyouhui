@@ -193,10 +193,10 @@ module.exports = function(app) {
         console.log(e.stack)
       }
     }
-    var extDatas = yield Mongo.getExtData({
+    var extDatas = (yield Mongo.getExtData({
       collection: collection,
       withoutSchema: true
-    });
+    })).extDatas;
     for (var i = 0; i < extDatas.length; i++) {
       extend(true, data, extDatas[i]);
     }

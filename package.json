@@ -1,6 +1,6 @@
 {
   "name": "carrier",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "dependencies": {
     "art-template": "^3.0.3",
     "async": "^0.7.0",
@@ -13,7 +13,6 @@
     "co-busboy": "^1.0.2",
     "flow-js": "^0.6.0",
     "iconv-lite": "^0.4.10",
-    "install": "^0.1.8",
     "jade": "1.3.1",
     "jsonwebtoken": "^5.0.1",
     "kcors": "^1.0.1",
@@ -29,22 +28,16 @@
     "mime": "^1.3.4",
     "mkdirp": "^0.5.1",
     "moment": "^2.10.3",
-    "mongodb": "^2.0.28",
     "mongodb-rest-tmp": "^0.10.12",
-    "node-datapool": "*",
     "node.extend": "^1.1.3",
-    "npm": "^2.8.3",
     "padnum": "0.0.1",
-    "pagegather": "0.0.20",
     "random-token": "0.0.8",
     "redis": "^0.12.1",
     "request": "^2.55.0",
-    "retryjs": "^1.0.1",
     "seajs": "^3.0.1",
     "socket.io": "^1.3.5",
     "thunkify": "2.1.2",
-    "underscore": "1.7.0",
-    "xinge": "^1.1.3"
+    "underscore": "1.7.0"
   },
   "devDependencies": {
     "grunt": "^0.4.3",
@@ -62,7 +55,7 @@
     "load-grunt-tasks": "~0.3.0",
     "grunt-shell": "*"
   },
-  "description": "wanleyun.com",
+  "description": "Node.js Carrier",
   "main": "index.js",
-  "author": "piaoshihuang@wanleyun.com"
+  "author": "7@seon.im"
 }

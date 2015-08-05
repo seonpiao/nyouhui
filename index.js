@@ -148,17 +148,25 @@ function isGeneratorFunction(obj) {
 }
 
 co(function*() {
-  var allConfig = require(path.join(APP_PATH, 'config.js'));
-  var appConfigs = allConfig.apps;
+  var allConfig = {};
+  var allConfigFile = path.join(APP_PATH, 'config.js');
+  if (fs.existsSync(allConfigFile)) {
+    allConfig = require(allConfigFile);
+  }
+  var appConfigs = allConfig.apps || {};
   delete allConfig.apps;
   for (var i = 0; i < apps.length; i++) {
     var appName = apps[i];
     var app = koa();
     app.name = appName;
     var appPath = path.join(APP_PATH, appName);
-    var appConfig;
+    var appConfigFile = path.join(appPath, 'config.js');
+    var appConfig = {};
+    if (fs.existsSync(appConfigFile)) {
+      appConfig = require(appConfigFile);
+    }
     try {
-      appConfig = _.extend(allConfig, appConfigs[appName] || {});
+      appConfig = _.extend(allConfig, appConfigs[appName] || {}, appConfig || {});
       app.config = appConfig;
       var runScript = require(path.join(appPath, 'run.js'));
       if (isGeneratorFunction(runScript)) {
