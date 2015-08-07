@@ -7,7 +7,7 @@ aside.main-sidebar
       .pull-left.image
         img.img-circle(src='/img/user2-160x160.jpg', alt='User Image')
       .pull-left.info
-        p Alexander Pierce
+        p= __global.user.nickname || __global.user.username
         a(href='#')
           i.fa.fa-circle.text-success
           |  Online

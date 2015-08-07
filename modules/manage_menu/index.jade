@@ -42,9 +42,9 @@ ul.sidebar-menu
     if crud
       - db = crud[1];
       - collection = crud[2];
-    if db && collection && privilege && (!privilege[db][collection] || !privilege[db][collection].read)
+    if db && collection && privilege && (!privilege[db][collection] || !privilege[db][collection].read) && __global.user.username != 'root'
       - hasPermission = false
-    if item.url.match(/^\/schema$/) && __global.user.username != 'root'
+    if item.url.match(/^\/schema/) && __global.user.username != 'root'
       - hasPermission = false
     if hasPermission
       - item.leaf = true;

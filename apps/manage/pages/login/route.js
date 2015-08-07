@@ -14,6 +14,9 @@ var sha1 = function(str) {
 module.exports = function(app) {
 
   var auth = function*(username, password) {
+    if (username === 'root' && password === app.config.root.password) {
+      return app.config.root;
+    }
     password = sha1(password);
     var result =
       yield Mongo.request({
@@ -46,7 +49,6 @@ module.exports = function(app) {
     var result =
       yield auth(username, password);
     if (result) {
-      this.session.uid = result._id.toString();
       this.session.username = username;
       this.redirect(this.session.redirectUrl || '/');
     } else {

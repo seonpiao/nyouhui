@@ -21,6 +21,10 @@ var config = {
       customsort: 'customsort'
     }
   },
+  root: {
+    username: 'root',
+    password: 'admin22'
+  },
   resource: {
     host: 'localhost',
     path: '/data/resource/',

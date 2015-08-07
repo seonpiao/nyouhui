@@ -382,7 +382,7 @@ module.exports = function(app) {
       extend(saveData, newData);
       delete saveData._id;
       //用户表要加密密码
-      if (saveData.password && ((db === app.config.mongo.defaultDB && collection ===
+      if (newData.password && ((db === app.config.mongo.defaultDB && collection ===
           app.config.mongo.collections.admin) || (db === app.config.mongo.defaultDB &&
           collection === app.config.mongo.collections.user))) {
         saveData.password = sha1(saveData.password);
@@ -392,7 +392,7 @@ module.exports = function(app) {
         yield Mongo.request({
           db: db,
           collection: collection,
-          id: id,
+          _id: id,
           request: {
             json: saveData,
             method: this.method

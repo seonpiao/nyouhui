@@ -11,7 +11,7 @@ li.form-group
       label 控件
       select.form-control(type="text",name="field_type")
         each control in controls
-          option(value=control._id,selected=((field && field.type === control._id) || (!field && control.name === 'input')))= control.name
+          option(value=(control.id||control._id.toString()),selected=((field && field.type === (control.id||control._id.toString())) || (!field && control.name === 'input')))= control.name
     .col-xs-1
       label 索引
       select.form-control(type="text",name="field_index")
@@ -26,7 +26,7 @@ li.form-group
     .col-xs-1
       label 编辑
       select.form-control(type="text",name="field_editable")
-        - var editable = {'yes':'可编辑','required':'必填',no:'不可编辑','hidden':'隐藏'}
+        - var editable = {'yes':'可编辑','required':'必填',no:'不可编辑','hidden':'隐藏',onlynew:'仅新建'}
         each title,value in editable
           option(value=value,selected=(field && field.editable === value))= title
     .col-xs-1

@@ -20,12 +20,13 @@ block append content
   section.content
     form(role="form",data-module="manage_form",data-db=result.db,data-collection=result.collection)
       div
-        - var data;
+        - var data, isNew = true;
         - var schema = result._data[result.config.schema.db][result.config.schema.collection];
         - var controls = result._data[result.config.control.db][result.config.control.collection];
         if result.data && result.data[result.db]
           - data = result.data[result.db][result.collection];
         if data && data._id
+          - isNew = false;
           +manage_ctrl_input({
             name:'_id',
             type:'hidden',
@@ -33,16 +34,16 @@ block append content
           })
         each field in schema.fields
           - var extraControl = controls.filter(function(v){
-          -   return v._id.toString() == field.type
+          -   return (v.id || v._id).toString() == field.type
           - })[0];
           if extraControl
-            - field.base = extraControl.base || extraControl._id;
+            - field.base = extraControl.base || extraControl.id || extraControl._id.toString();
             - var baseCtrl = controls.filter(function(v){
-            -   return v._id == field.base;
+            -   return (v.id || v._id) == field.base;
             - })
             if baseCtrl && baseCtrl.length > 0
               - field.base = baseCtrl[0].name;
-          if field.editable !== 'no'
+          if field.editable !== 'no' && !(!isNew && field.editable === 'onlynew')
             -var params = {};
             // 都改为label，暂时兼容老的alias，以后要删掉alias
             -params.label = field.label || field.alias;

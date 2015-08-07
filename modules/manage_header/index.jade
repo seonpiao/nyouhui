@@ -162,13 +162,13 @@ header.main-header
         li.dropdown.user.user-menu
           a.dropdown-toggle(href='#', data-toggle='dropdown')
             img.user-image(src='/img/user2-160x160.jpg', alt='User Image')
-            span.hidden-xs Alexander Pierce
+            span.hidden-xs= __global.user.nickname || __global.user.username
           ul.dropdown-menu
             // User image
             li.user-header
               img.img-circle(src='/img/user2-160x160.jpg', alt='User Image')
               p
-                | Alexander Pierce - Web Developer
+                = __global.user.nickname || __global.user.username + ' - Web Developer'
                 small Member since Nov. 2012
             // Menu Body
             li.user-body
