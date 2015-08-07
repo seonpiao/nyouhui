@@ -1,5 +1,1 @@
-["manage_table", "manage_schema_item", "manage_form", "manage_ctrl_input", "manage_menu", "manage_ctrl_tagsinput", "manage_ctrl_wizard", "manage_ctrl_select", "manage_ctrl_textarea",
-  "manage_ctrl_editor", "manage_ctrl_draggableselector", "manage_ctrl_checkbox", "socket", "manage_tasksocket", "manage_ctrl_won2yuan", "manage_ctrl_autocomplete", "manage_ctrl_datepicker",
-  "manage_ctrl_continue", "manage_ctrl_contentblock", "editor", "manage_ctrl_adminprivilege", "manage_ctrl_checkboxselect", "manage_ctrl_fileuploader", "manage_ctrl_saishiurl",
-  "manage_ctrl_customsort"
-]
+["manage_table","manage_schema_item","manage_form","manage_ctrl_input","manage_menu","manage_ctrl_tagsinput","manage_ctrl_wizard","manage_ctrl_select","manage_ctrl_textarea","manage_ctrl_editor","manage_ctrl_draggableselector","manage_ctrl_checkbox","socket","manage_tasksocket","manage_ctrl_won2yuan","manage_ctrl_autocomplete","manage_ctrl_datepicker","manage_ctrl_continue","manage_ctrl_contentblock","editor","manage_ctrl_adminprivilege","manage_ctrl_checkboxselect","manage_ctrl_fileuploader","manage_ctrl_saishiurl","manage_ctrl_customsort","manage_table_plugin_execbtn"]

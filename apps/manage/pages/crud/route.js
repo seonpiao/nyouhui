@@ -150,52 +150,50 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var query = this.request.query;
-    if (query.iDisplayStart && query.iDisplayLength) {
-      query.pagesize = query.iDisplayLength;
-      query.page = Math.ceil((query.iDisplayStart * 1 + 1) / (query.iDisplayLength *
-        1));
-      delete query.iDisplayStart;
-      delete query.iDisplayLength;
+    if (query.perPage) {
+      query.pagesize = query.perPage;
+      delete query.perPage;
     }
-    var columns = query.sColumns.split(',');
-    var filter;
-    if (query.sSearch) {
-      filter = columns.map(function(col, index) {
-        var obj = {};
-        obj[col] = {
-          $regex: sanitize(query.sSearch)
-        };
-        return obj;
-      });
-      filter = {
-        $or: filter
+    var filter = {},
+      sort = {};
+    for (var key in query) {
+      var value = query[key];
+      if (key.match(/queries\[(.+?)\]/)) {
+        key = RegExp.$1;
+        if (key === 'search') {
+          var columns = query.columns.split(',');
+          filter = columns.map(function(col, index) {
+            var obj = {};
+            obj[col] = {
+              $regex: sanitize(value)
+            };
+            return obj;
+          });
+          filter = {
+            $or: filter
+          }
+        } else {
+          filter[key] = value;
+        }
+      } else if (key.match(/sorts\[(.+?)\]/)) {
+        key = RegExp.$1;
+        sort[key] = value * 1;
       }
     }
-    if (query.query) {
-      try {
-        query.query = JSON.parse(query.query);
-      } catch (e) {
-        query.query = {};
-      }
-      filter = filter || {};
-      extend(filter, query.query);
-    }
-    if (filter) {
-      query.query = JSON.stringify(filter);
-    }
-    var sortCol = columns[query.iSortCol_0 || -1];
-    if (sortCol) {
-      var sort = {};
-      sort[sortCol] = query.sSortDir_0 === 'asc' ? 1 : -1;
-      query.sort = JSON.stringify(sort);
-    }
+    query.query = JSON.stringify(filter);
+    query.sort = JSON.stringify(sort);
     var result =
       yield getCollectionData.call(this);
-    result.sEcho = this.request.query.sEcho;
-    this.result = {
-      code: 200,
-      result: result
-    };
+    result.queryRecordCount = result.page.ret;
+    var ret = {
+      records: result.data[db][collection],
+      queryRecordCount: result.page.total,
+      _data: result._data,
+      db: db,
+      collection: collection,
+      config: result.config
+    }
+    this.result = ret;
   });
 
   app.route('/crud/:db/:collection/create').get(function*(next) {

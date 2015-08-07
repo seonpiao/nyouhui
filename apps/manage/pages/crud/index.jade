@@ -5,7 +5,7 @@ block append title
 block append meta
 
 block append stylesheet
-  link(href='/plugins/datatables/dataTables.bootstrap.css', rel='stylesheet', type='text/css')
+  link(href='/plugins/dynatable/jquery.dynatable.css', rel='stylesheet', type='text/css')
 
 block append headjs
 
@@ -16,7 +16,7 @@ block append content
       //- - var data = result.data[result.db][result.collection];
       - var schema = result._data[result.config.schema.db][result.config.schema.collection];
       - var params = {};
-      - try{params = JSON.parse(schema.params)}catch(e){}
+      - try{params = JSON.parse(schema.params)}catch(e){console.log(e.stack)}
       - var options = {fields:schema.fields}
       - for(var key in params){options[key] = params[key]}
       +manage_table(null,options)
@@ -27,8 +27,7 @@ block append content
 
 block append pluginjs
   // DATA TABES SCRIPT
-  script(src='/plugins/datatables/jquery.dataTables.js')
-  script(src='/plugins/datatables/dataTables.bootstrap.js')
+  script(src='/plugins/dynatable/jquery.dynatable.js')
 
 block append footjs
   script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.4c371819ba7ba089.js")

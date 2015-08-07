@@ -9,127 +9,117 @@ define(["libs/client/views/base"], function(Base) {
       var db = this.$el.attr('data-db');
       var collection = this.$el.attr('data-collection');
       var self = this;
-      var params = {
-        "bPaginate": true,
-        "bLengthChange": false,
-        "bFilter": true,
-        "bSort": true,
-        "bInfo": false,
-        "bAutoWidth": false
-      };
-      var isAjax = this.$el.attr('data-ajax') === '1';
-      if (isAjax) {
-        _.extend(params, {
-          "bServerSide": true,
-          "sAjaxSource": "/dt/" + db + '/' + collection,
-          "fnServerParams": function(aoData) {
-            var sColumns = self.getUrlParam('sColumns');
-            var sSearch = self.getUrlParam('sSearch');
-            var oDisplayStart, oDisplayLength;
-            var caredParams = {
-              'sColumns': 'scol',
-              'sSearch': 'skey'
-            };
-            var serverParams = {};
-            _.forEach(aoData, function(item) {
-              serverParams[item.name] = item;
-              if (item.name === 'iDisplayStart') {
-                oDisplayStart = item;
-              } else if (item.name === 'iDisplayLength') {
-                oDisplayLength = item;
+      var options = {};
+      try {
+        options = JSON.parse(this.$el.attr('data-options'));
+      } catch (e) {}
+      if (this.$el.attr('data-ajax') === '1') {
+        this.$el.on('dynatable:beforeProcess', function(e, data) {
+          data.columns = self.$('thead th').map(function(i, th) {
+            return $(th).attr('data-dynatable-column');
+          });
+          data.columns = _.filter(data.columns, function(col) {
+            return !col.match(/^__/);
+          });
+          data.columns = data.columns.join(',');
+        });
+        this.$el.on('dynatable:ajax:success', function(e, res) {
+          if (res.records) {
+            var schemaDb = res.config.schema.db;
+            var schemaCollection = res.config.schema.collection;
+            var controlDb = res.config.control.db;
+            var controlCollection = res.config.control.collection;
+            var schemaData = res._data[schemaDb][schemaCollection];
+            _.each(res.records, function(record) {
+              for (var fieldName in record) {
+                var value = record[fieldName];
+                var fieldSchema = _.filter(schemaData.fields, function(item) {
+                  return item.name === fieldName;
+                })[0];
+                if (fieldSchema && fieldSchema.db && fieldSchema.collection) {
+                  if (typeof value === 'string') {
+                    var foreignItem = _.filter(res._data[fieldSchema.db][fieldSchema.collection], function(item) {
+                      return (item.id || item._id) === value
+                    });
+                    if (foreignItem[0]) {
+                      value = foreignItem[0].name;
+                    }
+                  } else if (_.isArray(value)) {
+                    value = value.map(function(oneOfValue) {
+                      var foreignData = res._data[fieldSchema.db][fieldSchema.collection];
+                      for (var i = 0; i < foreignData.length; i++) {
+                        var foreignItem = foreignData[i];
+                        if ((foreignItem.id || foreignItem._id) === oneOfValue) return foreignItem.name;
+                      }
+                    });
+                  }
+                }
+                record[fieldName] = value;
               }
-              if (item.name === 'sColumns') {
-                item.value = _.map(_.filter(self.$('th'), function(el) {
-                  return !!$(el).attr('data-field');
-                }), function(el) {
-                  return $(el).attr('data-field');
-                }).join(',');
-              }
-            });
-            if (!self._initPage) {
-              var page = self.getUrlParam('page');
-              oDisplayStart.value = (page - 1) * oDisplayLength.value;
-              _.forEach(caredParams, function(value, key) {
-
-              });
-              self._initPage = true;
-            } else {
-
-            }
-          },
-          "fnAjaxUpdateDraw": function(oSettings, json) {
-            var options = JSON.parse(self.$el.attr('data-options'));
-            if (json.result.sEcho !== undefined) {
-              /* Protect against old returns over-writing a new one. Possible when you get
-               * very fast interaction, and later queries are completed much faster
-               */
-              if (json.result.sEcho * 1 < oSettings.iDraw) {
-                return;
-              } else {
-                oSettings.iDraw = json.result.sEcho * 1;
-              }
-            }
-            self.loadTemplate('body', function(template) {
-
-              if (!oSettings.oScroll.bInfinite ||
-                (oSettings.oScroll.bInfinite && (oSettings.bSorted || oSettings.bFiltered))) {
-                dt.oApi._fnClearTable(oSettings);
-              }
-              oSettings._iRecordsTotal = parseInt(json.result.page.total, 10);
-              oSettings._iRecordsDisplay = parseInt(json.result.page.total, 10);
-
-              _.extend(json, {
-                options: options
-              });
-              var html = template(json);
-              self.$('tbody').html(html);
-
-              dt.oApi._fnProcessingDisplay(oSettings, false);
-              dt.fnPagingInfo = function(oSettings) {
-                var pageInfo = {
-                  "iStart": json.result.page.pagesize * (json.result.page.page - 1),
-                  "iEnd": json.result.page.pagesize * (json.result.page.page - 1) + json.result.page.ret,
-                  "iLength": json.result.page.pagesize * 1,
-                  "iTotal": json.result.page.total,
-                  "iFilteredTotal": json.result.page.total,
-                  "iPage": json.result.page.page - 1,
-                  "iTotalPages": Math.ceil(json.result.page.total / json.result.page.pagesize)
-                };
-                return pageInfo;
-              };
-              dt.oApi._fnCallbackFire(oSettings, 'aoDrawCallback', 'pagination', [oSettings]);
-              self.addUrlParam({
-                page: json.result.page.page
-              });
             });
           }
         });
-      }
-      var dt = this.$el.dataTable(params);
-    },
-    addUrlParam: function(params) {
-      var replacedUrl = location.href;
-      _.forEach(params, function(value, name) {
-        var exp = new RegExp('(\\?|&)' + name + '=[^&]+');
-        if (!replacedUrl.match(exp)) {
-          if (replacedUrl.indexOf('?') === -1) {
-            replacedUrl = replacedUrl.replace(/(#|$)/, "?" + name + "=" + value + "$1");
-          } else {
-            replacedUrl = replacedUrl.replace(/(#|$)/, "&" + name + "=" + value + "$1");
+        this.$el.dynatable({
+          features: {
+            recordCount: false
+          },
+          inputs: {
+            paginationPrev: '上页',
+            paginationNext: '下页'
+          },
+          dataset: {
+            ajax: true,
+            ajaxUrl: '/dt/' + db + '/' + collection,
+            ajaxOnLoad: true,
+            records: []
+          },
+          writers: {
+            _rowWriter: function(rowIndex, record, columns, cellWriter) {
+              var tr = '';
+
+              // grab the record's attribute for each column
+              for (var i = 0, len = columns.length; i < len; i++) {
+                if (columns[i].id === '__buttons') {
+                  tr += '<td><a href="/crud/' + db + '/' + collection + '/update/' + (record.id || record._id) + '">编辑</a>';
+                  tr += ' <a class="del-row" data-id="' + (record.id || record._id) + '" href="javascript:;">删除</a>';
+                  if (options.buttons) {
+                    _.each(options.buttons, function(btn) {
+                      var attrs = ['data-dynatable-plugin', 'data-dynatable-plugin-data=\'' + JSON.stringify(record) + '\''];
+                      var href = 'javascript:;';
+                      if (btn.attrs) {
+                        _.each(btn.attrs, function(val, key) {
+                          if (key === 'href') {
+                            href = val;
+                          } else {
+                            attrs.push(key + '=' + val);
+                          }
+                        });
+                      }
+                      tr += ' <a href="' + href + '" ' + attrs.join(' ') + '>' + btn.name + '</a>'
+                    });
+                  }
+                  tr += '</td>';
+                } else {
+                  tr += cellWriter(columns[i], record);
+                }
+              }
+
+              return '<tr>' + tr + '</tr>';
+            }
           }
-        } else {
-          replacedUrl = replacedUrl.replace(exp, '$1' + name + '=' + value);
-        }
-      });
-      history.replaceState(null, null, replacedUrl);
-    },
-    getUrlParam: function(name) {
-      var exp = new RegExp('(?:\\?|&)' + name + '=([^&]+)');
-      var value = location.href.match(exp);
-      if (value) {
-        return value[1];
+        });
+      } else {
+        this.$el.dynatable({
+          features: {
+            recordCount: false
+          },
+          inputs: {
+            paginationPrev: '上页',
+            paginationNext: '下页'
+          }
+        });
       }
-      return '';
+      this._dt = this.$el.data('dynatable');
     },
     del: function(e) {
       var confirm = window.confirm('确定要删除么？');
@@ -147,15 +137,6 @@ define(["libs/client/views/base"], function(Base) {
         this.model.once('error', this.success.bind(this));
         this.model.destroy();
       }
-    },
-    exec: function(e) {
-      var $target = $(e.currentTarget);
-      var id = $target.attr('data-id');
-      this.model.exec(id, function(err) {
-        if (err) {
-          alert(err.message);
-        }
-      });
     },
     success: function(model, resp, options) {
       if (resp.code === 200) {

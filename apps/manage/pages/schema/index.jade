@@ -5,7 +5,7 @@ block append title
 block append meta
 
 block append stylesheet
-  link(href='/plugins/datatables/dataTables.bootstrap.css', rel='stylesheet', type='text/css')
+  link(href='/plugins/dynatable/jquery.dynatable.css', rel='stylesheet', type='text/css')
 
 block append headjs
 
@@ -31,8 +31,7 @@ block append content
 
 block append pluginjs
   // DATA TABES SCRIPT
-  script(src='/plugins/datatables/jquery.dataTables.js')
-  script(src='/plugins/datatables/dataTables.bootstrap.js')
+  script(src='/plugins/dynatable/jquery.dynatable.js')
 
 block append footjs
   script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/schema.min.c2132227a4cd3093.js")

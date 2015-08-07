@@ -12,32 +12,32 @@
 
 (function($) {
   var defaults,
-      mergeSettings,
-      dt,
-      Model,
-      modelPrototypes = {
-        dom: Dom,
-        domColumns: DomColumns,
-        records: Records,
-        recordsCount: RecordsCount,
-        processingIndicator: ProcessingIndicator,
-        state: State,
-        sorts: Sorts,
-        sortsHeaders: SortsHeaders,
-        queries: Queries,
-        inputsSearch: InputsSearch,
-        paginationPage: PaginationPage,
-        paginationPerPage: PaginationPerPage,
-        paginationLinks: PaginationLinks
-      },
-      utility,
-      build,
-      processAll,
-      initModel,
-      defaultRowWriter,
-      defaultCellWriter,
-      defaultAttributeWriter,
-      defaultAttributeReader;
+    mergeSettings,
+    dt,
+    Model,
+    modelPrototypes = {
+      dom: Dom,
+      domColumns: DomColumns,
+      records: Records,
+      recordsCount: RecordsCount,
+      processingIndicator: ProcessingIndicator,
+      state: State,
+      sorts: Sorts,
+      sortsHeaders: SortsHeaders,
+      queries: Queries,
+      inputsSearch: InputsSearch,
+      paginationPage: PaginationPage,
+      paginationPerPage: PaginationPerPage,
+      paginationLinks: PaginationLinks
+    },
+    utility,
+    build,
+    processAll,
+    initModel,
+    defaultRowWriter,
+    defaultCellWriter,
+    defaultAttributeWriter,
+    defaultAttributeReader;
 
   //-----------------------------------------------------------------
   // Cached plugin global defaults
@@ -77,7 +77,7 @@
       paginationDisabledClass: 'dynatable-disabled-page',
       paginationPrev: 'Previous',
       paginationNext: 'Next',
-      paginationGap: [1,2,2,1],
+      paginationGap: [1, 2, 2, 1],
       searchTarget: null,
       searchPlacement: 'before',
       perPageTarget: null,
@@ -98,7 +98,7 @@
       queryRecordCount: null,
       page: null,
       perPageDefault: 10,
-      perPageOptions: [10,20,50,100],
+      perPageOptions: [10, 20, 50, 100],
       sorts: {},
       sortsKeys: null,
       sortTypes: {},
@@ -200,19 +200,25 @@
 
     this.$element.trigger('dynatable:beforeProcess', data);
 
-    if (!$.isEmptyObject(this.settings.dataset.queries)) { data[this.settings.params.queries] = this.settings.dataset.queries; }
+    if (!$.isEmptyObject(this.settings.dataset.queries)) {
+      data[this.settings.params.queries] = this.settings.dataset.queries;
+    }
     // TODO: Wrap this in a try/rescue block to hide the processing indicator and indicate something went wrong if error
     this.processingIndicator.show();
 
-    if (this.settings.features.sort && !$.isEmptyObject(this.settings.dataset.sorts)) { data[this.settings.params.sorts] = this.settings.dataset.sorts; }
+    if (this.settings.features.sort && !$.isEmptyObject(this.settings.dataset.sorts)) {
+      data[this.settings.params.sorts] = this.settings.dataset.sorts;
+    }
     if (this.settings.features.paginate && this.settings.dataset.page) {
       var page = this.settings.dataset.page,
-          perPage = this.settings.dataset.perPage;
+        perPage = this.settings.dataset.perPage;
       data[this.settings.params.page] = page;
       data[this.settings.params.perPage] = perPage;
       data[this.settings.params.offset] = (page - 1) * perPage;
     }
-    if (this.settings.dataset.ajaxData) { $.extend(data, this.settings.dataset.ajaxData); }
+    if (this.settings.dataset.ajaxData) {
+      $.extend(data, this.settings.dataset.ajaxData);
+    }
 
     // If ajax, sends query to ajaxUrl with queries and sorts serialized and appended in ajax data
     // otherwise, executes queries and sorts on in-page data
@@ -222,8 +228,7 @@
         type: _this.settings.dataset.ajaxMethod,
         dataType: _this.settings.dataset.ajaxDataType,
         data: data,
-        error: function(xhr, error) {
-        },
+        error: function(xhr, error) {},
         success: function(response) {
           _this.$element.trigger('dynatable:ajax:success', response);
           // Merge ajax results and meta-data into dynatables cached data
@@ -243,14 +248,16 @@
       if (this.settings.dataset.ajaxUrl) {
         options.url = this.settings.dataset.ajaxUrl;
 
-      // If ajaxUrl is blank, then we're using the current page URL,
-      // we need to strip out any query, sort, or page data controlled by dynatable
-      // that may have been in URL when page loaded, so that it doesn't conflict with
-      // what's passed in with the data ajax parameter
+        // If ajaxUrl is blank, then we're using the current page URL,
+        // we need to strip out any query, sort, or page data controlled by dynatable
+        // that may have been in URL when page loaded, so that it doesn't conflict with
+        // what's passed in with the data ajax parameter
       } else {
         options.url = utility.refreshQueryString(window.location.href, {}, this.settings);
       }
-      if (this.settings.dataset.ajaxCache !== null) { options.cache = this.settings.dataset.ajaxCache; }
+      if (this.settings.dataset.ajaxCache !== null) {
+        options.cache = this.settings.dataset.ajaxCache;
+      }
 
       $.ajax(options);
     } else {
@@ -285,7 +292,7 @@
 
   function defaultCellWriter(column, record) {
     var html = column.attributeWriter(record),
-        td = '<td';
+      td = '<td';
 
     if (column.hidden || column.textAlign) {
       td += ' style="';
@@ -347,16 +354,16 @@
     // from query (whether ajax or not)
     this.update = function() {
       var rows = '',
-          columns = settings.table.columns,
-          rowWriter = settings.writers._rowWriter,
-          cellWriter = settings.writers._cellWriter;
+        columns = settings.table.columns,
+        rowWriter = settings.writers._rowWriter,
+        cellWriter = settings.writers._cellWriter;
 
       obj.$element.trigger('dynatable:beforeUpdate', rows);
 
       // loop through records
       for (var i = 0, len = settings.dataset.records.length; i < len; i++) {
         var record = settings.dataset.records[i],
-            tr = rowWriter(i, record, columns, cellWriter);
+          tr = rowWriter(i, record, columns, cellWriter);
         rows += tr;
       }
 
@@ -376,11 +383,13 @@
         obj.sortsHeaders.removeAllArrows();
         for (var i = 0, len = columns.length; i < len; i++) {
           var column = columns[i],
-              sortedByColumn = utility.allMatch(settings.dataset.sorts, column.sorts, function(sorts, sort) { return sort in sorts; }),
-              value = settings.dataset.sorts[column.sorts[0]];
+            sortedByColumn = utility.allMatch(settings.dataset.sorts, column.sorts, function(sorts, sort) {
+              return sort in sorts;
+            }),
+            value = settings.dataset.sorts[column.sorts[0]];
 
           if (sortedByColumn) {
-            obj.$element.find('[data-dynatable-column="' + column.id + '"]').find('.dynatable-sort-header').each(function(){
+            obj.$element.find('[data-dynatable-column="' + column.id + '"]').find('.dynatable-sort-header').each(function() {
               if (value == 1) {
                 obj.sortsHeaders.appendArrowUp($(this));
               } else {
@@ -400,7 +409,7 @@
 
         allQueries.each(function() {
           var $this = $(this),
-              q = settings.dataset.queries[$this.data('dynatable-query')];
+            q = settings.dataset.queries[$this.data('dynatable-query')];
           $this.val(q || '');
         });
       }
@@ -428,23 +437,26 @@
     this.getFromTable = function() {
       var $columns = obj.$element.find(settings.table.headRowSelector).children('th,td');
       if ($columns.length) {
-        $columns.each(function(index){
+        $columns.each(function(index) {
           _this.add($(this), index, true);
         });
       } else {
-        return $.error("Couldn't find any columns headers in '" + settings.table.headRowSelector + " th,td'. If your header row is different, specify the selector in the table: headRowSelector option.");
+        return $.error("Couldn't find any columns headers in '" + settings.table.headRowSelector +
+          " th,td'. If your header row is different, specify the selector in the table: headRowSelector option.");
       }
     };
 
     this.add = function($column, position, skipAppend, skipUpdate) {
       var columns = settings.table.columns,
-          label = $column.text(),
-          id = $column.data('dynatable-column') || utility.normalizeText(label, settings.table.defaultColumnIdStyle),
-          dataSorts = $column.data('dynatable-sorts'),
-          sorts = dataSorts ? $.map(dataSorts.split(','), function(text) { return $.trim(text); }) : [id];
+        label = $column.text(),
+        id = $column.data('dynatable-column') || utility.normalizeText(label, settings.table.defaultColumnIdStyle),
+        dataSorts = $column.data('dynatable-sorts'),
+        sorts = dataSorts ? $.map(dataSorts.split(','), function(text) {
+          return $.trim(text);
+        }) : [id];
 
       // If the column id is blank, generate an id for it
-      if ( !id ) {
+      if (!id) {
         this.generate($column);
         id = $column.data('dynatable-column');
       }
@@ -464,18 +476,20 @@
       $column
         .attr('data-dynatable-column', id)
         .addClass('dynatable-head');
-      if (settings.table.headRowClass) { $column.addClass(settings.table.headRowClass); }
+      if (settings.table.headRowClass) {
+        $column.addClass(settings.table.headRowClass);
+      }
 
       // Append column header to table
       if (!skipAppend) {
         var domPosition = position + 1,
-            $sibling = obj.$element.find(settings.table.headRowSelector)
-              .children('th:nth-child(' + domPosition + '),td:nth-child(' + domPosition + ')').first(),
-            columnsAfter = columns.slice(position + 1, columns.length);
+          $sibling = obj.$element.find(settings.table.headRowSelector)
+          .children('th:nth-child(' + domPosition + '),td:nth-child(' + domPosition + ')').first(),
+          columnsAfter = columns.slice(position + 1, columns.length);
 
         if ($sibling.length) {
           $sibling.before($column);
-        // sibling column doesn't yet exist (maybe this is the last column in the header row)
+          // sibling column doesn't yet exist (maybe this is the last column in the header row)
         } else {
           obj.$element.find(settings.table.headRowSelector).append($column);
         }
@@ -499,7 +513,7 @@
 
     this.remove = function(columnIndexOrId) {
       var columns = settings.table.columns,
-          length = columns.length;
+        length = columns.length;
 
       if (typeof(columnIndexOrId) === "number") {
         var column = columns[columnIndexOrId];
@@ -528,7 +542,7 @@
 
     this.removeFromArray = function(index) {
       var columns = settings.table.columns,
-          adjustColumns;
+        adjustColumns;
       columns.splice(index, 1);
       adjustColumns = columns.slice(index, columns.length);
       for (var i = 0, len = adjustColumns.length; i < len; i++) {
@@ -567,7 +581,7 @@
           settings.dataset.queryRecordCount = this.count();
         }
 
-        if (!settings.dataset.totalRecordCount){
+        if (!settings.dataset.totalRecordCount) {
           settings.dataset.totalRecordCount = settings.dataset.queryRecordCount;
         }
       }
@@ -604,9 +618,9 @@
     // see http://james.padolsey.com/javascript/sorting-elements-with-jquery/
     this.sort = function() {
       var sort = [].sort,
-          sorts = settings.dataset.sorts,
-          sortsKeys = settings.dataset.sortsKeys,
-          sortTypes = settings.dataset.sortTypes;
+        sorts = settings.dataset.sorts,
+        sortsKeys = settings.dataset.sortsKeys,
+        sortTypes = settings.dataset.sortTypes;
 
       var sortFunction = function(a, b) {
         var comparison;
@@ -615,12 +629,14 @@
         } else {
           for (var i = 0, len = sortsKeys.length; i < len; i++) {
             var attr = sortsKeys[i],
-                direction = sorts[attr],
-                sortType = sortTypes[attr] || obj.sorts.guessType(a, b, attr);
+              direction = sorts[attr],
+              sortType = sortTypes[attr] || obj.sorts.guessType(a, b, attr);
             comparison = obj.sorts.functions[sortType](a, b, attr, direction);
             // Don't need to sort any further unless this sort is a tie between a and b,
             // so break the for loop unless tied
-            if (comparison !== 0) { break; }
+            if (comparison !== 0) {
+              break;
+            }
           }
         }
         return comparison;
@@ -631,7 +647,8 @@
 
     this.paginate = function() {
       var bounds = this.pageBounds(),
-          first = bounds[0], last = bounds[1];
+        first = bounds[0],
+        last = bounds[1];
       settings.dataset.records = settings.dataset.records.slice(first, last);
     };
 
@@ -641,9 +658,9 @@
 
     this.pageBounds = function() {
       var page = settings.dataset.page || 1,
-          first = (page - 1) * settings.dataset.perPage,
-          last = Math.min(first + settings.dataset.perPage, settings.dataset.queryRecordCount);
-      return [first,last];
+        first = (page - 1) * settings.dataset.perPage,
+        last = Math.min(first + settings.dataset.perPage, settings.dataset.queryRecordCount);
+      return [first, last];
     };
 
     // get initial recordset to populate table
@@ -651,10 +668,10 @@
     // otherwise, initialize from in-table records
     this.getFromTable = function() {
       var records = [],
-          columns = settings.table.columns,
-          tableRecords = obj.$element.find(settings.table.bodyRowSelector);
+        columns = settings.table.columns,
+        tableRecords = obj.$element.find(settings.table.bodyRowSelector);
 
-      tableRecords.each(function(index){
+      tableRecords.each(function(index) {
         var record = {};
         record['dynatable-original-index'] = index;
         $(this).find('th,td').each(function(index) {
@@ -665,13 +682,13 @@
             obj.domColumns.add(obj.domColumns.generate(), columns.length, false, true); // don't skipAppend, do skipUpdate
           }
           var value = columns[index].attributeReader(this, record),
-              attr = columns[index].id;
+            attr = columns[index].id;
 
           // If value from table is HTML, let's get and cache the text equivalent for
           // the default string sorting, since it rarely makes sense for sort headers
           // to sort based on HTML tags.
           if (typeof(value) === "string" && value.match(/\s*\<.+\>/)) {
-            if (! record['dynatable-sortable-text']) {
+            if (!record['dynatable-sortable-text']) {
               record['dynatable-sortable-text'] = {};
             }
             record['dynatable-sortable-text'][attr] = $.trim($('<div></div>').html(value).text());
@@ -706,10 +723,10 @@
 
     this.create = function() {
       var recordsShown = obj.records.count(),
-          recordsQueryCount = settings.dataset.queryRecordCount,
-          recordsTotal = settings.dataset.totalRecordCount,
-          text = settings.inputs.recordCountText,
-          collection_name = settings.params.records;
+        recordsQueryCount = settings.dataset.queryRecordCount,
+        recordsTotal = settings.dataset.totalRecordCount,
+        text = settings.inputs.recordCountText,
+        collection_name = settings.params.records;
 
       if (recordsShown < recordsQueryCount && settings.features.paginate) {
         var bounds = obj.records.pageBounds();
@@ -723,10 +740,10 @@
       }
 
       return $('<span></span>', {
-                id: 'dynatable-record-count-' + obj.element.id,
-                'class': 'dynatable-record-count',
-                html: text
-              });
+        id: 'dynatable-record-count-' + obj.element.id,
+        'class': 'dynatable-record-count',
+        html: text
+      });
     };
 
     this.attach = function() {
@@ -742,30 +759,37 @@
 
     this.create = function() {
       var $processing = $('<div></div>', {
-            html: '<span>' + settings.inputs.processingText + '</span>',
-            id: 'dynatable-processing-' + obj.element.id,
-            'class': 'dynatable-processing',
-            style: 'position: absolute; display: none;'
-          });
+        html: '<span>' + settings.inputs.processingText + '</span>',
+        id: 'dynatable-processing-' + obj.element.id,
+        'class': 'dynatable-processing',
+        style: 'position: absolute; display: none;'
+      });
 
       return $processing;
     };
 
     this.position = function() {
       var $processing = $('#dynatable-processing-' + obj.element.id),
-          $span = $processing.children('span'),
-          spanHeight = $span.outerHeight(),
-          spanWidth = $span.outerWidth(),
-          $covered = obj.$element,
-          offset = $covered.offset(),
-          height = $covered.outerHeight(), width = $covered.outerWidth();
+        $span = $processing.children('span'),
+        spanHeight = $span.outerHeight(),
+        spanWidth = $span.outerWidth(),
+        $covered = obj.$element,
+        offset = $covered.offset(),
+        height = $covered.outerHeight(),
+        width = $covered.outerWidth();
 
       $processing
-        .offset({left: offset.left, top: offset.top})
+        .offset({
+          left: offset.left,
+          top: offset.top
+        })
         .width(width)
         .height(height)
       $span
-        .offset({left: offset.left + ( (width - spanWidth) / 2 ), top: offset.top + ( (height - spanHeight) / 2 )});
+        .offset({
+          left: offset.left + ((width - spanWidth) / 2),
+          top: offset.top + ((height - spanHeight) / 2)
+        });
 
       return $processing;
     };
@@ -800,29 +824,39 @@
 
     this.push = function(data) {
       var urlString = window.location.search,
-          urlOptions,
-          path,
-          params,
-          hash,
-          newParams,
-          cacheStr,
-          cache,
-          // replaceState on initial load, then pushState after that
-          firstPush = !(window.history.state && window.history.state.dynatable),
-          pushFunction = firstPush ? 'replaceState' : 'pushState';
+        urlOptions,
+        path,
+        params,
+        hash,
+        newParams,
+        cacheStr,
+        cache,
+        // replaceState on initial load, then pushState after that
+        firstPush = !(window.history.state && window.history.state.dynatable),
+        pushFunction = firstPush ? 'replaceState' : 'pushState';
 
-      if (urlString && /^\?/.test(urlString)) { urlString = urlString.substring(1); }
+      if (urlString && /^\?/.test(urlString)) {
+        urlString = urlString.substring(1);
+      }
       $.extend(urlOptions, data);
 
       params = utility.refreshQueryString(urlString, data, settings);
-      if (params) { params = '?' + params; }
+      if (params) {
+        params = '?' + params;
+      }
       hash = window.location.hash;
       path = window.location.pathname;
 
       obj.$element.trigger('dynatable:push', data);
 
-      cache = { dynatable: { dataset: settings.dataset } };
-      if (!firstPush) { cache.dynatable.scrollTop = $(window).scrollTop(); }
+      cache = {
+        dynatable: {
+          dataset: settings.dataset
+        }
+      };
+      if (!firstPush) {
+        cache.dynatable.scrollTop = $(window).scrollTop();
+      }
       cacheStr = JSON.stringify(cache);
 
       // Mozilla has a 640k char limit on what can be stored in pushState.
@@ -841,7 +875,7 @@
 
       try {
         window.history[pushFunction](cache, "Dynatable state", path + params + hash);
-      } catch(error) {
+      } catch (error) {
         // Make cached records = null, so that `pop` will rerun process to retrieve records
         cache.dynatable.dataset.records = null;
         window.history[pushFunction](cache, "Dynatable state", path + params + hash);
@@ -852,10 +886,12 @@
       var data = event.state.dynatable;
       settings.dataset = data.dataset;
 
-      if (data.scrollTop) { $(window).scrollTop(data.scrollTop); }
+      if (data.scrollTop) {
+        $(window).scrollTop(data.scrollTop);
+      }
 
       // If dataset.records is cached from pushState
-      if ( data.dataset.records ) {
+      if (data.dataset.records) {
         obj.dom.update();
       } else {
         obj.process(true);
@@ -876,17 +912,21 @@
 
     this.add = function(attr, direction) {
       var sortsKeys = settings.dataset.sortsKeys,
-          index = $.inArray(attr, sortsKeys);
+        index = $.inArray(attr, sortsKeys);
       settings.dataset.sorts[attr] = direction;
-      if (index === -1) { sortsKeys.push(attr); }
+      if (index === -1) {
+        sortsKeys.push(attr);
+      }
       return dt;
     };
 
     this.remove = function(attr) {
       var sortsKeys = settings.dataset.sortsKeys,
-          index = $.inArray(attr, sortsKeys);
+        index = $.inArray(attr, sortsKeys);
       delete settings.dataset.sorts[attr];
-      if (index !== -1) { sortsKeys.splice(index, 1); }
+      if (index !== -1) {
+        sortsKeys.splice(index, 1);
+      }
       return dt;
     };
 
@@ -900,13 +940,13 @@
     // Consider using something more robust than `typeof` (http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/)
     this.guessType = function(a, b, attr) {
       var types = {
-            string: 'string',
-            number: 'number',
-            'boolean': 'number',
-            object: 'number' // dates and null values are also objects, this works...
-          },
-          attrType = a[attr] ? typeof(a[attr]) : typeof(b[attr]),
-          type = types[attrType] || 'number';
+          string: 'string',
+          number: 'number',
+          'boolean': 'number',
+          object: 'number' // dates and null values are also objects, this works...
+        },
+        attrType = a[attr] ? typeof(a[attr]) : typeof(b[attr]),
+        type = types[attrType] || 'number';
       return type;
     };
 
@@ -918,8 +958,8 @@
       },
       string: function(a, b, attr, direction) {
         var aAttr = (a['dynatable-sortable-text'] && a['dynatable-sortable-text'][attr]) ? a['dynatable-sortable-text'][attr] : a[attr],
-            bAttr = (b['dynatable-sortable-text'] && b['dynatable-sortable-text'][attr]) ? b['dynatable-sortable-text'][attr] : b[attr],
-            comparison;
+          bAttr = (b['dynatable-sortable-text'] && b['dynatable-sortable-text'][attr]) ? b['dynatable-sortable-text'][attr] : b[attr],
+          comparison;
         aAttr = aAttr.toLowerCase();
         bAttr = bAttr.toLowerCase();
         comparison = aAttr === bAttr ? 0 : (direction > 0 ? aAttr > bAttr : bAttr > aAttr);
@@ -946,13 +986,15 @@
 
     this.create = function(cell) {
       var $cell = $(cell),
-          $link = $('<a></a>', {
-            'class': 'dynatable-sort-header',
-            href: '#',
-            html: $cell.html()
-          }),
-          id = $cell.data('dynatable-column'),
-          column = utility.findObjectInArray(settings.table.columns, {id: id});
+        $link = $('<a></a>', {
+          'class': 'dynatable-sort-header',
+          href: '#',
+          html: $cell.html()
+        }),
+        id = $cell.data('dynatable-column'),
+        column = utility.findObjectInArray(settings.table.columns, {
+          id: id
+        });
 
       $link.bind('click', function(e) {
         _this.toggleSort(e, $link, column);
@@ -973,7 +1015,7 @@
     };
 
     this.removeAll = function() {
-      obj.$element.find(settings.table.headRowSelector).children('th,td').each(function(){
+      obj.$element.find(settings.table.headRowSelector).children('th,td').each(function() {
         _this.removeAllArrows();
         _this.removeOne(this);
       });
@@ -981,7 +1023,7 @@
 
     this.removeOne = function(cell) {
       var $cell = $(cell),
-          $link = $cell.find('.dynatable-sort-header');
+        $link = $cell.find('.dynatable-sort-header');
       if ($link.length) {
         var html = $link.html();
         $link.remove();
@@ -990,7 +1032,7 @@
     };
 
     this.attach = function() {
-      obj.$element.find(settings.table.headRowSelector).children('th,td').each(function(){
+      obj.$element.find(settings.table.headRowSelector).children('th,td').each(function() {
         _this.attachOne(this);
       });
     };
@@ -1023,9 +1065,11 @@
 
     this.toggleSort = function(e, $link, column) {
       var sortedByColumn = this.sortedByColumn($link, column),
-          value = this.sortedByColumnValue(column);
+        value = this.sortedByColumnValue(column);
       // Clear existing sorts unless this is a multisort event
-      if (!settings.inputs.multisort || !utility.anyMatch(e, settings.inputs.multisort, function(evt, key) { return e[key]; })) {
+      if (!settings.inputs.multisort || !utility.anyMatch(e, settings.inputs.multisort, function(evt, key) {
+          return e[key];
+        })) {
         this.removeAllArrows();
         obj.sorts.clear();
       }
@@ -1038,14 +1082,14 @@
             obj.sorts.add(column.sorts[i], -1);
           }
           this.appendArrowDown($link);
-        // If descending, remove sort
+          // If descending, remove sort
         } else {
           for (var i = 0, len = column.sorts.length; i < len; i++) {
             obj.sorts.remove(column.sorts[i]);
           }
           this.removeArrow($link);
         }
-      // Otherwise, if not already set, set to ascending
+        // Otherwise, if not already set, set to ascending
       } else {
         for (var i = 0, len = column.sorts.length; i < len; i++) {
           obj.sorts.add(column.sorts[i], 1);
@@ -1055,7 +1099,9 @@
     };
 
     this.sortedByColumn = function($link, column) {
-      return utility.allMatch(settings.dataset.sorts, column.sorts, function(sorts, sort) { return sort in sorts; });
+      return utility.allMatch(settings.dataset.sorts, column.sorts, function(sorts, sort) {
+        return sort in sorts;
+      });
     };
 
     this.sortedByColumnValue = function(column) {
@@ -1074,7 +1120,9 @@
       var queriesUrl = window.location.search.match(new RegExp(settings.params.queries + '[^&=]*=[^&]*', 'g'));
 
       settings.dataset.queries = queriesUrl ? utility.deserialize(queriesUrl)[settings.params.queries] : {};
-      if (settings.dataset.queries === "") { settings.dataset.queries = {}; }
+      if (settings.dataset.queries === "") {
+        settings.dataset.queries = {};
+      }
 
       if (settings.inputs.queries) {
         this.setupInputs();
@@ -1101,7 +1149,9 @@
           var value = settings.dataset.queries[query];
           if (_this.functions[query] === undefined) {
             // Try to lazily evaluate query from column names if not explicitly defined
-            var queryColumn = utility.findObjectInArray(settings.table.columns, {id: query});
+            var queryColumn = utility.findObjectInArray(settings.table.columns, {
+              id: query
+            });
             if (queryColumn) {
               _this.functions[query] = function(record, queryValue) {
                 return record[query] == queryValue;
@@ -1136,20 +1186,24 @@
     this.setupInputs = function() {
       settings.inputs.queries.each(function() {
         var $this = $(this),
-            event = $this.data('dynatable-query-event') || settings.inputs.queryEvent,
-            query = $this.data('dynatable-query') || $this.attr('name') || this.id,
-            queryFunction = function(e) {
-              var q = $(this).val();
-              if (q === "") { q = undefined; }
-              if (q === settings.dataset.queries[query]) { return false; }
-              if (q) {
-                _this.add(query, q);
-              } else {
-                _this.remove(query);
-              }
-              obj.process();
-              e.preventDefault();
-            };
+          event = $this.data('dynatable-query-event') || settings.inputs.queryEvent,
+          query = $this.data('dynatable-query') || $this.attr('name') || this.id,
+          queryFunction = function(e) {
+            var q = $(this).val();
+            if (q === "") {
+              q = undefined;
+            }
+            if (q === settings.dataset.queries[query]) {
+              return false;
+            }
+            if (q) {
+              _this.add(query, q);
+            } else {
+              _this.remove(query);
+            }
+            obj.process();
+            e.preventDefault();
+          };
 
         $this
           .attr('data-dynatable-query', query)
@@ -1160,7 +1214,9 @@
             }
           });
 
-        if (settings.dataset.queries[query]) { $this.val(decodeURIComponent(settings.dataset.queries[query])); }
+        if (settings.dataset.queries[query]) {
+          $this.val(decodeURIComponent(settings.dataset.queries[query]));
+        }
       });
     };
 
@@ -1201,16 +1257,16 @@
 
     this.create = function() {
       var $search = $('<input />', {
-            type: 'search',
-            id: 'dynatable-query-search-' + obj.element.id,
-            'data-dynatable-query': 'search',
-            value: settings.dataset.queries.search
-          }),
-          $searchSpan = $('<span></span>', {
-            id: 'dynatable-search-' + obj.element.id,
-            'class': 'dynatable-search',
-            text: 'Search: '
-          }).append($search);
+          type: 'search',
+          id: 'dynatable-query-search-' + obj.element.id,
+          'data-dynatable-query': 'search',
+          value: settings.dataset.queries.search
+        }),
+        $searchSpan = $('<span></span>', {
+          id: 'dynatable-search-' + obj.element.id,
+          'class': 'dynatable-search',
+          text: 'Search: '
+        }).append($search);
 
       $search
         .bind(settings.inputs.queryEvent, function() {
@@ -1282,13 +1338,13 @@
 
     this.create = function() {
       var $select = $('<select>', {
-            id: 'dynatable-per-page-' + obj.element.id,
-            'class': 'dynatable-per-page-select'
-          });
+        id: 'dynatable-per-page-' + obj.element.id,
+        'class': 'dynatable-per-page-select'
+      });
 
       for (var i = 0, len = settings.dataset.perPageOptions.length; i < len; i++) {
         var number = settings.dataset.perPageOptions[i],
-            selected = settings.dataset.perPage == number ? 'selected="selected"' : '';
+          selected = settings.dataset.perPage == number ? 'selected="selected"' : '';
         $select.append('<option value="' + number + '" ' + selected + '>' + number + '</option>');
       }
 
@@ -1308,7 +1364,9 @@
     };
 
     this.set = function(number, skipResetPage) {
-      if (!skipResetPage) { obj.paginationPage.set(1); }
+      if (!skipResetPage) {
+        obj.paginationPage.set(1);
+      }
       settings.dataset.perPage = parseInt(number);
     };
   };
@@ -1327,28 +1385,27 @@
 
     this.create = function() {
       var pageLinks = '<ul id="' + 'dynatable-pagination-links-' + obj.element.id + '" class="' + settings.inputs.paginationClass + '">',
-          pageLinkClass = settings.inputs.paginationLinkClass,
-          activePageClass = settings.inputs.paginationActiveClass,
-          disabledPageClass = settings.inputs.paginationDisabledClass,
-          pages = Math.ceil(settings.dataset.queryRecordCount / settings.dataset.perPage),
-          page = settings.dataset.page,
-          breaks = [
-            settings.inputs.paginationGap[0],
-            settings.dataset.page - settings.inputs.paginationGap[1],
-            settings.dataset.page + settings.inputs.paginationGap[2],
-            (pages + 1) - settings.inputs.paginationGap[3]
-          ];
+        pageLinkClass = settings.inputs.paginationLinkClass,
+        activePageClass = settings.inputs.paginationActiveClass,
+        disabledPageClass = settings.inputs.paginationDisabledClass,
+        pages = Math.ceil(settings.dataset.queryRecordCount / settings.dataset.perPage),
+        page = settings.dataset.page,
+        breaks = [
+          settings.inputs.paginationGap[0],
+          settings.dataset.page - settings.inputs.paginationGap[1],
+          settings.dataset.page + settings.inputs.paginationGap[2], (pages + 1) - settings.inputs.paginationGap[3]
+        ];
 
       pageLinks += '<li><span>Pages: </span></li>';
 
       for (var i = 1; i <= pages; i++) {
-        if ( (i > breaks[0] && i < breaks[1]) || (i > breaks[2] && i < breaks[3])) {
+        if ((i > breaks[0] && i < breaks[1]) || (i > breaks[2] && i < breaks[3])) {
           // skip to next iteration in loop
           continue;
         } else {
           var li = obj.paginationLinks.buildLink(i, i, pageLinkClass, page == i, activePageClass),
-              breakIndex,
-              nextBreak;
+            breakIndex,
+            nextBreak;
 
           // If i is not between one of the following
           // (1 + (settings.paginationGap[0]))
@@ -1396,7 +1453,7 @@
 
     this.buildLink = function(page, label, linkClass, conditional, conditionalClass) {
       var link = '<a data-dynatable-page=' + page + ' class="' + linkClass,
-          li = '<li';
+        li = '<li';
 
       if (conditional) {
         link += ' ' + conditionalClass;
@@ -1429,9 +1486,15 @@
       camelCase: function(text) {
         text = this.trimDash(text);
         return text
-          .replace(/(\-[a-zA-Z])/g, function($1){return $1.toUpperCase().replace('-','');})
-          .replace(/([A-Z])([A-Z]+)/g, function($1,$2,$3){return $2 + $3.toLowerCase();})
-          .replace(/^[A-Z]/, function($1){return $1.toLowerCase();});
+          .replace(/(\-[a-zA-Z])/g, function($1) {
+            return $1.toUpperCase().replace('-', '');
+          })
+          .replace(/([A-Z])([A-Z]+)/g, function($1, $2, $3) {
+            return $2 + $3.toLowerCase();
+          })
+          .replace(/^[A-Z]/, function($1) {
+            return $1.toLowerCase();
+          });
       },
       dashed: function(text) {
         text = this.trimDash(text);
@@ -1442,7 +1505,9 @@
         return this.lowercase(text.replace(/(-)/g, '_'));
       },
       lowercase: function(text) {
-        return text.replace(/([A-Z])/g, function($1){return $1.toLowerCase();});
+        return text.replace(/([A-Z])/g, function($1) {
+          return $1.toLowerCase();
+        });
       }
     },
     // Deserialize params in URL to object
@@ -1450,17 +1515,21 @@
     deserialize: function(query) {
       if (!query) return {};
       // modified to accept an array of partial URL strings
-      if (typeof(query) === "object") { query = query.join('&'); }
+      if (typeof(query) === "object") {
+        query = query.join('&');
+      }
 
       var hash = {},
-          vars = query.split("&");
+        vars = query.split("&");
 
       for (var i = 0; i < vars.length; i++) {
         var pair = vars[i].split("="),
-            k = decodeURIComponent(pair[0]),
-            v, m;
+          k = decodeURIComponent(pair[0]),
+          v, m;
 
-        if (!pair[1]) { continue };
+        if (!pair[1]) {
+          continue
+        };
         v = decodeURIComponent(pair[1].replace(/\+/g, ' '));
 
         // modified to parse multi-level parameters (e.g. "hi[there][dude]=whatsup" => hi: {there: {dude: "whatsup"}})
@@ -1471,8 +1540,8 @@
 
           // If nested param ends in '][', then the regex above erroneously included half of a trailing '[]',
           // which indicates the end-value is part of an array
-          if (m[2].substr(m[2].length-2) == '][') { // must use substr for IE to understand it
-            v[m[2].substr(0,m[2].length-2)] = [origV];
+          if (m[2].substr(m[2].length - 2) == '][') { // must use substr for IE to understand it
+            v[m[2].substr(0, m[2].length - 2)] = [origV];
           } else {
             v[m[2]] = origV;
           }
@@ -1480,18 +1549,18 @@
 
         // If it is the first entry with this name
         if (typeof hash[k] === "undefined") {
-          if (k.substr(k.length-2) != '[]') { // not end with []. cannot use negative index as IE doesn't understand it
+          if (k.substr(k.length - 2) != '[]') { // not end with []. cannot use negative index as IE doesn't understand it
             hash[k] = v;
           } else {
             hash[k] = [v];
           }
-        // If subsequent entry with this name and not array
+          // If subsequent entry with this name and not array
         } else if (typeof hash[k] === "string") {
-          hash[k] = v;  // replace it
-        // modified to add support for objects
+          hash[k] = v; // replace it
+          // modified to add support for objects
         } else if (typeof hash[k] === "object") {
           hash[k] = $.extend({}, hash[k], v);
-        // If subsequent entry with this name and is array
+          // If subsequent entry with this name and is array
         } else {
           hash[k].push(v);
         }
@@ -1500,9 +1569,9 @@
     },
     refreshQueryString: function(urlString, data, settings) {
       var _this = this,
-          queryString = urlString.split('?'),
-          path = queryString.shift(),
-          urlOptions;
+        queryString = urlString.split('?'),
+        path = queryString.shift(),
+        urlOptions;
 
       urlOptions = this.deserialize(urlString);
 
@@ -1514,7 +1583,9 @@
           // because if the feature is turned off, then parameter name is a coincidence and it's unrelated to dynatable.
           if (
             (!settings.features.sort && attr == "sorts") ||
-              (!settings.features.paginate && _this.anyMatch(attr, ["page", "perPage", "offset"], function(attr, param) { return attr == param; }))
+            (!settings.features.paginate && _this.anyMatch(attr, ["page", "perPage", "offset"], function(attr, param) {
+              return attr == param;
+            }))
           ) {
             continue;
           }
@@ -1539,14 +1610,20 @@
           // handling the entire queries object below, since we need to make sure that this is a query controlled by dynatable.
           if (attr == "queries" && data[label]) {
             var queries = settings.inputs.queries || [],
-                inputQueries = $.makeArray(queries.map(function() { return $(this).attr('name') }));
+              inputQueries = $.makeArray(queries.map(function() {
+                return $(this).attr('name')
+              }));
 
-            if (settings.features.search) { inputQueries.push('search'); }
+            if (settings.features.search) {
+              inputQueries.push('search');
+            }
 
             for (var i = 0, len = inputQueries.length; i < len; i++) {
               var attr = inputQueries[i];
               if (data[label][attr]) {
-                if (typeof urlOptions[label] === 'undefined') { urlOptions[label] = {}; }
+                if (typeof urlOptions[label] === 'undefined') {
+                  urlOptions[label] = {};
+                }
                 urlOptions[label][attr] = data[label][attr];
               } else {
                 delete urlOptions[label][attr];
@@ -1567,9 +1644,9 @@
     },
     // Get array of keys from object
     // see http://stackoverflow.com/questions/208016/how-to-list-the-properties-of-a-javascript-object/208020#208020
-    keysFromObject: function(obj){
+    keysFromObject: function(obj) {
       var keys = [];
-      for (var key in obj){
+      for (var key in obj) {
         keys.push(key);
       }
       return keys;
@@ -1578,11 +1655,13 @@
     // E.g. find object with {id: 'hi', name: 'there'} in an array of objects
     findObjectInArray: function(array, objectAttr) {
       var _this = this,
-          foundObject;
+        foundObject;
       for (var i = 0, len = array.length; i < len; i++) {
         var item = array[i];
         // For each object in array, test to make sure all attributes in objectAttr match
-        if (_this.allMatch(item, objectAttr, function(item, key, value) { return item[key] == value; })) {
+        if (_this.allMatch(item, objectAttr, function(item, key, value) {
+            return item[key] == value;
+          })) {
           foundObject = item;
           break;
         }
@@ -1593,7 +1672,7 @@
     allMatch: function(item, arrayOrObject, test) {
       // start off with true result by default
       var match = true,
-          isArray = $.isArray(arrayOrObject);
+        isArray = $.isArray(arrayOrObject);
       // Loop through all items in array
       $.each(arrayOrObject, function(key, value) {
         var result = isArray ? test(item, value) : test(item, key, value);
@@ -1602,14 +1681,16 @@
         // otherwise, continue with next iteration in loop
         // (if we make it through all iterations without overriding match with false,
         // then we can return the true result we started with by default)
-        if (!result) { return match = false; }
+        if (!result) {
+          return match = false;
+        }
       });
       return match;
     },
     // Return true if supplied test function passes for ANY items in an array
     anyMatch: function(item, arrayOrObject, test) {
       var match = false,
-          isArray = $.isArray(arrayOrObject);
+        isArray = $.isArray(arrayOrObject);
 
       $.each(arrayOrObject, function(key, value) {
         var result = isArray ? test(item, value) : test(item, key, value);
@@ -1640,7 +1721,7 @@
     },
     // Taken from http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/105074#105074
     randomHash: function() {
-      return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     }
   };
 
@@ -1649,8 +1730,8 @@
   //-----------------------------------------------------------------
 
   // Object.create support test, and fallback for browsers without it
-  if ( typeof Object.create !== "function" ) {
-    Object.create = function (o) {
+  if (typeof Object.create !== "function") {
+    Object.create = function(o) {
       function F() {}
       F.prototype = o;
       return new F();
@@ -1666,11 +1747,11 @@
   };
 
   // Create dynatable plugin based on a defined object
-  $.dynatable = function( object ) {
-    $.fn['dynatable'] = function( options ) {
+  $.dynatable = function(object) {
+    $.fn['dynatable'] = function(options) {
       return this.each(function() {
-        if ( ! $.data( this, 'dynatable' ) ) {
-          $.data( this, 'dynatable', Object.create(object).init(this, options) );
+        if (!$.data(this, 'dynatable')) {
+          $.data(this, 'dynatable', Object.create(object).init(this, options));
         }
       });
     };
