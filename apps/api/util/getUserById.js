@@ -4,14 +4,18 @@ var extend = require('node.extend');
 var getUserById = function(app) {
   return function*(uid, options) {
     options = options || {};
+    var query;
     if (Array.isArray(uid)) {
-      uid = {
-        $in: uid
+      query = {
+        uid: {
+          $in: uid
+        }
       }
+    } else {
+      query = {
+        uid: uid
+      };
     }
-    var query = {
-      uid: uid
-    };
     if (options.filter) {
       extend(true, query, options.filter);
     }
