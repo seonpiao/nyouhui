@@ -16,7 +16,7 @@ block append content
       //- - var data = result.data[result.db][result.collection];
       - var schema = result._data[result.config.schema.db][result.config.schema.collection];
       - var params = {};
-      - try{params = JSON.parse(schema.params)}catch(e){console.log(e.stack)}
+      - try{params = JSON.parse(schema.params)}catch(e){}
       - var options = {fields:schema.fields}
       - for(var key in params){options[key] = params[key]}
       +manage_table(null,options)
@@ -30,4 +30,4 @@ block append pluginjs
   script(src='/plugins/dynatable/jquery.dynatable.js')
 
 block append footjs
-  script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.4c371819ba7ba089.js")
+  script(type="text/javascript",src="//" + __global.base.static + "/dist/js/manage/crud.min.1daae5c58d7e59df.js")
