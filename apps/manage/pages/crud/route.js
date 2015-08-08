@@ -162,7 +162,9 @@ module.exports = function(app) {
         key = RegExp.$1;
         if (key === 'search') {
           var columns = query.columns.split(',');
-          filter = columns.map(function(col, index) {
+          filter = columns.filter(function(col) {
+            return !filter[col];
+          }).map(function(col, index) {
             var obj = {};
             obj[col] = {
               $regex: sanitize(value)
