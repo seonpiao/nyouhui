@@ -175,6 +175,7 @@ module.exports = function(app) {
             obj['__' + col + '_pinyin'] = {
               $regex: sanitize(value)
             }
+            _filter.push(obj);
             obj = {};
             obj['__' + col + '_suoxie'] = {
               $regex: sanitize(value)
