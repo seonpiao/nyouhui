@@ -162,7 +162,7 @@ module.exports = function(app) {
         key = RegExp.$1;
         if (key === 'search') {
           var columns = query.columns.split(',');
-          filter = columns.filter(function(col) {
+          var _filter = columns.filter(function(col) {
             return !filter[col];
           }).map(function(col, index) {
             var obj = {};
@@ -171,9 +171,7 @@ module.exports = function(app) {
             };
             return obj;
           });
-          filter = {
-            $or: filter
-          }
+          filter['$or'] = _filter;
         } else {
           filter[key] = value;
         }
