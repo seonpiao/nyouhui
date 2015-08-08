@@ -9,13 +9,8 @@ module.exports = {
     var pinyinKeys = data.pinyinKeys;
     pinyinKeys.forEach(function(key) {
       if (_data[key]) {
-        var keys = _data['__' + key + '_pinyin'] = [];
         var fullPinyin = pinyin(_data[key], {
           style: pinyin.STYLE_NORMAL,
-          heteronym: true
-        });
-        var firstLetter = pinyin(_data[key], {
-          style: pinyin.STYLE_FIRST_LETTER,
           heteronym: true
         });
         var allFullPinyin = [''];
@@ -28,6 +23,11 @@ module.exports = {
           });
           allFullPinyin = tmp;
         });
+        _data['__' + key + '_pinyin'] = allFullPinyin.join('');
+        var firstLetter = pinyin(_data[key], {
+          style: pinyin.STYLE_FIRST_LETTER,
+          heteronym: true
+        });
         var allFirstLetter = [''];
         firstLetter.forEach(function(single) {
           var tmp = [];
@@ -38,19 +38,7 @@ module.exports = {
           });
           allFirstLetter = tmp;
         });
-        allFullPinyin.forEach(function(fullPinyin) {
-          for (var i = 1; i <= fullPinyin.length; i++) {
-            keys.push(fullPinyin.substring(0, i));
-          }
-        });
-        allFirstLetter.forEach(function(firstLetter) {
-          for (var i = 1; i <= firstLetter.length; i++) {
-            keys.push(firstLetter.substring(0, i));
-          }
-        });
-        for (var i = 1; i <= _data[key].length; i++) {
-          keys.push(_data[key].substring(0, i));
-        }
+        _data['__' + key + '_suoxie'] = allFirstLetter.join('');
       }
     });
     done(null, {

@@ -162,14 +162,24 @@ module.exports = function(app) {
         key = RegExp.$1;
         if (key === 'search') {
           var columns = query.columns.split(',');
-          var _filter = columns.filter(function(col) {
+          var _filter = [];
+          columns.filter(function(col) {
             return !filter[col];
-          }).map(function(col, index) {
+          }).forEach(function(col, index) {
             var obj = {};
             obj[col] = {
               $regex: sanitize(value)
             };
-            return obj;
+            _filter.push(obj);
+            obj = {};
+            obj['__' + col + '_pinyin'] = {
+              $regex: sanitize(value)
+            }
+            obj = {};
+            obj['__' + col + '_suoxie'] = {
+              $regex: sanitize(value)
+            }
+            _filter.push(obj);
           });
           filter['$or'] = _filter;
         } else {
