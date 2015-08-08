@@ -173,12 +173,12 @@ module.exports = function(app) {
             _filter.push(obj);
             obj = {};
             obj['__' + col + '_pinyin'] = {
-              $regex: sanitize(value)
+              $regex: sanitize(value.toLowerCase())
             }
             _filter.push(obj);
             obj = {};
             obj['__' + col + '_suoxie'] = {
-              $regex: sanitize(value)
+              $regex: sanitize(value.toLowerCase())
             }
             _filter.push(obj);
           });

@@ -23,7 +23,7 @@ module.exports = {
           });
           allFullPinyin = tmp;
         });
-        _data['__' + key + '_pinyin'] = allFullPinyin.join('');
+        _data['__' + key + '_pinyin'] = allFullPinyin.join('').toLowerCase();
         var firstLetter = pinyin(_data[key], {
           style: pinyin.STYLE_FIRST_LETTER,
           heteronym: true
@@ -38,7 +38,7 @@ module.exports = {
           });
           allFirstLetter = tmp;
         });
-        _data['__' + key + '_suoxie'] = allFirstLetter.join('');
+        _data['__' + key + '_suoxie'] = allFirstLetter.join('').toLowerCase();
       }
     });
     done(null, {
