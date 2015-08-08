@@ -99,6 +99,39 @@ module.exports = function(app) {
     }
   };
 
+  var emitEvent = function*(db, collection, stage, action, data) {
+    var events = yield Mongo.request({
+      collection: app.config.mongo.collections.event,
+      request: {
+        qs: {
+          query: JSON.stringify({
+            db: db,
+            collection: collection,
+            stage: stage,
+            action: action
+          })
+        }
+      }
+    });
+    events = events[app.config.mongo.defaultDB][app.config.mongo.collections.event];
+    if (events) {
+      for (var i = 0; i < events.length; i++) {
+        var flowData = yield global.manage.runTask({
+          taskid: events[i].taskid,
+          beginData: {
+            db: events[i].db,
+            collection: events[i].colletion,
+            data: data
+          },
+          username: this.session.username
+        });
+        if (flowData) {
+          extend(data, flowData.data);
+        }
+      }
+    }
+  };
+
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -125,6 +158,7 @@ module.exports = function(app) {
     query.skip = skip;
     delete query.page;
     delete query.pagesize;
+    yield emitEvent.call(this, db, collection, 'before', 'find', query);
     try {
       var data =
         yield Mongo.request({
@@ -143,6 +177,7 @@ module.exports = function(app) {
         yield Mongo.exec({
           collection: collection
         }, 'count', filter);
+      yield emitEvent.call(this, db, collection, 'after', 'find', data);
       this.result = {
         code: 200,
         result: {
@@ -167,6 +202,7 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var hasPermission = true;
+    var self = this;
     try {
       var privilege = JSON.parse(this.global.user.privilege);
       hasPermission = !!privilege[db][collection].read;
@@ -178,6 +214,7 @@ module.exports = function(app) {
       return;
     }
     var body = this.request.body;
+    yield emitEvent.call(this, db, collection, 'before', 'insert', body);
     try {
       //用户表要加密密码
       if (body.password && ((db === app.config.mongo.defaultDB && collection ===
@@ -273,6 +310,7 @@ module.exports = function(app) {
             }
           }
         }
+        yield emitEvent.call(this, db, collection, 'after', 'insert', body);
         this.result = {
           code: 200,
           result: data
@@ -294,6 +332,7 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var hasPermission = true;
+    var self = this;
     try {
       var privilege = JSON.parse(this.global.user.privilege);
       hasPermission = !!privilege[db][collection].read;
@@ -305,8 +344,9 @@ module.exports = function(app) {
       return;
     }
     var id = this.request.params.id;
+    var newData = this.request.body;
+    yield emitEvent.call(this, db, collection, 'before', 'update', newData);
     try {
-      var newData = this.request.body;
       var saveData = {};
       var originData =
         yield Mongo.request({
@@ -438,6 +478,7 @@ module.exports = function(app) {
           }
         }
       }
+      yield emitEvent.call(this, db, collection, 'after', 'update', newData);
       this.result = {
         code: 200,
         result: data
@@ -472,6 +513,7 @@ module.exports = function(app) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
     var hasPermission = true;
+    var self = this;
     try {
       var privilege = JSON.parse(this.global.user.privilege);
       hasPermission = !!privilege[db][collection].read;
@@ -483,6 +525,7 @@ module.exports = function(app) {
       return;
     }
     var id = this.request.params.id;
+    yield emitEvent.call(this, db, collection, 'before', 'remove', id);
     try {
       var originData =
         yield Mongo.request({
@@ -536,6 +579,7 @@ module.exports = function(app) {
             method: this.method
           }
         });
+      yield emitEvent.call(this, db, collection, 'after', 'remove', id);
       this.result = {
         code: 200,
         result: data

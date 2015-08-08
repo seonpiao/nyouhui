@@ -70,12 +70,26 @@ var dequeue = function(username) {
   }
 };
 
+var exec = function(task, done) {
+  var username = task.username;
+  task.flow.on('end', function() {
+    done(null, task.flow.__context.data);
+  });
+  task.flow.on('error', function(e) {
+    done(e);
+  });
+  task.flow.begin(task.beginData);
+  task.steps.forEach(function(step) {
+    task.flow.go(step.id);
+  });
+};
+
 module.exports = function(app) {
 
   global.manage.runTask = function*(options) {
     var taskid = options.taskid,
       beginData = options.beginData || {},
-      username = options.username;
+      username = options.username
     var start = Date.now();
     var data =
       yield Mongo.request({
@@ -85,6 +99,7 @@ module.exports = function(app) {
     data = (data[app.config.mongo.defaultDB][app.config.mongo.collections.task]);
     if (data) {
       var ids = data.steps;
+      var sync = data.sync === '1';
       var flow = new Flow();
       var steps = [];
       for (var i = 0; i < ids.length; i++) {
@@ -114,15 +129,20 @@ module.exports = function(app) {
           steps.forEach(function(step) {
             flow.addStep(step.id, step);
           });
-          enqueue.call(this, {
+          var task = {
             username: username,
             id: taskid,
             name: data.name,
             flow: flow,
             steps: steps,
             beginData: beginData
-          });
-          dequeue.call(this, username);
+          };
+          if (sync) {
+            return yield thunkify(exec)(task);
+          } else {
+            enqueue.call(this, task);
+            dequeue.call(this, username);
+          }
         } catch (e) {
           logger.error(e.stack);
           throw {

@@ -5,13 +5,10 @@ var userData = require('./userData');
 var menu = require('./menu');
 var jsonApi = require('./jsonApi');
 var redisStore = require('koa-redis');
-var EventEmitter = require("events").EventEmitter;
 
 module.exports = function(app) {
 
   global.manage = {};
-
-  global.manage.emitter = new EventEmitter();
 
   app.keys = ['firstre'];
   app.jwt_secret = 'jwt_secret_firstre';

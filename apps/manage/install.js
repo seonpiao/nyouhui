@@ -143,6 +143,12 @@ initData[db][collection] = [{
   base: 'select',
   params: '{"url":"/task/steps"}',
   desc: ''
+}, {
+  id: 'task_select',
+  name: 'task_select',
+  base: 'select',
+  params: '{"db":"' + config.mongo.defaultDB + '","collection":"' + collections.task '"}',
+  desc: ''
 }];
 
 collection = collections.schema;
@@ -357,6 +363,51 @@ initData[db][collection] = [{
     display: 'yes',
     editable: 'yes'
   }]
+}, {
+  db: db,
+  collection: collections.event,
+  params: '',
+  fields: [{
+    name: 'db',
+    alias: 'db',
+    type: 'input',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'required'
+  }, {
+    name: 'collection',
+    alias: 'collection',
+    type: 'input',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'required'
+  }, {
+    name: 'stage',
+    alias: '阶段',
+    type: 'input',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'required'
+  }, {
+    name: 'action',
+    alias: '动作',
+    type: 'input',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'required'
+  }, {
+    name: 'taskid',
+    alias: '任务',
+    type: 'task_select',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'required'
+  }]
 }];
 
 collection = config.mongo.collections.menu;
@@ -384,6 +435,10 @@ initData[db][collection] = [{
   name: '菜单管理',
   path: '系统设置',
   url: '/crud/' + db + '/' + collections.menu
+}, {
+  name: '事件管理',
+  path: '系统设置',
+  url: '/crud/' + db + '/' + collections.event
 }, {
   name: '任务管理',
   path: '任务系统',
