@@ -14,6 +14,7 @@ var mkdirp = require('mkdirp');
 var path = require('path');
 var fs = require('fs');
 var cp = require('child_process');
+var jade = require('jade');
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
