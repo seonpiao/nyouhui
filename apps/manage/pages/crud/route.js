@@ -102,17 +102,6 @@ module.exports = function(app) {
       this.status = 403;
       return;
     }
-    // 后续做基础组件选择时用
-    // this.global = this.global || {};
-    // this.global.allModules = fs.readdirSync('modules');
-    // if (this.global.allModules && this.global.allModules.length > 0) {
-    //   this.global.allModules = this.global.allModules.filter(function(name) {
-    //     if (name.charAt(0) != '.') {
-    //       return true;
-    //     }
-    //     return false;
-    //   });
-    // }
     try {
       //table data
       var data =
