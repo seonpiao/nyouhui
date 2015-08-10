@@ -179,7 +179,6 @@ module.exports = function(app) {
             }
           }
           //清空救援人列表
-          result.rescuer = [];
           yield save('sos', result);
           me.help_id = '';
           yield saveUser(me);
@@ -226,7 +225,6 @@ module.exports = function(app) {
           }
         }
         //清空救援人列表
-        result.rescuer = [];
         delete result._id;
         yield Mongo.request({
           collection: 'sos',
