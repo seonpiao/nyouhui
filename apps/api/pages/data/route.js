@@ -139,13 +139,12 @@ module.exports = function(app) {
     var id = this.request.params.id;
     var query = this.request.query;
     var customSort = query.custom_sort;
-    delete query.custom_sort;
     var pagesize = (query.pagesize || Infinity) * 1;
     var page = 1;
     if (query.page >= 1) {
       page = parseInt(query.page, 10);
     }
-    var filter = {};
+    var filter;
     try {
       filter = JSON.parse(query.query);
     } catch (e) {}
@@ -167,6 +166,8 @@ module.exports = function(app) {
       filter: filter,
       fields: fields,
       sort: sort,
+      sortDb: app.config.mongo.defaultDB,
+      sortCollection: app.config.mongo.collections.customsort,
       customSort: customSort
     });
     data[db][collection] = data[db][collection] || [];
