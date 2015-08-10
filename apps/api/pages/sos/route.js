@@ -72,9 +72,7 @@ module.exports = function(app) {
     if (aroundHelpers) {
       yield FirstrePush.pushToPro(aroundHelpers, {
         type: 'newhelp',
-        data: {
-          help_id: user.help_id
-        }
+        help_id: user.help_id
       });
     }
     return aroundHelpers;
