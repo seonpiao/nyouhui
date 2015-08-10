@@ -73,6 +73,9 @@ define(["libs/client/views/base"], function(Base) {
             records: []
           },
           writers: {
+            _attributeWriter: function(record) {
+              return record[this.id] || '';
+            },
             _rowWriter: function(rowIndex, record, columns, cellWriter) {
               var tr = '';
 
