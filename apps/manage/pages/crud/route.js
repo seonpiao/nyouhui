@@ -16,38 +16,6 @@ module.exports = function(app) {
     return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
   }
 
-  var applyCustomTemplate = function*(list, db, collection) {
-    var schema =
-      yield Mongo.request({
-        collection: app.config.mongo.collections.schema,
-        one: true,
-        request: {
-          qs: {
-            query: JSON.stringify({
-              db: db,
-              collection: collection
-            })
-          }
-        }
-      });
-    var schemaData = schema[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
-    if (schemaData) {
-      var fields = schemaData.fields;
-      //检查有哪些自定义的模板
-      var templates = {};
-      fields.forEach(function(field) {
-        if (field.template) {
-          templates[field.name] = field.template;
-        }
-      });
-      Object.keys(templates).forEach(function(fieldName) {
-        list.forEach(function(row) {
-          row[fieldName] = jade.render(templates[fieldName], row);
-        });
-      });
-    }
-  };
-
   app.route('/crud/:db/:collection').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
