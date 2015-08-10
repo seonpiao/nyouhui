@@ -22,14 +22,13 @@ define(["libs/client/views/base"], function(Base) {
             return !col.match(/^__/);
           });
           data.columns = data.columns.join(',');
+          data.with_schema = '1';
         });
         this.$el.on('dynatable:ajax:success', function(e, res) {
-          if (res.records) {
-            var schemaDb = res.config.schema.db;
-            var schemaCollection = res.config.schema.collection;
-            var controlDb = res.config.control.db;
-            var controlCollection = res.config.control.collection;
-            var schemaData = res._data[schemaDb][schemaCollection];
+          if (res.code === 200) {
+            res.records = res.result.data[res.result.db][res.result.collection];
+            res.queryRecordCount = res.result.page.total;
+            var schemaData = res.result.schema;
             _.each(res.records, function(record) {
               for (var fieldName in record) {
                 var value = record[fieldName];
@@ -38,7 +37,7 @@ define(["libs/client/views/base"], function(Base) {
                 })[0];
                 if (fieldSchema && fieldSchema.db && fieldSchema.collection) {
                   if (typeof value === 'string') {
-                    var foreignItem = _.filter(res._data[fieldSchema.db][fieldSchema.collection], function(item) {
+                    var foreignItem = _.filter(res.result._data[fieldSchema.db][fieldSchema.collection], function(item) {
                       return (item.id || item._id) === value
                     });
                     if (foreignItem[0]) {
@@ -46,7 +45,7 @@ define(["libs/client/views/base"], function(Base) {
                     }
                   } else if (_.isArray(value)) {
                     value = value.map(function(oneOfValue) {
-                      var foreignData = res._data[fieldSchema.db][fieldSchema.collection];
+                      var foreignData = res.result._data[fieldSchema.db][fieldSchema.collection];
                       for (var i = 0; i < foreignData.length; i++) {
                         var foreignItem = foreignData[i];
                         if ((foreignItem.id || foreignItem._id) === oneOfValue) return foreignItem.name;
@@ -69,7 +68,7 @@ define(["libs/client/views/base"], function(Base) {
           },
           dataset: {
             ajax: true,
-            ajaxUrl: '/dt/' + db + '/' + collection,
+            ajaxUrl: '/api/' + db + '/' + collection,
             ajaxOnLoad: true,
             records: []
           },
@@ -79,7 +78,7 @@ define(["libs/client/views/base"], function(Base) {
 
               // grab the record's attribute for each column
               for (var i = 0, len = columns.length; i < len; i++) {
-                if (columns[i].id === '__buttons') {
+                if (columns[i].id === '__buttons' && !options.readonly) {
                   tr += '<td><a href="/crud/' + db + '/' + collection + '/update/' + (record.id || record._id) + '">编辑</a>';
                   tr += ' <a class="del-row" data-id="' + (record.id || record._id) + '" href="javascript:;">删除</a>';
                   if (options.buttons) {

@@ -140,59 +140,37 @@ module.exports = function(app) {
     var query = this.request.query;
     var customSort = query.custom_sort;
     delete query.custom_sort;
-    var pagesize = query.pagesize || Infinity;
-    var cus
+    var pagesize = (query.pagesize || Infinity) * 1;
     var page = 1;
     if (query.page >= 1) {
       page = parseInt(query.page, 10);
     }
-    var skip = pagesize * (page - 1);
-    query.limit = pagesize;
-    query.skip = skip;
-    delete query.page;
-    delete query.pagesize;
+    var filter = {};
+    try {
+      filter = JSON.parse(query.query);
+    } catch (e) {}
+    var sort = {};
+    try {
+      sort = JSON.parse(query.sort);
+    } catch (e) {}
+    var fields;
+    try {
+      fields = JSON.parse(query.fields);
+    } catch (e) {}
     //要显示的列表数据
     var data = yield Mongo.request({
       db: db,
       collection: collection,
       id: id,
-      request: {
-        qs: query
-      }
+      page: page,
+      pagesize: pagesize,
+      filter: filter,
+      fields: fields,
+      sort: sort,
+      customSort: customSort
     });
     data[db][collection] = data[db][collection] || [];
     var list = data[db][collection];
-    if (customSort === '1') {
-      try {
-        var filter;
-        if (query.query) {
-          filter = JSON.parse(query.query || '{}')
-          filter = JSON.stringify(sortQuery(filter));
-        }
-        var seq = yield Mongo.request({
-          collection: app.config.mongo.collections.customsort,
-          one: true,
-          request: {
-            qs: {
-              query: JSON.stringify({
-                db: db,
-                collection: collection,
-                filter: filter
-              })
-            }
-          }
-        });
-        seq = seq[app.config.mongo.defaultDB][app.config.mongo.collections.customsort];
-        if (seq) {
-          seq = seq.seq;
-          list.sort(function(a, b) {
-            return seq.indexOf(a.id || a._id.toString()) - seq.indexOf(b.id || b._id.toString());
-          });
-        }
-      } catch (e) {
-        console.log(e.stack)
-      }
-    }
     var extDatas = (yield Mongo.getExtData({
       collection: collection,
       withoutSchema: true
@@ -200,10 +178,6 @@ module.exports = function(app) {
     for (var i = 0; i < extDatas.length; i++) {
       extend(true, data, extDatas[i]);
     }
-    var filter = {};
-    try {
-      filter = JSON.parse(query.query);
-    } catch (e) {}
     var count =
       yield Mongo.exec({
         collection: collection

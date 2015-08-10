@@ -1,31 +1,17 @@
-var Mongo = require('../../../../../libs/server/mongodb');
-var pinyin = require('pinyin');
-var co = require('co');
+var crypto = require('crypto');
+
+var sha1 = function(str) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update(str);
+  return shasum.digest('hex');
+};
 
 module.exports = {
-  input: ['data', 'db', 'collection'],
-  output: [],
+  input: ['data'],
+  output: ['data'],
   go: function(data, done) {
     var _data = data.data;
-    co(function*() {
-      var method = 'post';
-      var _id;
-      if (_data._id) {
-        _id = _data._id;
-        method = 'put';
-        delete _data._id;
-      }
-      yield Mongo.request({
-        db: data.db,
-        collection: data.collection,
-        id: _id,
-        request: {
-          method: method,
-          json: _data
-        }
-      });
-    })(function(err, data) {
-      done();
-    });
+    _data.password = sha1(_data.password);
+    done();
   }
 };

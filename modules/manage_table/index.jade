@@ -9,7 +9,8 @@ mixin manage_table(list, options)
         each field in options.fields
           if field.display === 'yes'
             th(data-dynatable-column=field.name, data-field=field.name)= field.alias
-        th(data-dynatable-column="__buttons") 操作
+        if !options.readonly
+          th(data-dynatable-column="__buttons") 操作
     tbody
       if list
         include body

@@ -21,6 +21,10 @@ var sha1 = function(str) {
   return shasum.digest('hex')
 }
 
+var sanitize = function(s) {
+  return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
 module.exports = function(app) {
   var client = redis.createClient(app.config.redis.port, app.config.redis.host);
   var uploader = require('koa-bylh-upload')({
@@ -132,6 +136,99 @@ module.exports = function(app) {
     }
   };
 
+  var getCollectionData = function*() {
+    var db = this.request.params.db;
+    var collection = this.request.params.collection;
+    var id = this.request.params.id;
+    var query = this.request.query;
+    var customSort = query.custom_sort;
+    var withoutSchema = !(query.with_schema === '1');
+    var pagesize = (query.perPage || query.pagesize || Infinity) * 1;
+    var page = 1;
+    if (query.page >= 1) {
+      page = parseInt(query.page, 10);
+    }
+    var filter = {},
+      sort = {};
+    for (var key in query) {
+      var value = query[key];
+      if (key.match(/queries\[(.+?)\]/)) {
+        key = RegExp.$1;
+        if (key === 'search') {
+          var columns = query.columns.split(',');
+          var _filter = [];
+          columns.filter(function(col) {
+            return !filter[col];
+          }).forEach(function(col, index) {
+            var obj = {};
+            obj[col] = {
+              $regex: sanitize(value)
+            };
+            _filter.push(obj);
+            obj = {};
+            obj['__' + col + '_pinyin'] = {
+              $regex: sanitize(value.toLowerCase())
+            }
+            _filter.push(obj);
+            obj = {};
+            obj['__' + col + '_suoxie'] = {
+              $regex: sanitize(value.toLowerCase())
+            }
+            _filter.push(obj);
+          });
+          filter['$or'] = _filter;
+        } else {
+          filter[key] = value;
+        }
+      } else if (key.match(/sorts\[(.+?)\]/)) {
+        key = RegExp.$1;
+        sort[key] = value * 1;
+      }
+    }
+    //要显示的列表数据
+    var data = yield Mongo.request({
+      db: db,
+      collection: collection,
+      id: id,
+      page: page,
+      pagesize: pagesize,
+      filter: filter,
+      sort: sort,
+      customSort: customSort
+    });
+    data[db][collection] = data[db][collection] || [];
+    var list = data[db][collection];
+    var extDatas = (yield Mongo.getExtData({
+      collection: collection,
+      withoutSchema: withoutSchema
+    })).extDatas;
+    var _data = {};
+    for (var i = 0; i < extDatas.length; i++) {
+      extend(true, _data, extDatas[i]);
+    }
+    var count =
+      yield Mongo.exec({
+        collection: collection
+      }, 'count', filter);
+    var ret = {
+      data: data,
+      _data: _data,
+      db: db,
+      collection: collection,
+      page: {
+        total: count,
+        pagesize: pagesize,
+        page: page,
+        ret: list.length
+      }
+    }
+    if (!withoutSchema) {
+      ret.schema = _data[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
+      delete _data[app.config.mongo.defaultDB][app.config.mongo.collections.schema];
+    }
+    return ret;
+  }
+
   app.route('/api/:db/:collection/:id?').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -146,50 +243,15 @@ module.exports = function(app) {
       };
       return;
     }
-    var id = this.request.params.id;
     var query = this.request.query;
-    var pagesize = query.pagesize || Infinity;
-    var page = 1;
-    if (query.page >= 1) {
-      page = parseInt(query.page, 10);
-    }
-    var skip = pagesize * (page - 1);
-    query.limit = pagesize;
-    query.skip = skip;
-    delete query.page;
-    delete query.pagesize;
     yield emitEvent.call(this, db, collection, 'before', 'find', query);
     try {
-      var data =
-        yield Mongo.request({
-          db: db,
-          collection: collection,
-          id: id,
-          request: {
-            qs: query
-          }
-        });
-      var filter = {};
-      try {
-        filter = JSON.parse(query.query);
-      } catch (e) {}
-      var count =
-        yield Mongo.exec({
-          collection: collection
-        }, 'count', filter);
+      var result = yield getCollectionData.call(this);
+      var data = result.data[db][collection];
       yield emitEvent.call(this, db, collection, 'after', 'find', data);
       this.result = {
         code: 200,
-        result: {
-          db: db,
-          collection: collection,
-          data: data,
-          page: {
-            total: count,
-            pagesize: pagesize,
-            page: page
-          }
-        }
+        result: result
       }
     } catch (e) {
       this.result = {
@@ -216,69 +278,8 @@ module.exports = function(app) {
     var body = this.request.body;
     yield emitEvent.call(this, db, collection, 'before', 'insert', body);
     try {
-      //用户表要加密密码
-      if (body.password && ((db === app.config.mongo.defaultDB && collection ===
-          app.config.mongo.collections.admin) || (db === app.config.mongo.defaultDB &&
-          collection === app.config.mongo.collections.user))) {
-        body.password = sha1(body.password);
-      }
       if (db === 'cl' && collection === 'sells') {
-        var goodsName = body.name;
-        var count = body.count;
-        var goods =
-          yield Mongo.request({
-            db: 'cl',
-            collection: 'goods',
-            request: {
-              qs: {
-                query: JSON.stringify({
-                  name: goodsName
-                })
-              }
-            }
-          });
-        goods = goods['cl']['goods'];
-        if (goods && goods.length > 0) {
-          var changedItems = [];
-          for (var i = 0; i < goods.length; i++) {
-            var item = goods[i];
-            if (count > 0) {
-              if (item.stock >= count) {
-                item.stock -= count;
-                count = 0;
-                changedItems.push(item);
-                break;
-              } else {
-                count -= item.stock;
-                item.stock = 0;
-                changedItems.push(item);
-              }
-            }
-          }
-          if (count > 0) {
-            this.result = {
-              code: 500,
-              message: '库存不足'
-            }
-            return;
-          } else {
-            for (var i = 0; i < changedItems.length; i++) {
-              var item = changedItems[i];
-              item.total_yuan = item.stock * item.unit_yuan;
-              var goodsId = item._id + '';
-              delete item._id;
-              yield Mongo.request({
-                db: 'cl',
-                collection: 'goods',
-                id: goodsId,
-                request: {
-                  method: 'put',
-                  json: item
-                }
-              });
-            }
-          }
-        }
+
       }
       var now = Date.now();
       body.create_time = now;
@@ -421,12 +422,6 @@ module.exports = function(app) {
       extend(saveData, originData);
       extend(saveData, newData);
       delete saveData._id;
-      //用户表要加密密码
-      if (newData.password && ((db === app.config.mongo.defaultDB && collection ===
-          app.config.mongo.collections.admin) || (db === app.config.mongo.defaultDB &&
-          collection === app.config.mongo.collections.user))) {
-        saveData.password = sha1(saveData.password);
-      }
       saveData.modify_time = Date.now();
       var data =
         yield Mongo.request({

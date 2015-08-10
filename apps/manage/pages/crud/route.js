@@ -48,71 +48,6 @@ module.exports = function(app) {
     }
   };
 
-  var getCollectionData = function*() {
-    var db = this.request.params.db;
-    var collection = this.request.params.collection;
-    var query = this.request.query;
-    var pagesize = (query.pagesize || 10) * 1;
-    var page = 1;
-    if (query.page >= 1) {
-      page = parseInt(query.page, 10);
-    }
-    var skip = pagesize * (page - 1);
-    query.limit = pagesize;
-    query.skip = skip;
-    delete query.page;
-    delete query.pagesize;
-    //要显示的列表数据
-    var data =
-      yield Mongo.request({
-        db: db,
-        collection: collection,
-        request: {
-          qs: query
-        }
-      });
-    var list = data[db][collection];
-    //列表的字段定义数据
-    var _data = {};
-    var extDatas = (yield Mongo.getExtData({
-      collection: collection
-    })).extDatas;
-    for (var i = 0; i < extDatas.length; i++) {
-      extend(true, _data, extDatas[i]);
-    }
-    yield applyCustomTemplate(list, db, collection);
-    var filter = {};
-    try {
-      filter = JSON.parse(query.query);
-    } catch (e) {}
-    var count =
-      yield Mongo.exec({
-        collection: collection
-      }, 'count', filter);
-    return {
-      data: data,
-      _data: _data,
-      db: db,
-      collection: collection,
-      config: {
-        schema: {
-          db: app.config.mongo.defaultDB,
-          collection: app.config.mongo.collections.schema
-        },
-        control: {
-          db: app.config.mongo.defaultDB,
-          collection: app.config.mongo.collections.control
-        }
-      },
-      page: {
-        total: count,
-        pagesize: pagesize,
-        page: page,
-        ret: list.length
-      }
-    };
-  }
-
   app.route('/crud/:db/:collection').get(function*(next) {
     var db = this.request.params.db;
     var collection = this.request.params.collection;
@@ -126,11 +61,21 @@ module.exports = function(app) {
       return;
     }
     try {
-      var result =
-        yield getCollectionData.call(this);
+      var result = yield Mongo.request({
+        collection: app.config.mongo.collections.schema,
+        one: true,
+        request: {
+          qs: {
+            query: JSON.stringify({
+              db: db,
+              collection: collection
+            })
+          }
+        }
+      });
       this.result = {
         code: 200,
-        result: result
+        result: result[app.config.mongo.defaultDB][app.config.mongo.collections.schema]
       }
       if (fs.existsSync(path.join(__dirname, 'views', db, collection,
           'index.jade'))) {
@@ -143,68 +88,6 @@ module.exports = function(app) {
       }
       logger.error(e.stack);
     }
-  });
-
-  app.route('/dt/:db/:collection').get(function*(next) {
-    this.json = true;
-    var db = this.request.params.db;
-    var collection = this.request.params.collection;
-    var query = this.request.query;
-    if (query.perPage) {
-      query.pagesize = query.perPage;
-      delete query.perPage;
-    }
-    var filter = {},
-      sort = {};
-    for (var key in query) {
-      var value = query[key];
-      if (key.match(/queries\[(.+?)\]/)) {
-        key = RegExp.$1;
-        if (key === 'search') {
-          var columns = query.columns.split(',');
-          var _filter = [];
-          columns.filter(function(col) {
-            return !filter[col];
-          }).forEach(function(col, index) {
-            var obj = {};
-            obj[col] = {
-              $regex: sanitize(value)
-            };
-            _filter.push(obj);
-            obj = {};
-            obj['__' + col + '_pinyin'] = {
-              $regex: sanitize(value.toLowerCase())
-            }
-            _filter.push(obj);
-            obj = {};
-            obj['__' + col + '_suoxie'] = {
-              $regex: sanitize(value.toLowerCase())
-            }
-            _filter.push(obj);
-          });
-          filter['$or'] = _filter;
-        } else {
-          filter[key] = value;
-        }
-      } else if (key.match(/sorts\[(.+?)\]/)) {
-        key = RegExp.$1;
-        sort[key] = value * 1;
-      }
-    }
-    query.query = JSON.stringify(filter);
-    query.sort = JSON.stringify(sort);
-    var result =
-      yield getCollectionData.call(this);
-    result.queryRecordCount = result.page.ret;
-    var ret = {
-      records: result.data[db][collection],
-      queryRecordCount: result.page.total,
-      _data: result._data,
-      db: db,
-      collection: collection,
-      config: result.config
-    }
-    this.result = ret;
   });
 
   app.route('/crud/:db/:collection/create').get(function*(next) {

@@ -14,7 +14,7 @@ block append content
   section.content
     div
       //- - var data = result.data[result.db][result.collection];
-      - var schema = result._data[result.config.schema.db][result.config.schema.collection];
+      - var schema = result;
       - var params = {};
       - try{params = JSON.parse(schema.params)}catch(e){}
       - var options = {fields:schema.fields}
