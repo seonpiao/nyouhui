@@ -150,6 +150,11 @@ module.exports = function(app) {
     }
     var filter = {},
       sort = {};
+    if (query.query) {
+      try {
+        filter = JSON.parse(query.query);
+      } catch (e) {}
+    }
     for (var key in query) {
       var value = query[key];
       if (key.match(/queries\[(.+?)\]/)) {

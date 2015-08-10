@@ -1,5 +1,5 @@
 mixin manage_ctrl_autocomplete(options)
-  .form-group(data-module="manage_ctrl_autocomplete",data-form-control="autocomplete",data-db=options.db,data-collection=options.collection)
+  .form-group(data-module="manage_ctrl_autocomplete",data-form-control="autocomplete",data-db=options.db,data-collection=options.collection,data-template=options.template)
     if options.label
       label= options.label
     if options.editable === 'required'

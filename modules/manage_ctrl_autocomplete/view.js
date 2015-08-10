@@ -4,15 +4,25 @@ define(["libs/client/views/base"], function(Base) {
     init: function() {
       this.model.db = this.$el.attr('data-db');
       this.model.collection = this.$el.attr('data-collection');
-      var template = this.$el.attr('data-template') || '${name} - ${base}';
+      var template = this.$el.attr('data-template');
       var self = this;
       this.$('input').autocomplete({
         source: function(request, response) {
           $.getJSON("/api/" + self.model.db + '/' + self.model.collection, {
             query: JSON.stringify({
-              name: {
-                $regex: request.term
-              }
+              $or: [{
+                name: {
+                  $regex: request.term
+                }
+              }, {
+                __name_pinyin: {
+                  $regex: request.term
+                }
+              }, {
+                __name_suoxie: {
+                  $regex: request.term
+                }
+              }]
             })
           }, function(json) {
             var list = json.result.data[json.result.db][json.result.collection].map(function(item) {
