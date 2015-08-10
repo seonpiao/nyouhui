@@ -76,7 +76,7 @@ module.exports = function(app) {
         json: extend(userData, {
           uid: uid,
           source: source,
-          nickname: userData.nickname || uid,
+          nickname: userData.nickname || userData.phone || uid,
           group: ['normal'], // 默认用户组
           reg_ip: this.ip,
           helping: [],
