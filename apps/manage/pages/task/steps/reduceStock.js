@@ -8,7 +8,7 @@ module.exports = {
     var goodsName = _data.name;
     var batch = matched[2];
     var count = _data.count;
-    co(function() {
+    co(function*() {
       var goods =
         yield Mongo.request({
           db: 'cl',
