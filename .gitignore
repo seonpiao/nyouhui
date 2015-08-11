@@ -5,3 +5,4 @@ temp
 dump.rdb
 upload_tmp
 apps/config.js
+npm-debug.log
