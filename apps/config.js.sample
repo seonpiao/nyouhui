@@ -24,7 +24,7 @@ var config = {
   },
   root: {
     username: 'root',
-    password: 'admin22'
+    password: 'admin'
   },
   resource: {
     host: 'localhost',
