@@ -341,7 +341,7 @@ initData[db][collection] = [{
   fields: [{
     name: 'stepid',
     alias: 'id',
-    type: 'input',
+    type: 'stepid_select',
     index: 'unique',
     defaults: '',
     display: 'yes',
