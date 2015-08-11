@@ -6,6 +6,7 @@ module.exports = {
   go: function(data, done) {
     var _data = data.data;
     var goodsName = _data.name;
+    var batch = matched[2];
     var count = _data.count;
     var goods =
       yield Mongo.request({

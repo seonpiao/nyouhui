@@ -18,7 +18,8 @@ var config = {
       task: 'task',
       tasklog: 'tasklog',
       control: 'control',
-      customsort: 'customsort'
+      customsort: 'customsort',
+      event: 'event'
     }
   },
   root: {
