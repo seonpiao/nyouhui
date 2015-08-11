@@ -147,7 +147,7 @@ initData[db][collection] = [{
   id: 'task_select',
   name: 'task_select',
   base: 'select',
-  params: '{"db":"' + config.mongo.defaultDB + '","collection":"' + collections.task '"}',
+  params: '{"db":"' + config.mongo.defaultDB + '","collection":"' + collections.task + '"}',
   desc: ''
 }];
 
