@@ -1,0 +1,13 @@
+mixin manage_ctrl_optionlist(options)
+  .form-group(data-module="manage_ctrl_optionlist",data-form-control="optionlist")
+    if options.label
+      div
+        label(style="clear:both;")= options.label
+        if options.editable === 'required'
+          span.text-red *
+    input.option.form-control(type="text",style="margin-bottom:5px;",placeholder="新增选项",data-nosubmit)
+    ul.list-unstyled(data-name=options.name,style="min-height:100px;padding:10px;border:1px solid rgba(0, 166, 90, 0.4);border-radius:3px;")
+      if options.value
+        for item in options.value
+          include li
+      

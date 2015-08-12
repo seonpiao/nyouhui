@@ -52,49 +52,6 @@ module.exports = function(app) {
     };
   });
 
-  route.nested('/push').get(function*(next) {
-    this.json = true;
-    var accessId = 2200133274;
-    var secretKey = '20c9f72b3c5cc2ec5777befbd3ed7167';
-    var xinge = new Xinge.XingeApp(accessId, secretKey);
-    var pushid = [this.request.query.uid];
-    var iOSMessage = new Xinge.IOSMessage();
-    iOSMessage.alert = 'av';
-    iOSMessage.badge = 22;
-    iOSMessage.sound = 'df';
-    iOSMessage.acceptTime.push(new Xinge.TimeInterval(0, 0, 23, 0));
-    iOSMessage.customContent = {
-      event: {
-        name: 'event1',
-        data: {
-          a: 1,
-          b: 2
-        }
-      }
-    };
-    try {
-      var result = yield thunkify(xinge.pushByAccounts.bind(xinge))(
-        pushid,
-        iOSMessage, Xinge.IOS_ENV_DEV);
-      if (result) {
-        result = JSON.parse(result);
-        if (result.ret_code === 0) {
-          this.result = {
-            code: 0
-          };
-        } else {
-          app.Errors.USER_XINGE_REQUEST_ERROR.message = result.err_msg;
-          this.result = app.Errors.USER_XINGE_REQUEST_ERROR;
-        }
-      } else {
-        this.result = app.Errors.USER_XINGE_REQUEST_FAILED;
-      }
-    } catch (e) {
-      logger.error(e.stack);
-      this.result = app.Errors.UNKNOWN;
-    }
-  });
-
   route.nested('/getUserInfo').get(function*(next) {
     this.json = true;
     var uid =

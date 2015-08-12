@@ -73,7 +73,8 @@ define(["libs/client/views/base"], function(Base) {
     },
     submit: function(e) {
       e.preventDefault();
-      if (!this.$submit.hasClass('disabled')) {
+      var $focus = this.$(':focus');
+      if (!this.$submit.hasClass('disabled') && $focus.attr('data-nosubmit') === undefined) {
         this.fillModel();
         this.$submit.addClass('disabled');
         this.model.save();

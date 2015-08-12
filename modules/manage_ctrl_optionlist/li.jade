@@ -1,0 +1,5 @@
+li.ui-state-default(style="margin:5px;padding:3px;position:relative;")
+  span.name(style="display:inline-block;width:400px;")= item.name
+  input(style="margin-left:10px;",value=(item.show_count || item.count || 0))
+  span(style="margin-left:10px;")= '真实投票数: ' + (item.count || 0)
+  a.delete(href="javascript:;",style="position:absolute;right:10px;top:0px") x

@@ -333,6 +333,14 @@ initData[db][collection] = [{
     defaults: '',
     display: 'yes',
     editable: 'yes'
+  }, {
+    name: 'sync',
+    alias: '同步',
+    type: 'checkboxselect',
+    index: 'no',
+    defaults: '',
+    display: 'yes',
+    editable: 'yes'
   }]
 }, {
   db: db,
