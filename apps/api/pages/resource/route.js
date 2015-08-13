@@ -39,7 +39,7 @@ module.exports = function(app) {
       //因此，需要先判断用户是否登录，然后读完整个文件流，再return
       var uid = yield checkLogin.call(this, token);
       if (!uid) {
-        part.pip(fs.createWriteStream('/dev/null'));
+        part.pipe(fs.createWriteStream('/dev/null'));
         return;
       };
       parts.field.dir = path.join(dir, uid);
