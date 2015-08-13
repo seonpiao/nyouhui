@@ -90,6 +90,10 @@ mixin manage_ctrl_fileuploader(options)
           button.btn.btn-warning.cancel(type='reset')
             i.glyphicon.glyphicon-ban-circle
             span Cancel upload
+          label
+            | &nbsp;&nbsp;
+            input(type="checkbox",name="keepname")
+            |  保持原文件名
           span.fileupload-process
         .col-lg-5.fileupload-progress.fade
           .progress.progress-striped.active(role='progressbar', aria-valuemin='0', aria-valuemax='100')

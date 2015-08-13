@@ -1,6 +1,8 @@
 - var list = result.data[result.db][result.collection];
 each item in list
   tr
+    td
+      input(type="checkbox",name="select_row")
     each field in options.fields
       if field.display === 'yes'
         - var value = item[field.name];
