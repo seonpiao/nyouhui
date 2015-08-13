@@ -140,14 +140,7 @@ module.exports = function(app, config) {
     }
   };
 
-  app.Middlewares = [session({
-    store: redisStore(),
-    cookie: {
-      domain: global.DOMAIN,
-      path: '/',
-      maxage: 1000 * 60 * 60 * 24 * 30
-    }
-  }), cors({
+  app.Middlewares = [cors({
     origin: function(ctx) {
       return ctx.headers.origin;
     }

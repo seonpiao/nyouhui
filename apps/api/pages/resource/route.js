@@ -16,6 +16,7 @@ module.exports = function(app) {
 
   route.nested('/upload').post(function*(next) {
     this.json = true;
+    console.log(this.headers);
     var parts = parse(this, {
       autoFields: true
     });
