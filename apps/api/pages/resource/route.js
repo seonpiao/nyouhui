@@ -16,7 +16,6 @@ module.exports = function(app) {
 
   route.nested('/upload').post(function*(next) {
     this.json = true;
-    console.log(this.headers);
     var parts = parse(this, {
       autoFields: true
     });
@@ -31,12 +30,13 @@ module.exports = function(app) {
     try {
       var part = yield parts;
       var token = parts.field.token;
-      console.log(token);
       var helpId = parts.field.help_id;
       var overwrite = parts.field.overwrite;
       var filename = part.filename;
       var dir = parts.field.dir || '';
       var isLogin = true;
+      //在上传的文件流没有全部read完的时候，如果判断出用户未登录直接return，会导致客户端收不到响应内容
+      //因此，需要先判断用户是否登录，然后读完整个文件流，再return
       var uid = yield checkLogin.call(this, token);
       if (!uid) {
         isLogin = false;
@@ -44,6 +44,7 @@ module.exports = function(app) {
       };
       parts.field.dir = path.join(dir, uid);
       var relPath = path.join(dir, uid, filename);
+      //这里会读取文件流，要等这里执行完，才能return
       var result = yield uploader.call(this, part, parts.field);
       if (!isLogin) return;
       if (app.config.resource.collection) {
