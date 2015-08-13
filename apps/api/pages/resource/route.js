@@ -51,6 +51,7 @@ module.exports = function(app) {
         while (null !== (chunk = part.read())) {
           yield writeStream(stream, chunk);
         }
+        stream.end();
         return;
       };
       parts.field.dir = path.join(dir, uid);
