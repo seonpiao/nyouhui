@@ -36,11 +36,16 @@ module.exports = function(app) {
       var overwrite = parts.field.overwrite;
       var filename = part.filename;
       var dir = parts.field.dir || '';
+      var isLogin = true;
       var uid = yield checkLogin.call(this, token);
-      if (!uid) return;
+      if (!uid) {
+        isLogin = false;
+        uid = 'nobody';
+      };
       parts.field.dir = path.join(dir, uid);
       var relPath = path.join(dir, uid, filename);
       var result = yield uploader.call(this, part, parts.field);
+      if (!isLogin) return;
       if (app.config.resource.collection) {
         if (overwrite !== '1') {
           var resourceCount = yield Mongo.exec({
