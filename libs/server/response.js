@@ -44,23 +44,18 @@ module.exports = function*(view) {
   }
 
   if (this.json) {
+    this.status = 200;
     this.body = this.result || {};
     this.body.time = Date.now();
-  } else if (this.text || this.raw) {
-    this.body = this.result || '';
-  } else {
-    this.locals = this.result
-  }
-
-  if (this.json) {
-    this.status = 200;
     _.extend(this.body, requestInfo);
     // _.extend(this.body, defaultLocals);
   } else if (this.text || this.raw) {
     this.status = 200;
+    this.body = this.result || '';
   } else if (this.body && typeof this.body.pipe === 'function') {
     this.status = 200;
   } else {
+    this.locals = this.result
     _.extend(this.locals, defaultLocals);
     _.extend(this.locals, requestInfo);
     this.status = 200;

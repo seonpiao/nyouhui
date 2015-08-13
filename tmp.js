@@ -2,14 +2,15 @@ var request = require('request');
 var fs = require('fs');
 
 var formData = {
-  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ91.eyJ1aWQiOiIxMDAwMDAwMDAwMTEiLCJpYXQiOjE0Mzk0NTAxOTN9.NSoDVXwfVW88zAwmTiLR6D1we30PFIIXDO73pw7XhYw',
+  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.1eyJ1aWQiOiIxMDAwMDAwMDAwMTciLCJpYXQiOjE0Mzk0NTE3NDR9.W7DtnxUrEdNxb3k2ydtGWN1A2E6RMiFuHLYAQnwpp3s',
   // Pass data via Streams
-  my_file: fs.createReadStream(__dirname + '/test.ini')
+  my_file: fs.createReadStream('/Users/seon/Downloads/MotoX2专用adb及fastboot组件.zip')
 };
 
 request.post({
-  url: 'http://local.nyouhui.com:9002/resource/upload',
+  // url: 'http://local.nyouhui.com:9002/resource/upload',
+  url: 'http://api.test.bylh.tv/resource/upload',
   formData: formData
 }, function(err, res, body) {
-  console.log(body)
+  console.log(err || body)
 })
