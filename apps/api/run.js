@@ -140,7 +140,10 @@ module.exports = function(app, config) {
     }
   };
 
-  app.Middlewares = [cors({
+  app.Middlewares = [function*(next) {
+    this.set('Cache-Control', 'no-cache');
+    yield next;
+  }, cors({
     origin: function(ctx) {
       return ctx.headers.origin;
     }
