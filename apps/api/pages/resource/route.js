@@ -31,6 +31,7 @@ module.exports = function(app) {
     try {
       var part = yield parts;
       var token = parts.field.token;
+      console.log(token);
       var helpId = parts.field.help_id;
       var overwrite = parts.field.overwrite;
       var uid = yield checkLogin.call(this, token);
