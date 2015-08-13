@@ -66,7 +66,10 @@ module.exports = function(app) {
       var token = yield createSession(username);
       this.session.username = username;
       this.cookies.set('token', token, {
-        signed: true
+        signed: true,
+        domain: global.DOMAIN,
+        path: '/',
+        maxage: 1000 * 60 * 60 * 24 * 30
       });
       this.redirect(this.session.redirectUrl || '/');
     } else {
