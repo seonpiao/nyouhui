@@ -59,6 +59,7 @@ module.exports = function(app) {
         }
         //资源不存储url
         delete result.url;
+        result.create_time = Date.now();
         var db = yield Mongo.get({
           hosts: app.config.mongo.hosts.split(','),
           db: app.config.mongo.defaultDB
