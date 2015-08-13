@@ -34,26 +34,26 @@ module.exports = function(app) {
       console.log(token);
       var helpId = parts.field.help_id;
       var overwrite = parts.field.overwrite;
-      var uid = yield checkLogin.call(this, token);
-      if (!uid) return;
       var filename = part.filename;
       var dir = parts.field.dir || '';
       parts.field.dir = path.join(dir, uid);
       var relPath = path.join(dir, uid, filename);
-      if (app.config.resource.collection && overwrite !== '1') {
-        var resourceCount = yield Mongo.exec({
-          collection: app.config.resource.collection
-        }, 'count', {
-          path: relPath,
-          owner: uid
-        });
-        if (resourceCount > 0) {
-          this.result = app.Errors.RESOURCE_DUPLICATE;
-          return;
-        }
-      }
       var result = yield uploader.call(this, part, parts.field);
+      var uid = yield checkLogin.call(this, token);
+      if (!uid) return;
       if (app.config.resource.collection) {
+        if (overwrite !== '1') {
+          var resourceCount = yield Mongo.exec({
+            collection: app.config.resource.collection
+          }, 'count', {
+            path: relPath,
+            owner: uid
+          });
+          if (resourceCount > 0) {
+            this.result = app.Errors.RESOURCE_DUPLICATE;
+            return;
+          }
+        }
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         if (helpId) {
