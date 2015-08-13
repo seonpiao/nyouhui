@@ -3,17 +3,24 @@ mixin manage_table(list, options)
   if !__global.__manage_table_id
     - __global.__manage_table_id = 1;
   - var tableid = 'table_' + __global.__manage_table_id++
-  table.table.table-bordered.table-striped(id=tableid,data-module="manage_table",data-db=result.db,data-collection=result.collection,data-options=JSON.stringify(options),data-ajax=(list ? '0' : '1'))
-    thead
-      tr
-        each field in options.fields
-          if field.display === 'yes'
-            th(data-dynatable-column=field.name, data-field=field.name)= field.alias
-        if !options.readonly
-          th(data-dynatable-column="__buttons") 操作
-    tbody
-      if list
-        include body
+  div(id=tableid,data-module="manage_table",data-db=result.db,data-collection=result.collection,data-options=JSON.stringify(options),data-ajax=(list ? '0' : '1'))
+    table.table.table-bordered.table-striped
+      thead
+        tr
+          th(data-dynatable-column="__checkbox", data-dynatable-no-sort="true" ,width="50",style="text-align:center;")
+            input(type="checkbox",name="select_all")
+          each field in options.fields
+            if field.display === 'yes'
+              th(data-dynatable-column=field.name, data-field=field.name)= field.alias
+          if !options.readonly
+            th(data-dynatable-column="__buttons") 操作
+      tbody
+        if list
+          include body
+    if !options.readonly
+      .form-group
+        a.btn.btn-primary(href="/crud/" + result.db + "/" + result.collection + "/create") 新建
+        a.btn.btn-multidel(href="javascript:;") 批量删除
     //- tfoot
     //-   tr
     //-     each field in options.fields

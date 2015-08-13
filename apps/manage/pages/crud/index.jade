@@ -20,9 +20,6 @@ block append content
       - var options = {fields:schema.fields}
       - for(var key in params){options[key] = params[key]}
       +manage_table(null,options)
-      if !params.readonly
-        .form-group
-          a.btn.btn-primary(href="/crud/" + result.db + "/" + result.collection + "/create") 新建
     +manage_box()
 
 block append pluginjs

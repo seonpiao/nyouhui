@@ -558,92 +558,96 @@ module.exports = function(app) {
       };
       return;
     }
-    var id = this.request.params.id;
-    try {
-      yield emitEvent.call(this, db, collection, 'before', 'remove', id);
-      var originData =
-        yield Mongo.request({
-          db: db,
-          collection: collection,
-          id: id
-        });
-      originData = originData[db][collection];
-      if (db === 'cl' && collection === 'sells') {
-        var goodsName = originData.name;
-        var count = originData.count;
-        var goods =
+    var ids = this.request.params.id.split(',');
+    for (var i = 0; i < ids.length; i++) {
+      var id = ids[i];
+      try {
+        yield emitEvent.call(this, db, collection, 'before', 'remove', id);
+        var originData =
           yield Mongo.request({
-            db: 'cl',
-            collection: 'goods',
-            request: {
-              qs: {
-                query: JSON.stringify({
-                  name: goodsName
-                })
-              }
-            }
+            db: db,
+            collection: collection,
+            id: id
           });
-        goods = goods['cl']['goods'];
-        if (goods && goods.length > 0) {
-          for (var i = 0; i < goods.length; i++) {
-            var item = goods[i];
-            item.stock = item.stock * 1 + count * 1;
-            item.total_yuan = item.stock * item.unit_yuan;
-            var goodsId = item._id + '';
-            delete item._id;
+        originData = originData[db][collection];
+        if (db === 'cl' && collection === 'sells') {
+          var goodsName = originData.name;
+          var count = originData.count;
+          var goods =
             yield Mongo.request({
               db: 'cl',
               collection: 'goods',
-              id: goodsId,
               request: {
-                method: 'put',
-                json: item
+                qs: {
+                  query: JSON.stringify({
+                    name: goodsName
+                  })
+                }
               }
             });
-            break;
+          goods = goods['cl']['goods'];
+          if (goods && goods.length > 0) {
+            for (var i = 0; i < goods.length; i++) {
+              var item = goods[i];
+              item.stock = item.stock * 1 + count * 1;
+              item.total_yuan = item.stock * item.unit_yuan;
+              var goodsId = item._id + '';
+              delete item._id;
+              yield Mongo.request({
+                db: 'cl',
+                collection: 'goods',
+                id: goodsId,
+                request: {
+                  method: 'put',
+                  json: item
+                }
+              });
+              break;
+            }
           }
         }
-      }
-      var data =
-        yield Mongo.request({
-          db: db,
-          collection: collection,
-          id: id,
-          request: {
-            method: this.method
-          }
-        });
-      yield emitEvent.call(this, db, collection, 'after', 'remove', id);
-      this.result = {
-        code: 200,
-        result: data
-      };
+        var data =
+          yield Mongo.request({
+            db: db,
+            collection: collection,
+            id: id,
+            request: {
+              method: this.method
+            }
+          });
+        yield emitEvent.call(this, db, collection, 'after', 'remove', id);
 
-      // 判断是否需要清空 redis 缓存
-      if (collection === app.config.mongo.collections.privilege) {
-        co(function*() {
-          var key = serializeKeyByQuery(db, collection, {
-            db: originData.db,
-            collection: originData.collection
-          });
-          var result = yield thunkify(client.del.bind(client))(key);
-        })();
+        // 判断是否需要清空 redis 缓存
+        if (collection === app.config.mongo.collections.privilege) {
+          co(function*() {
+            var key = serializeKeyByQuery(db, collection, {
+              db: originData.db,
+              collection: originData.collection
+            });
+            var result = yield thunkify(client.del.bind(client))(key);
+          })();
+        }
+        if (db === app.config.mongo.defaultDB && collection === app.config.mongo.collections.user) {
+          co(function*() {
+            var key = serializeKeyByQuery(db, collection, {
+              uid: originData.uid
+            });
+            yield thunkify(client.del.bind(client))(key);
+          })();
+        }
+      } catch (e) {
+        this.result = {
+          code: 500,
+          message: e.message
+        }
+        logger.error(e.stack);
+        return;
       }
-      if (db === app.config.mongo.defaultDB && collection === app.config.mongo.collections.user) {
-        co(function*() {
-          var key = serializeKeyByQuery(db, collection, {
-            uid: originData.uid
-          });
-          yield thunkify(client.del.bind(client))(key);
-        })();
-      }
-    } catch (e) {
-      this.result = {
-        code: 500,
-        message: e.message
-      }
-      logger.error(e.stack);
     }
+    this.result = {
+      code: 200,
+      result: data
+    };
   });
 
   function writeStream(stream, buffer) {
