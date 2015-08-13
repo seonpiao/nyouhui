@@ -283,8 +283,8 @@ module.exports = function(app) {
       return;
     }
     var query = this.request.query;
-    yield emitEvent.call(this, db, collection, 'before', 'find', query);
     try {
+      yield emitEvent.call(this, db, collection, 'before', 'find', query);
       var result = yield getCollectionData.call(this);
       var data = result.data[db][collection];
       yield emitEvent.call(this, db, collection, 'after', 'find', data);
@@ -315,8 +315,8 @@ module.exports = function(app) {
       return;
     }
     var body = this.request.body;
-    yield emitEvent.call(this, db, collection, 'before', 'insert', body);
     try {
+      yield emitEvent.call(this, db, collection, 'before', 'insert', body);
       if (db === 'cl' && collection === 'sells') {
 
       }
@@ -385,8 +385,8 @@ module.exports = function(app) {
     }
     var id = this.request.params.id;
     var newData = this.request.body;
-    yield emitEvent.call(this, db, collection, 'before', 'update', newData);
     try {
+      yield emitEvent.call(this, db, collection, 'before', 'update', newData);
       var saveData = {};
       var originData =
         yield Mongo.request({
@@ -559,8 +559,8 @@ module.exports = function(app) {
       return;
     }
     var id = this.request.params.id;
-    yield emitEvent.call(this, db, collection, 'before', 'remove', id);
     try {
+      yield emitEvent.call(this, db, collection, 'before', 'remove', id);
       var originData =
         yield Mongo.request({
           db: db,

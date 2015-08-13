@@ -147,6 +147,8 @@ function isGeneratorFunction(obj) {
   return obj && obj.constructor && 'GeneratorFunction' == obj.constructor.name;
 }
 
+global.apps = {};
+
 co(function*() {
   var allConfig = {};
   var allConfigFile = path.join(APP_PATH, 'config.js');
@@ -159,6 +161,7 @@ co(function*() {
     var appName = apps[i];
     var app = koa();
     app.name = appName;
+    global.apps[appName] = app;
     var appPath = path.join(APP_PATH, appName);
     var appConfigFile = path.join(appPath, 'config.js');
     var appConfig = {};
