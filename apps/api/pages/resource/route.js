@@ -36,10 +36,10 @@ module.exports = function(app) {
       var overwrite = parts.field.overwrite;
       var filename = part.filename;
       var dir = parts.field.dir || '';
+      var uid = yield checkLogin.call(this, token);
       parts.field.dir = path.join(dir, uid);
       var relPath = path.join(dir, uid, filename);
       var result = yield uploader.call(this, part, parts.field);
-      var uid = yield checkLogin.call(this, token);
       if (!uid) return;
       if (app.config.resource.collection) {
         if (overwrite !== '1') {
