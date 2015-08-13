@@ -10,8 +10,8 @@ module.exports = function(app) {
 
   global.manage = {};
 
-  app.keys = ['firstre'];
-  app.jwt_secret = 'jwt_secret_firstre';
+  app.keys = [app.config.name];
+  app.jwt_secret = 'jwt_secret_' + app.config.name;
 
 
   app.Middlewares = [session({

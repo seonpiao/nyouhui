@@ -109,8 +109,7 @@ module.exports = function(app) {
     }
   });
   route.nested('/get').get(function*(next) {
-    var token = this.request.query.token;
-    var uid = yield checkLogin.call(this, token);
+    var uid = yield checkLogin.call(this);
     if (!uid) {
       this.json = true;
       return;

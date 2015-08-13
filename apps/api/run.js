@@ -4,8 +4,8 @@ var redisStore = require('koa-redis');
 
 module.exports = function(app, config) {
 
-  app.keys = ['firstre'];
-  app.jwt_secret = 'jwt_secret_firstre';
+  app.keys = [app.config.name];
+  app.jwt_secret = 'jwt_secret_' + app.config.name;
 
   app.Errors = {
     //通用错误

@@ -4,6 +4,7 @@ var jwt = require('jsonwebtoken');
 var captchapng = require('captchapng');
 var tokenGenerator = require('random-token');
 var crypto = require('crypto');
+var redis = require("redis");
 
 var sha1 = function(str) {
   var shasum = crypto.createHash('sha1');
@@ -11,7 +12,20 @@ var sha1 = function(str) {
   return shasum.digest('hex')
 }
 
+
 module.exports = function(app) {
+
+  var client = redis.createClient(app.config.redis.port, app.config.redis.host);
+
+  var createSession = function*(uid) {
+    var token = jwt.sign({
+      uid: uid
+    }, app.jwt_secret);
+    yield thunkify(client.set.bind(client))('app_session_' + uid, token);
+    //设置一个月的有效期
+    yield thunkify(client.expire.bind(client))('app_session_' + uid, 60 * 60 * 24 * 30);
+    return token;
+  };
 
   var auth = function*(username, password) {
     if (username === 'root' && password === app.config.root.password) {
@@ -49,7 +63,11 @@ module.exports = function(app) {
     var result =
       yield auth(username, password);
     if (result) {
+      var token = yield createSession(username);
       this.session.username = username;
+      this.cookies.set('token', token, {
+        signed: true
+      });
       this.redirect(this.session.redirectUrl || '/');
     } else {
       this.redirect('/login');
