@@ -37,10 +37,10 @@ module.exports = function(app) {
       var filename = part.filename;
       var dir = parts.field.dir || '';
       parts.field.dir = path.join(dir, uid);
-      var relPath = path.join(dir, filename);
-      if (app.config.upload.collection && overwrite !== '1') {
+      var relPath = path.join(dir, uid, filename);
+      if (app.config.resource.collection && overwrite !== '1') {
         var resourceCount = yield Mongo.exec({
-          collection: app.config.upload.collection
+          collection: app.config.resource.collection
         }, 'count', {
           path: relPath,
           owner: uid
@@ -51,7 +51,7 @@ module.exports = function(app) {
         }
       }
       var result = yield uploader.call(this, part, parts.field);
-      if (app.config.upload.collection) {
+      if (app.config.resource.collection) {
         result.owner = uid;
         result.type_id = typeMap[result.type] || 0;
         if (helpId) {
@@ -64,7 +64,7 @@ module.exports = function(app) {
           hosts: app.config.mongo.hosts.split(','),
           db: app.config.mongo.defaultDB
         });
-        var collection = db.collection(app.config.upload.collection);
+        var collection = db.collection(app.config.resource.collection);
         var inserted = yield thunkify(collection.insert.bind(collection))(result, {
           fullResult: true
         });
@@ -117,10 +117,10 @@ module.exports = function(app) {
     }
     var resourceId = this.request.query.resource_id;
     var resource = yield Mongo.request({
-      collection: app.config.upload.collection,
+      collection: app.config.resource.collection,
       id: resourceId
     });
-    resource = resource[app.config.mongo.defaultDB][app.config.upload.collection];
+    resource = resource[app.config.mongo.defaultDB][app.config.resource.collection];
     if (resource) {
       var mimeType = mime.lookup(resource.type);
       if (mimeType && mimeType.match(/^image\//)) {

@@ -76,7 +76,7 @@ var exec = function(task, done) {
     done(null, task.flow.__context.data);
   });
   task.flow.on('error', function(e) {
-    done(e);
+    done(e.data);
   });
   task.flow.begin(task.beginData);
   task.steps.forEach(function(step) {
@@ -125,29 +125,22 @@ module.exports = function(app) {
           extend(beginData, JSON.parse(data.data));
         } catch (e) {}
         beginData.mongo = app.config.mongo;
-        try {
-          steps.forEach(function(step) {
-            flow.addStep(step.id, step);
-          });
-          var task = {
-            username: username,
-            id: taskid,
-            name: data.name,
-            flow: flow,
-            steps: steps,
-            beginData: beginData
-          };
-          if (sync) {
-            return yield thunkify(exec)(task);
-          } else {
-            enqueue.call(this, task);
-            dequeue.call(this, username);
-          }
-        } catch (e) {
-          logger.error(e.stack);
-          throw {
-            code: 500
-          };
+        steps.forEach(function(step) {
+          flow.addStep(step.id, step);
+        });
+        var task = {
+          username: username,
+          id: taskid,
+          name: data.name,
+          flow: flow,
+          steps: steps,
+          beginData: beginData
+        };
+        if (sync) {
+          return yield thunkify(exec)(task);
+        } else {
+          enqueue.call(this, task);
+          dequeue.call(this, username);
         }
       }
     }

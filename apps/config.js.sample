@@ -29,7 +29,8 @@ var config = {
   resource: {
     host: 'localhost',
     path: '/data/resource/',
-    user: 'root'
+    user: 'root',
+    collection: 'resource'
   },
   upload: {
     host: 'static.test.bylh.tv',
@@ -42,12 +43,7 @@ var config = {
   },
   apps: {
     api: {
-      port: 9002,
-      upload: {
-        host: 'static.test.bylh.tv',
-        path: '/usr/share/nginx/html/',
-        collection: 'resource'
-      }
+      port: 9002
     },
     m: {
       name: '北京马拉松',

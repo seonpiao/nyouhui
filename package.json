@@ -8,6 +8,7 @@
     "carrier-firstre-push": "~0.0.1",
     "carrier-mongo": "~0.0.2",
     "carrier-sensitive-word": "~0.0.1",
+    "carrier-shellize": "~0.0.1",
     "carrier-verify-password": "~0.0.1",
     "co": "3.1.0",
     "co-busboy": "^1.0.2",
