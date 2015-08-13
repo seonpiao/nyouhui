@@ -39,14 +39,13 @@ module.exports = function(app) {
       //因此，需要先判断用户是否登录，然后读完整个文件流，再return
       var uid = yield checkLogin.call(this, token);
       if (!uid) {
-        isLogin = false;
-        uid = 'nobody';
+        part.pip(fs.createWriteStream('/dev/null'));
+        return;
       };
       parts.field.dir = path.join(dir, uid);
       var relPath = path.join(dir, uid, filename);
       //这里会读取文件流，要等这里执行完，才能return
       var result = yield uploader.call(this, part, parts.field);
-      if (!isLogin) return;
       if (app.config.resource.collection) {
         if (overwrite !== '1') {
           var resourceCount = yield Mongo.exec({
