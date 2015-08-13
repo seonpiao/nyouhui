@@ -70,7 +70,7 @@ script#template-download(type='text/x-tmpl').
   </tr>
   {% } %}
 mixin manage_ctrl_fileuploader(options)
-  .form-group(data-module="manage_ctrl_fileuploader",data-form-control="fileuploader",data-name=options.name,data-max=options.max)
+  .form-group(data-module="manage_ctrl_fileuploader",data-form-control="fileuploader",data-name=options.name,data-max=options.max,data-keepname=options.keepname)
     if options.label
       label= options.label
     if options.editable === 'required'

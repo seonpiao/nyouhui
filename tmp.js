@@ -8,8 +8,8 @@ var formData = {
 };
 
 request.post({
-  // url: 'http://local.nyouhui.com:9002/resource/upload',
-  url: 'http://api.test.bylh.tv/resource/upload',
+  url: 'http://local.nyouhui.com:9002/resource/upload',
+  // url: 'http://api.test.bylh.tv/resource/upload',
   formData: formData
 }, function(err, res, body) {
   console.log(err || body)
